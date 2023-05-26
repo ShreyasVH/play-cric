@@ -25,6 +25,7 @@ public class CountryRepository {
 
     public List<Country> getAll(int page, int limit) {
         return DB.find(Country.class)
+            .orderBy("name asc")
             .setFirstRow((page - 1) * limit)
             .setMaxRows(limit)
             .findList();
