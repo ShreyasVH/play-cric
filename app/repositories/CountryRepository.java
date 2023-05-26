@@ -19,6 +19,10 @@ public class CountryRepository {
         return DB.find(Country.class).where().eq("id", id).findOne();
     }
 
+    public List<Country> getByIds(List<Long> id) {
+        return DB.find(Country.class).where().in("id", id).findList();
+    }
+
     public Country getByName(String name) {
         return DB.find(Country.class).where().eq("name", name).findOne();
     }

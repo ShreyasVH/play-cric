@@ -13,9 +13,9 @@ public class StadiumResponse {
 	private String name;
 	private String city;
     private String state;
-    private Country country;
+    private CountryResponse country;
 
-	public StadiumResponse(Stadium stadium, Country country) {
+	public StadiumResponse(Stadium stadium, CountryResponse country) {
 		this.id = stadium.getId();
 		this.name = stadium.getName();
 		this.city = stadium.getCity();

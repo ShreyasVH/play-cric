@@ -27,4 +27,12 @@ public class StadiumService {
 
 		return stadiumRepository.create(createRequest);
 	}
+
+	public List<Stadium> getAll(int page, int limit) {
+		return stadiumRepository.getAll(page, limit);
+	}
+
+	public int getTotalCount() {
+		return stadiumRepository.getTotalCount();
+	}
 }

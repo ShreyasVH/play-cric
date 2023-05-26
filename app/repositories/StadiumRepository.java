@@ -18,4 +18,16 @@ public class StadiumRepository {
     public Stadium getByNameAndCountryId(String name, Long countryId) {
         return DB.find(Stadium.class).where().eq("name", name).eq("countryId", countryId).findOne();
     }
+
+    public List<Stadium> getAll(int page, int limit) {
+        return DB.find(Stadium.class)
+                .orderBy("name asc")
+                .setFirstRow((page - 1) * limit)
+                .setMaxRows(limit)
+                .findList();
+    }
+
+    public int getTotalCount() {
+        return DB.find(Stadium.class).findCount();
+    }
 }

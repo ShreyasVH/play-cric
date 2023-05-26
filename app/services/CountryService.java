@@ -32,6 +32,10 @@ public class CountryService {
 		return countryRepository.getById(id);
 	}
 
+	public List<Country> getByIds(List<Long> ids) {
+		return countryRepository.getByIds(ids);
+	}
+
 	public List<Country> searchByName(String name) {
 		return countryRepository.getByNamePattern(name);
 	}
