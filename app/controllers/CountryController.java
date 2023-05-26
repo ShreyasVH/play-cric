@@ -39,7 +39,10 @@ public class CountryController extends Controller {
 
 	public Result getAll(int page, int limit) {
 		List<Country> countries = countryService.getAll(page, limit);
-		int totalCount = countryService.getTotalCount();
+		int totalCount = 0;
+		if(page == 1) {
+			totalCount = countryService.getTotalCount();
+		}
 		List<CountryResponse> countryResponses = countries.stream().map(country -> new CountryResponse(country)).collect(Collectors.toList());
 		PaginatedResponse<CountryResponse> paginatedResponse = new PaginatedResponse(totalCount, countryResponses, page, limit);
 		return ok(Json.toJson(new Response(paginatedResponse)));
