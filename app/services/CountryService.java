@@ -28,6 +28,10 @@ public class CountryService {
 		return countryRepository.create(createRequest);
 	}
 
+	public Country getById(Long id) {
+		return countryRepository.getById(id);
+	}
+
 	public List<Country> searchByName(String name) {
 		return countryRepository.getByNamePattern(name);
 	}
