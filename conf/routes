@@ -1,0 +1,7 @@
+POST   	/cric/v1/countries				com.playframework.cric.controllers.CountryController.create(request: Request)
+GET	   	/cric/v1/countries/name/:name	com.playframework.cric.controllers.CountryController.searchByName(name: String)
+GET		/cric/v1/countries				com.playframework.cric.controllers.CountryController.getAll(page: Integer, limit: Integer)
+
+GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
+
+GET /swagger-ui/*file        controllers.Assets.at(path="/public/swagger-ui", file)
