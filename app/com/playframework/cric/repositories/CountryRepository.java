@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.playframework.cric.models.Country;
 import com.playframework.cric.requests.countries.CreateRequest;
-import com.playframework.cric.exceptions.BadRequestException;
 import com.playframework.cric.utils.Utils;
 
 public class CountryRepository {

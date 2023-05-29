@@ -4,7 +4,6 @@ import lombok.NoArgsConstructor;
 import lombok.Data;
 
 import com.playframework.cric.models.Stadium;
-import com.playframework.cric.models.Country;
 
 @Data
 @NoArgsConstructor

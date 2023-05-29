@@ -1,4 +1,4 @@
-name := "play-error-handling"
+name := "play-cric"
 
 version := "1.0.0"
 
