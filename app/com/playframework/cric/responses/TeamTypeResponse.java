@@ -8,7 +8,7 @@ import com.playframework.cric.models.TeamType;
 @Data
 @NoArgsConstructor
 public class TeamTypeResponse {
-    private Long id;
+    private Integer id;
     private String name;
 
     public TeamTypeResponse(TeamType teamType) {

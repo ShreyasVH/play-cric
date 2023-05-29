@@ -6,6 +6,7 @@ POST   	/cric/v1/stadiums				com.playframework.cric.controllers.StadiumControlle
 GET		/cric/v1/stadiums				com.playframework.cric.controllers.StadiumController.getAll(page: Integer, limit: Integer)
 
 POST   	/cric/v1/teams				    com.playframework.cric.controllers.TeamController.create(request: Request)
+GET		/cric/v1/teams				    com.playframework.cric.controllers.TeamController.getAll(page: Integer, limit: Integer)
 
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 

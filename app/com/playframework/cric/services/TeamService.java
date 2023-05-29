@@ -3,6 +3,7 @@ package com.playframework.cric.services;
 import com.google.inject.Inject;
 import java.util.List;
 
+import com.playframework.cric.models.Stadium;
 import com.playframework.cric.repositories.TeamRepository;
 import com.playframework.cric.repositories.TeamTypeRepository;
 import com.playframework.cric.requests.teams.CreateRequest;
@@ -28,5 +29,13 @@ public class TeamService {
         }
 
         return teamRepository.create(createRequest);
+    }
+
+    public List<Team> getAll(int page, int limit) {
+        return teamRepository.getAll(page, limit);
+    }
+
+    public int getTotalCount() {
+        return teamRepository.getTotalCount();
     }
 }

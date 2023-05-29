@@ -18,4 +18,8 @@ public class TeamTypeService {
     public TeamType getById(Integer id) {
         return teamTypeRepository.getById(id);
     }
+
+    public List<TeamType> getByIds(List<Integer> ids) {
+        return teamTypeRepository.getByIds(ids);
+    }
 }
