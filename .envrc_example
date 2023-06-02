@@ -11,3 +11,4 @@ export MYSQL_USER=
 export MYSQL_PASSWORD=
 
 export PORT=
+export DEBUG_PORT=

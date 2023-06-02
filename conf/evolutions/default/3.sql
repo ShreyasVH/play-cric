@@ -13,7 +13,7 @@ INSERT INTO `team_types` (`name`) VALUES
     ('Franchise');
 
 CREATE TABLE `teams` (
-    `id`                            int unsigned AUTO_INCREMENT NOT NULL,
+    `id`                            bigint unsigned AUTO_INCREMENT NOT NULL,
     `name`                          varchar(100) NOT NULL,
     `country_id`                    bigint unsigned NOT NULL,
     `type_id`                       tinyint unsigned NOT NULL,

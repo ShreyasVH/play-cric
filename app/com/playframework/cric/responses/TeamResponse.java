@@ -11,12 +11,12 @@ public class TeamResponse {
     private Long id;
     private String name;
     private CountryResponse country;
-    private TeamTypeResponse teamType;
+    private TeamTypeResponse type;
 
     public TeamResponse(Team team, CountryResponse country, TeamTypeResponse teamType) {
         this.id = team.getId();
         this.name = team.getName();
         this.country = country;
-        this.teamType = teamType;
+        this.type = teamType;
     }
 }
