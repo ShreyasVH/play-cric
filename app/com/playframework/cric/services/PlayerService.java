@@ -1,6 +1,7 @@
 package com.playframework.cric.services;
 
 import com.google.inject.Inject;
+import java.util.List;
 
 import com.playframework.cric.exceptions.ConflictException;
 import com.playframework.cric.models.Player;
@@ -25,5 +26,13 @@ public class PlayerService {
         }
 
         return playerRepository.create(createRequest);
+    }
+
+    public List<Player> getAll(int page, int limit) {
+        return playerRepository.getAll(page, limit);
+    }
+
+    public int getTotalCount() {
+        return playerRepository.getTotalCount();
     }
 }
