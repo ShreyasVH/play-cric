@@ -10,6 +10,8 @@ GET		/cric/v1/teams				    com.playframework.cric.controllers.TeamController.get
 
 POST   	/cric/v1/tours				    com.playframework.cric.controllers.TourController.create(request: Request)
 
+POST   	/cric/v1/players				com.playframework.cric.controllers.PlayerController.create(request: Request)
+
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 
 GET /swagger-ui/*file        controllers.Assets.at(path="/public/swagger-ui", file)
