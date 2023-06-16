@@ -26,4 +26,12 @@ public class SeriesService {
 
         return seriesRepository.create(createRequest);
     }
+
+    public List<Series> getAll(int page, int limit) {
+        return seriesRepository.getAll(page, limit);
+    }
+
+    public int getTotalCount() {
+        return seriesRepository.getTotalCount();
+    }
 }

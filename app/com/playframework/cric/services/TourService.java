@@ -7,6 +7,8 @@ import com.playframework.cric.requests.tours.CreateRequest;
 import com.playframework.cric.models.Tour;
 import com.playframework.cric.exceptions.ConflictException;
 
+import java.util.List;
+
 public class TourService {
     private final TourRepository tourRepository;
 
@@ -29,5 +31,9 @@ public class TourService {
 
     public Tour getById(Long id) {
         return tourRepository.getById(id);
+    }
+
+    public List<Tour> getByIds(List<Long> ids) {
+        return tourRepository.getByIds(ids);
     }
 }

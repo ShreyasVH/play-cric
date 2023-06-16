@@ -16,6 +16,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -100,5 +101,63 @@ public class SeriesController extends Controller {
         List<TeamResponse> teamResponses = teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
 
         return created(Json.toJson(new Response(new SeriesResponse(series, new CountryResponse(country), new TourResponse(tour), new SeriesTypeResponse(seriesType), new GameTypeResponse(gameType), teamResponses))));
+    }
+
+    public Result getAll(int page, int limit) {
+        List<Series> seriesList = seriesService.getAll(page, limit);
+        int totalCount = 0;
+        if(page == 1) {
+            totalCount = seriesService.getTotalCount();
+        }
+
+        List<Long> countryIds = new ArrayList<>();
+        List<Integer> seriesTypeIds = new ArrayList<>();
+        List<Integer> gameTypeIds = new ArrayList<>();
+        List<Long> tourIds = new ArrayList<>();
+        List<Long> seriesIds = new ArrayList<>();
+
+        for (Series series: seriesList) {
+            countryIds.add(series.getHomeCountryId());
+            seriesTypeIds.add(series.getTypeId());
+            gameTypeIds.add(series.getGameTypeId());
+            tourIds.add(series.getTourId());
+            seriesIds.add(series.getId());
+        }
+
+
+
+        List<SeriesType> seriesTypes = seriesTypeService.getByIds(seriesTypeIds);
+        Map<Integer, SeriesType> seriesTypeMap = seriesTypes.stream().collect(Collectors.toMap(SeriesType::getId, seriesType -> seriesType));
+
+        List<GameType> gameTypes = gameTypeService.getByIds(gameTypeIds);
+        Map<Integer, GameType> gameTypeMap = gameTypes.stream().collect(Collectors.toMap(GameType::getId, gameType -> gameType));
+
+        List<SeriesTeamsMap> seriesTeamsMaps = seriesTeamsMapService.getBySeriesIds(seriesIds);
+        List<Long> teamIds = seriesTeamsMaps.stream().map(SeriesTeamsMap::getTeamId).collect(Collectors.toList());
+
+        List<Team> teams = teamService.getByIds(teamIds);
+
+        List<Integer> teamTypeIds = new ArrayList<>();
+        Map<Long, Team> teamMap = new HashMap<>();
+        for (Team team: teams) {
+            teamTypeIds.add(team.getTypeId());
+            countryIds.add(team.getCountryId());
+            teamMap.put(team.getId(), team);
+        }
+
+        List<Country> countries = countryService.getByIds(countryIds);
+        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
+
+        List<TeamType> teamTypes = teamTypeService.getByIds(teamTypeIds);
+        Map<Integer, TeamType> teamTypeMap = teamTypes.stream().collect(Collectors.toMap(TeamType::getId, teamType -> teamType));
+
+        List<Tour> tours = tourService.getByIds(tourIds);
+        Map<Long, Tour> tourMap = tours.stream().collect(Collectors.toMap(Tour::getId, tour -> tour));
+
+        List<TeamResponse> teamResponses = teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
+
+        List<SeriesResponse> seriesResponses = seriesList.stream().map(series -> new SeriesResponse(series, new CountryResponse(countryMap.get(series.getHomeCountryId())), new TourResponse(tourMap.get(series.getTourId())), new SeriesTypeResponse(seriesTypeMap.get(series.getTypeId())), new GameTypeResponse(gameTypeMap.get(series.getGameTypeId())), teamResponses)).collect(Collectors.toList());
+        PaginatedResponse<SeriesResponse> paginatedResponse = new PaginatedResponse<>(totalCount, seriesResponses, page, limit);
+        return ok(Json.toJson(new Response(paginatedResponse)));
     }
 }

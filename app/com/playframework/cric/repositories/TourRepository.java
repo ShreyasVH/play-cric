@@ -3,6 +3,7 @@ package com.playframework.cric.repositories;
 import io.ebean.DB;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.playframework.cric.models.Tour;
 import com.playframework.cric.requests.tours.CreateRequest;
@@ -21,5 +22,9 @@ public class TourRepository {
 
     public Tour getById(Long id) {
         return DB.find(Tour.class).where().eq("id", id).findOne();
+    }
+
+    public List<Tour> getByIds(List<Long> ids) {
+        return DB.find(Tour.class).where().in("id", ids).findList();
     }
 }

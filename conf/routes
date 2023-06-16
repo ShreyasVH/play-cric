@@ -14,6 +14,7 @@ POST   	/cric/v1/players				com.playframework.cric.controllers.PlayerController.
 GET		/cric/v1/players				com.playframework.cric.controllers.PlayerController.getAll(page: Integer, limit: Integer)
 
 POST   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.create(request: Request)
+GET   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.getAll(page: Integer, limit: Integer)
 
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 

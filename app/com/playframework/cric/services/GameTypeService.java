@@ -18,4 +18,8 @@ public class GameTypeService {
     public GameType getById(Integer id) {
         return gameTypeRepository.getById(id);
     }
+
+    public List<GameType> getByIds(List<Integer> ids) {
+        return gameTypeRepository.getByIds(ids);
+    }
 }
