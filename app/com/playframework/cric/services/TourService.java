@@ -26,4 +26,8 @@ public class TourService {
 
         return tourRepository.create(createRequest);
     }
+
+    public Tour getById(Long id) {
+        return tourRepository.getById(id);
+    }
 }

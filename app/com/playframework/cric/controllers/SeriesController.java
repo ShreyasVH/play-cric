@@ -1,0 +1,104 @@
+package com.playframework.cric.controllers;
+
+import com.google.inject.Inject;
+import com.playframework.cric.exceptions.NotFoundException;
+import com.playframework.cric.models.*;
+import com.playframework.cric.requests.series.CreateRequest;
+import com.playframework.cric.responses.*;
+import com.playframework.cric.services.*;
+import com.playframework.cric.utils.Utils;
+import io.ebean.DB;
+import io.ebean.Ebean;
+import io.ebean.Transaction;
+import play.libs.Json;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class SeriesController extends Controller {
+    private final SeriesService seriesService;
+    private final CountryService countryService;
+    private final SeriesTypeService seriesTypeService;
+    private final GameTypeService gameTypeService;
+    private final TourService tourService;
+    private final TeamService teamService;
+    private final TeamTypeService teamTypeService;
+    private final SeriesTeamsMapService seriesTeamsMapService;
+
+    @Inject
+    public SeriesController (SeriesService seriesService, CountryService countryService, TourService tourService, SeriesTypeService seriesTypeService, GameTypeService gameTypeService, TeamService teamService, TeamTypeService teamTypeService, SeriesTeamsMapService seriesTeamsMapService) {
+        this.seriesService = seriesService;
+        this.countryService = countryService;
+        this.tourService = tourService;
+        this.seriesTypeService = seriesTypeService;
+        this.gameTypeService = gameTypeService;
+        this.teamService = teamService;
+        this.teamTypeService = teamTypeService;
+        this.seriesTeamsMapService = seriesTeamsMapService;
+    }
+
+    public Result create(Http.Request request) {
+        CreateRequest createRequest = Utils.convertObject(request.body().asJson(), CreateRequest.class);
+
+        List<Team> teams = teamService.getByIds(createRequest.getTeams());
+        if(teams.size() != createRequest.getTeams().stream().distinct().count()) {
+            throw new NotFoundException("Team");
+        }
+
+        List<Integer> teamTypeIds = new ArrayList<>();
+        List<Long> countryIds = new ArrayList<>();
+        for(Team team: teams) {
+            teamTypeIds.add(team.getTypeId());
+            countryIds.add(team.getCountryId());
+        }
+
+        countryIds.add(createRequest.getHomeCountryId());
+        List<Country> countries = countryService.getByIds(countryIds);
+        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
+
+        Country country = countryMap.get(createRequest.getHomeCountryId());
+        if(null == country) {
+            throw new NotFoundException("Home country");
+        }
+
+        Tour tour = tourService.getById(createRequest.getTourId());
+        if(null == tour) {
+            throw new NotFoundException("Tour");
+        }
+
+        SeriesType seriesType = seriesTypeService.getById(createRequest.getTypeId());
+        if(null == seriesType) {
+            throw new NotFoundException("Type");
+        }
+
+        GameType gameType = gameTypeService.getById(createRequest.getGameTypeId());
+        if(null == gameType) {
+            throw new NotFoundException("Game type");
+        }
+
+        Transaction transaction = DB.beginTransaction();
+        Series series;
+        try {
+            series = seriesService.create(createRequest);
+            seriesTeamsMapService.create(series.getId(), createRequest.getTeams());
+
+            transaction.commit();
+            transaction.end();
+        } catch (Exception ex) {
+            transaction.end();
+            throw ex;
+        }
+
+        List<TeamType> teamTypes = teamTypeService.getByIds(teamTypeIds);
+        Map<Integer, TeamType> teamTypeMap = teamTypes.stream().collect(Collectors.toMap(TeamType::getId, teamType -> teamType));
+
+        List<TeamResponse> teamResponses = teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
+
+        return created(Json.toJson(new Response(new SeriesResponse(series, new CountryResponse(country), new TourResponse(tour), new SeriesTypeResponse(seriesType), new GameTypeResponse(gameType), teamResponses))));
+    }
+}

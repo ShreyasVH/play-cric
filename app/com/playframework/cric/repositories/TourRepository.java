@@ -18,4 +18,8 @@ public class TourRepository {
     public Tour getByNameAndStartTime(String name, LocalDateTime startTime) {
         return DB.find(Tour.class).where().eq("name", name).eq("startTime", startTime).findOne();
     }
+
+    public Tour getById(Long id) {
+        return DB.find(Tour.class).where().eq("id", id).findOne();
+    }
 }

@@ -13,6 +13,8 @@ POST   	/cric/v1/tours				    com.playframework.cric.controllers.TourController.
 POST   	/cric/v1/players				com.playframework.cric.controllers.PlayerController.create(request: Request)
 GET		/cric/v1/players				com.playframework.cric.controllers.PlayerController.getAll(page: Integer, limit: Integer)
 
+POST   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.create(request: Request)
+
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 
 GET /swagger-ui/*file        controllers.Assets.at(path="/public/swagger-ui", file)
