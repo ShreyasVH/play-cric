@@ -7,6 +7,7 @@ import com.playframework.cric.models.Series;
 import com.playframework.cric.repositories.SeriesRepository;
 import com.playframework.cric.requests.series.CreateRequest;
 import com.playframework.cric.exceptions.ConflictException;
+import com.playframework.cric.requests.series.UpdateRequest;
 
 public class SeriesService {
     private final SeriesRepository seriesRepository;
@@ -33,5 +34,48 @@ public class SeriesService {
 
     public int getTotalCount() {
         return seriesRepository.getTotalCount();
+    }
+
+    public Series getById(Long id) {
+        return seriesRepository.getById(id);
+    }
+
+    public Series update(Series existingSeries, UpdateRequest updateRequest) {
+        boolean isUpdateRequired = false;
+        if (null != updateRequest.getName() && !updateRequest.getName().equals(existingSeries.getName())) {
+            isUpdateRequired = true;
+            existingSeries.setName(updateRequest.getName());
+        }
+
+        if (null != updateRequest.getHomeCountryId() && !updateRequest.getHomeCountryId().equals(existingSeries.getHomeCountryId())) {
+            isUpdateRequired = true;
+            existingSeries.setHomeCountryId(updateRequest.getHomeCountryId());
+        }
+
+        if (null != updateRequest.getTourId() && !updateRequest.getTourId().equals(existingSeries.getTourId())) {
+            isUpdateRequired = true;
+            existingSeries.setTourId(updateRequest.getTourId());
+        }
+
+        if (null != updateRequest.getTypeId() && !updateRequest.getTypeId().equals(existingSeries.getTypeId())) {
+            isUpdateRequired = true;
+            existingSeries.setTypeId(updateRequest.getTypeId());
+        }
+
+        if (null != updateRequest.getGameTypeId() && !updateRequest.getGameTypeId().equals(existingSeries.getGameTypeId())) {
+            isUpdateRequired = true;
+            existingSeries.setGameTypeId(updateRequest.getGameTypeId());
+        }
+
+        if (null != updateRequest.getStartTime() && !updateRequest.getStartTime().equals(existingSeries.getStartTime())) {
+            isUpdateRequired = true;
+            existingSeries.setStartTime(updateRequest.getStartTime());
+        }
+
+        if (isUpdateRequired) {
+            seriesRepository.update(existingSeries);
+        }
+
+        return existingSeries;
     }
 }

@@ -1,5 +1,6 @@
 package com.playframework.cric.repositories;
 
+import com.playframework.cric.requests.series.UpdateRequest;
 import io.ebean.DB;
 
 import com.playframework.cric.models.Series;
@@ -29,5 +30,13 @@ public class SeriesRepository {
 
     public int getTotalCount() {
         return DB.find(Series.class).findCount();
+    }
+
+    public Series getById(Long id) {
+        return DB.find(Series.class).where().eq("id", id).findOne();
+    }
+
+    public void update(Series series) {
+        DB.save(series);
     }
 }

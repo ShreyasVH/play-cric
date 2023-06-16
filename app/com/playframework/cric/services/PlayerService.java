@@ -35,4 +35,8 @@ public class PlayerService {
     public int getTotalCount() {
         return playerRepository.getTotalCount();
     }
+
+    public List<Player> getByIds(List<Long> ids) {
+        return playerRepository.getByIds(ids);
+    }
 }

@@ -52,7 +52,7 @@ CREATE TABLE `series_teams_map` (
     UNIQUE KEY `uk` (`series_id`,`team_id`),
     KEY `series` (`series_id`),
     KEY `teams` (`team_id`),
-    CONSTRAINT `fk_series_teams_map_series` FOREIGN KEY (`series_id`) REFERENCES `series_teams_map` (`id`) on DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT `fk_series_teams_map_series` FOREIGN KEY (`series_id`) REFERENCES `series` (`id`) on DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT `fk_series_teams_map_team` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) on DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

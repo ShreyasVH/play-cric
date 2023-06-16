@@ -26,8 +26,9 @@ public class SeriesResponse {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime startTime;
     private List<TeamResponse> teams;
+    private List<PlayerResponse> manOfTheSeriesList;
 
-    public SeriesResponse(Series series, CountryResponse country, TourResponse tour, SeriesTypeResponse seriesType, GameTypeResponse gameType, List<TeamResponse> teams) {
+    public SeriesResponse(Series series, CountryResponse country, TourResponse tour, SeriesTypeResponse seriesType, GameTypeResponse gameType, List<TeamResponse> teams, List<PlayerResponse> manOfTheSeriesList) {
         this.id = series.getId();
         this.name = series.getName();
         this.homeCountry = country;
@@ -36,5 +37,6 @@ public class SeriesResponse {
         this.gameType = gameType;
         this.startTime = series.getStartTime();
         this.teams = teams;
+        this.manOfTheSeriesList = manOfTheSeriesList;
     }
 }

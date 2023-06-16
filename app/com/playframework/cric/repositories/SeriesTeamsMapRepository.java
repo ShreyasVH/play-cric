@@ -18,4 +18,9 @@ public class SeriesTeamsMapRepository {
     public List<SeriesTeamsMap> getBySeriesIds(List<Long> seriesIds) {
         return DB.find(SeriesTeamsMap.class).where().in("seriesId", seriesIds).findList();
     }
+
+    public void delete(Long seriesId, List<Long> teamIds) {
+        List<SeriesTeamsMap> seriesTeamsMaps = DB.find(SeriesTeamsMap.class).where().eq("seriesId", seriesId).in("teamId", teamIds).findList();
+        DB.deleteAll(seriesTeamsMaps);
+    }
 }

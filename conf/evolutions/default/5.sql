@@ -1,7 +1,7 @@
 # --- !Ups
 
 CREATE TABLE `players` (
-   `id`                            int unsigned AUTO_INCREMENT NOT NULL,
+   `id`                            bigint unsigned AUTO_INCREMENT NOT NULL,
    `name`                          varchar(50) NOT NULL,
    `country_id`                    bigint unsigned NOT NULL,
    `date_of_birth`                 DATE NULL,

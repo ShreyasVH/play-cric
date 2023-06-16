@@ -1,0 +1,23 @@
+package com.playframework.cric.repositories;
+
+import com.playframework.cric.models.ManOfTheSeries;
+import io.ebean.DB;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class ManOfTheSeriesRepository {
+    public List<ManOfTheSeries> getBySeriesIds(List<Long> seriesIds) {
+        return DB.find(ManOfTheSeries.class).where().in("seriesId", seriesIds).findList();
+    }
+
+    public void add(Long seriesId, List<Long> playerIds) {
+        List<ManOfTheSeries> manOfTheSeriesList = playerIds.stream().map(playerId -> new ManOfTheSeries(null, seriesId, playerId)).collect(Collectors.toList());
+        DB.saveAll(manOfTheSeriesList);
+    }
+
+    public void delete(Long seriesId, List<Long> playerIds) {
+        List<ManOfTheSeries> manOfTheSeriesList = DB.find(ManOfTheSeries.class).where().eq("seriesId", seriesId).in("playerId", playerIds).findList();
+        DB.deleteAll(manOfTheSeriesList);
+    }
+}

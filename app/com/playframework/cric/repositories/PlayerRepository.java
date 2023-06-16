@@ -30,4 +30,8 @@ public class PlayerRepository {
     public int getTotalCount() {
         return DB.find(Player.class).findCount();
     }
+
+    public List<Player> getByIds(List<Long> ids) {
+        return DB.find(Player.class).where().in("id", ids).findList();
+    }
 }
