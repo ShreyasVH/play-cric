@@ -39,9 +39,12 @@ public class MatchController extends Controller {
     private final BowlingFigureService bowlingFigureService;
     private final ExtrasService extrasService;
     private final ExtrasTypeService extrasTypeService;
+    private final ManOfTheMatchService manOfTheMatchService;
+    private final CaptainService captainService;
+    private final WicketKeeperService wicketKeeperService;
 
     @Inject
-    public MatchController(MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, TourService tourService, SeriesTypeService seriesTypeService, GameTypeService gameTypeService, SeriesTeamsMapService seriesTeamsMapService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService)
+    public MatchController(MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, TourService tourService, SeriesTypeService seriesTypeService, GameTypeService gameTypeService, SeriesTeamsMapService seriesTeamsMapService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService)
     {
         this.matchService = matchService;
         this.seriesService = seriesService;
@@ -63,6 +66,9 @@ public class MatchController extends Controller {
         this.bowlingFigureService = bowlingFigureService;
         this.extrasService = extrasService;
         this.extrasTypeService = extrasTypeService;
+        this.manOfTheMatchService = manOfTheMatchService;
+        this.captainService = captainService;
+        this.wicketKeeperService = wicketKeeperService;
     }
 
     public Result create(Http.Request request)
@@ -246,6 +252,10 @@ public class MatchController extends Controller {
                 })
                 .collect(Collectors.toList());
 
+            manOfTheMatchService.add(createRequest.getManOfTheMatchList(), playerToMatchPlayerMap);
+            captainService.add(createRequest.getCaptains(), playerToMatchPlayerMap);
+            wicketKeeperService.add(createRequest.getWicketKeepers(), playerToMatchPlayerMap);
+
             transaction.commit();
             transaction.end();
         }
@@ -289,6 +299,6 @@ public class MatchController extends Controller {
             createRequest.getWicketKeepers()
         );
 
-        return ok(Json.toJson(new Response(matchResponse)));
+        return created(Json.toJson(new Response(matchResponse)));
     }
 }

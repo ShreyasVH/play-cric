@@ -27,4 +27,28 @@ public class TourRepository {
     public List<Tour> getByIds(List<Long> ids) {
         return DB.find(Tour.class).where().in("id", ids).findList();
     }
+
+    public List<Tour> getAll(int year, int page, int limit) {
+        LocalDateTime startTime = LocalDateTime.of(year, 1, 1, 0, 0, 0);
+        LocalDateTime endTime = startTime.plusYears(1L);
+
+        return DB.find(Tour.class)
+                .where()
+                .ge("startTime", startTime)
+                .le("startTime", endTime)
+                .orderBy("startTime asc")
+                .setFirstRow((page - 1) * limit)
+                .setMaxRows(limit)
+                .findList();
+    }
+
+    public int getTotalCountForYear(int year) {
+        LocalDateTime startTime = LocalDateTime.of(year, 1, 1, 0, 0, 0);
+        LocalDateTime endTime = startTime.plusYears(1L);
+        return DB.find(Tour.class)
+                .where()
+                .ge("startTime", startTime)
+                .le("startTime", endTime)
+                .findCount();
+    }
 }

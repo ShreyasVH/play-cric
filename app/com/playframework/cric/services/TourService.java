@@ -36,4 +36,14 @@ public class TourService {
     public List<Tour> getByIds(List<Long> ids) {
         return tourRepository.getByIds(ids);
     }
+
+    public List<Tour> getAllForYear(int year, int page, int limit)
+    {
+        return tourRepository.getAll(year, page, limit);
+    }
+
+    public int getTotalCountForYear(int year)
+    {
+        return tourRepository.getTotalCountForYear(year);
+    }
 }
