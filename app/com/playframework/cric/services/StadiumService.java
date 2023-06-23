@@ -35,4 +35,9 @@ public class StadiumService {
 	public int getTotalCount() {
 		return stadiumRepository.getTotalCount();
 	}
+
+	public Stadium getById(Long id)
+	{
+		return stadiumRepository.getById(id);
+	}
 }

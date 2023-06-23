@@ -29,4 +29,9 @@ public class StadiumRepository {
     public int getTotalCount() {
         return DB.find(Stadium.class).findCount();
     }
+
+    public Stadium getById(Long id)
+    {
+        return DB.find(Stadium.class).where().eq("id", id).findOne();
+    }
 }

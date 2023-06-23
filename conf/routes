@@ -17,6 +17,8 @@ POST   	/cric/v1/series				    com.playframework.cric.controllers.SeriesControll
 GET   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.getAll(page: Integer, limit: Integer)
 PUT   	/cric/v1/series/:id				    com.playframework.cric.controllers.SeriesController.update(id: Long, request: Request)
 
+POST   	/cric/v1/matches				com.playframework.cric.controllers.MatchController.create(request: Request)
+
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 
 GET /swagger-ui/*file        controllers.Assets.at(path="/public/swagger-ui", file)
