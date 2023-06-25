@@ -184,8 +184,8 @@ public class MatchController extends Controller {
                 BattingScore battingScoreFromDb = battingScoreMap.get(key);
 
                 DismissalModeResponse dismissalModeResponse = null;
-                List<PlayerResponse> fielders = new ArrayList<>();
-                PlayerResponse bowler = null;
+                List<PlayerMiniResponse> fielders = new ArrayList<>();
+                PlayerMiniResponse bowler = null;
 
                 if(null != battingScore.getDismissalModeId())
                 {
@@ -193,14 +193,14 @@ public class MatchController extends Controller {
                     if(null != battingScore.getBowlerId())
                     {
                         Player bowlerPlayer = playerMap.get(battingScore.getBowlerId());
-                        bowler = new PlayerResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId())));
+                        bowler = new PlayerMiniResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId())));
                     }
 
                     if(null != battingScore.getFielderIds())
                     {
                         fielders = battingScore.getFielderIds().stream().map(playerId -> {
                             Player fielderPlayer = playerMap.get(playerId);
-                            return new PlayerResponse(fielderPlayer, new CountryResponse(countryMap.get(fielderPlayer.getCountryId())));
+                            return new PlayerMiniResponse(fielderPlayer, new CountryResponse(countryMap.get(fielderPlayer.getCountryId())));
                         }).collect(Collectors.toList());
                         scoreFielderMap.put(battingScoreFromDb.getId(), battingScore.getFielderIds());
                     }
@@ -209,7 +209,7 @@ public class MatchController extends Controller {
 
                 return new BattingScoreResponse(
                     battingScoreFromDb,
-                    new PlayerResponse(batsmanPlayer, new CountryResponse(countryMap.get(batsmanPlayer.getCountryId()))),
+                    new PlayerMiniResponse(batsmanPlayer, new CountryResponse(countryMap.get(batsmanPlayer.getCountryId()))),
                     dismissalModeResponse,
                     bowler,
                     fielders
@@ -225,7 +225,7 @@ public class MatchController extends Controller {
 
                 Player bowlerPlayer = playerMap.get(bowlingFigureRequest.getPlayerId());
 
-                return new BowlingFigureResponse(bowlingFigure, new PlayerResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId()))));
+                return new BowlingFigureResponse(bowlingFigure, new PlayerMiniResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId()))));
             }).collect(Collectors.toList());
 
             List<ExtrasType> extrasTypes = extrasTypeService.getAll();
@@ -280,7 +280,7 @@ public class MatchController extends Controller {
                 new ArrayList<>()
         );
 
-        List<PlayerResponse> playerResponses = allPlayers.stream().map(player -> new PlayerResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+        List<PlayerMiniResponse> playerResponses = allPlayers.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
 
         MatchResponse matchResponse = new MatchResponse(
             match,

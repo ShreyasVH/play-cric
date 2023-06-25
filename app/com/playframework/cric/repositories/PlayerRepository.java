@@ -34,4 +34,9 @@ public class PlayerRepository {
     public List<Player> getByIds(List<Long> ids) {
         return DB.find(Player.class).where().in("id", ids).findList();
     }
+
+    public Player getById(Long id)
+    {
+        return DB.find(Player.class).where().eq("id", id).findOne();
+    }
 }

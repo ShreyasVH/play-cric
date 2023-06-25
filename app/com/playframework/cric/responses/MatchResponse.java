@@ -32,12 +32,12 @@ public class MatchResponse {
     private List<BattingScoreResponse> battingScores;
     private List<BowlingFigureResponse> bowlingFigures;
     private List<ExtrasResponse> extras;
-    private List<PlayerResponse> players;
-    private List<PlayerResponse> manOfTheMatchList;
-    private List<PlayerResponse> captains;
-    private List<PlayerResponse> wicketKeepers;
+    private List<PlayerMiniResponse> players;
+    private List<PlayerMiniResponse> manOfTheMatchList;
+    private List<PlayerMiniResponse> captains;
+    private List<PlayerMiniResponse> wicketKeepers;
 
-    public MatchResponse(Match match, SeriesResponse seriesResponse, TeamResponse team1, TeamResponse team2, ResultTypeResponse resultType, WinMarginTypeResponse winMarginType, StadiumResponse stadium, List<PlayerResponse> players, List<BattingScoreResponse> battingScores, List<BowlingFigureResponse> bowlingFigures, List<ExtrasResponse> extras, List<Long> manOfTheMatchPlayerIds, List<Long> captainIds, List<Long> wicketKeeperIds)
+    public MatchResponse(Match match, SeriesResponse seriesResponse, TeamResponse team1, TeamResponse team2, ResultTypeResponse resultType, WinMarginTypeResponse winMarginType, StadiumResponse stadium, List<PlayerMiniResponse> players, List<BattingScoreResponse> battingScores, List<BowlingFigureResponse> bowlingFigures, List<ExtrasResponse> extras, List<Long> manOfTheMatchPlayerIds, List<Long> captainIds, List<Long> wicketKeeperIds)
     {
         this.id = match.getId();
         this.series = seriesResponse;
@@ -65,7 +65,7 @@ public class MatchResponse {
         this.bowlingFigures = bowlingFigures;
         this.extras = extras;
         this.players = players;
-        Map<Long, PlayerResponse> playerMap = players.stream().collect(Collectors.toMap(PlayerResponse::getId, player -> player));
+        Map<Long, PlayerMiniResponse> playerMap = players.stream().collect(Collectors.toMap(PlayerMiniResponse::getId, player -> player));
         this.manOfTheMatchList = manOfTheMatchPlayerIds.stream().map(playerMap::get).collect(Collectors.toList());
         this.captains = captainIds.stream().map(playerMap::get).collect(Collectors.toList());
         this.wicketKeepers = wicketKeeperIds.stream().map(playerMap::get).collect(Collectors.toList());

@@ -21,4 +21,9 @@ public class BowlingFigureService {
     {
         return bowlingFigureRepository.add(bowlingFigureRequests, matchPlayerMap);
     }
+
+    public Map<String, Map<String, Integer>> getBasicBowlingStats(Long playerId)
+    {
+        return bowlingFigureRepository.getBasicBowlingStats(playerId);
+    }
 }

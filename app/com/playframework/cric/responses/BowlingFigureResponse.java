@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 public class BowlingFigureResponse
 {
     private Integer id;
-    private PlayerResponse player;
+    private PlayerMiniResponse player;
     private Integer balls;
     private Integer maidens;
     private Integer runs;
     private Integer wickets;
     private Integer innings;
 
-    public BowlingFigureResponse(BowlingFigure bowlingFigure, PlayerResponse player)
+    public BowlingFigureResponse(BowlingFigure bowlingFigure, PlayerMiniResponse player)
     {
         this.id = bowlingFigure.getId();
         this.player = player;

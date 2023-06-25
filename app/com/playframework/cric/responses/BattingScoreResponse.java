@@ -11,18 +11,18 @@ import java.util.List;
 public class BattingScoreResponse
 {
     private Integer id;
-    private PlayerResponse player;
+    private PlayerMiniResponse player;
     private Integer runs;
     private Integer balls;
     private Integer fours;
     private Integer sixes;
     private DismissalModeResponse dismissalMode;
-    private PlayerResponse bowler;
-    private List<PlayerResponse> fielders;
+    private PlayerMiniResponse bowler;
+    private List<PlayerMiniResponse> fielders;
     private Integer innings;
     private Integer number;
 
-    public BattingScoreResponse(BattingScore battingScore, PlayerResponse player, DismissalModeResponse dismissalMode, PlayerResponse bowler, List<PlayerResponse> fielders)
+    public BattingScoreResponse(BattingScore battingScore, PlayerMiniResponse player, DismissalModeResponse dismissalMode, PlayerMiniResponse bowler, List<PlayerMiniResponse> fielders)
     {
         this.id = battingScore.getId();
         this.player = player;

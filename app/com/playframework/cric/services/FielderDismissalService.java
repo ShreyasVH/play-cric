@@ -20,4 +20,9 @@ public class FielderDismissalService {
     {
         return fielderDismissalRepository.add(scorePlayerMap, matchPlayerMap);
     }
+
+    public Map<String, Map<String, Integer>> getFieldingStats(Long playerId)
+    {
+        return fielderDismissalRepository.getFieldingStats(playerId);
+    }
 }

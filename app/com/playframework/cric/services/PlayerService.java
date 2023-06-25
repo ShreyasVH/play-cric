@@ -39,4 +39,9 @@ public class PlayerService {
     public List<Player> getByIds(List<Long> ids) {
         return playerRepository.getByIds(ids);
     }
+
+    public Player getById(Long id)
+    {
+        return playerRepository.getById(id);
+    }
 }
