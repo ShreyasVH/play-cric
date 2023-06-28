@@ -158,6 +158,6 @@ public class PlayerController extends Controller {
             playerResponse.setFieldingStats(fieldingStatsMapFinal);
         }
 
-        return ok(Json.toJson(playerResponse));
+        return ok(Json.toJson(new Response(playerResponse)));
     }
 }
