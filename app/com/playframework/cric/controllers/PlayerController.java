@@ -100,9 +100,9 @@ public class PlayerController extends Controller {
             for(String gameType: basicBattingStats.keySet())
             {
                 BattingStats battingStats = new BattingStats(basicBattingStats.get(gameType));
-                battingStats.setNotOuts(battingStats.getInnings() - dismissalCountMap.get(gameType));
+                battingStats.setNotOuts(battingStats.getInnings() - dismissalCountMap.getOrDefault(gameType, 0));
 
-                if(dismissalCountMap.get(gameType) > 0)
+                if(dismissalCountMap.getOrDefault(gameType, 0) > 0)
                 {
                     battingStats.setAverage(battingStats.getRuns() * 1.0 / dismissalCountMap.get(gameType));
                 }
