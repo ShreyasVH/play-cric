@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.playframework.cric.models.Match;
+import com.playframework.cric.models.Series;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class MatchResponse {
     private Integer id;
-    private SeriesResponse series;
+    private SeriesMiniResponse series;
     private TeamResponse team1;
     private TeamResponse team2;
     private TeamResponse tossWinner;
@@ -37,10 +38,10 @@ public class MatchResponse {
     private List<PlayerMiniResponse> captains;
     private List<PlayerMiniResponse> wicketKeepers;
 
-    public MatchResponse(Match match, SeriesResponse seriesResponse, TeamResponse team1, TeamResponse team2, ResultTypeResponse resultType, WinMarginTypeResponse winMarginType, StadiumResponse stadium, List<PlayerMiniResponse> players, List<BattingScoreResponse> battingScores, List<BowlingFigureResponse> bowlingFigures, List<ExtrasResponse> extras, List<Long> manOfTheMatchPlayerIds, List<Long> captainIds, List<Long> wicketKeeperIds)
+    public MatchResponse(Match match, Series series, TeamResponse team1, TeamResponse team2, ResultTypeResponse resultType, WinMarginTypeResponse winMarginType, StadiumResponse stadium, List<PlayerMiniResponse> players, List<BattingScoreResponse> battingScores, List<BowlingFigureResponse> bowlingFigures, List<ExtrasResponse> extras, List<Long> manOfTheMatchPlayerIds, List<Long> captainIds, List<Long> wicketKeeperIds)
     {
         this.id = match.getId();
-        this.series = seriesResponse;
+        this.series = new SeriesMiniResponse(series);
         this.team1 = team1;
         this.team2 = team2;
         Map<Long, TeamResponse> teamMap = Map.of(

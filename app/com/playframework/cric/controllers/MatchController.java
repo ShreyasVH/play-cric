@@ -28,10 +28,6 @@ public class MatchController extends Controller {
     private final WinMarginTypeService winMarginTypeService;
     private final StadiumService stadiumService;
     private final PlayerService playerService;
-    private final TourService tourService;
-    private final SeriesTypeService seriesTypeService;
-    private final GameTypeService gameTypeService;
-    private final SeriesTeamsMapService seriesTeamsMapService;
     private final MatchPlayerMapService matchPlayerMapService;
     private final BattingScoreService battingScoreService;
     private final DismissalModeService dismissalModeService;
@@ -44,7 +40,7 @@ public class MatchController extends Controller {
     private final WicketKeeperService wicketKeeperService;
 
     @Inject
-    public MatchController(MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, TourService tourService, SeriesTypeService seriesTypeService, GameTypeService gameTypeService, SeriesTeamsMapService seriesTeamsMapService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService)
+    public MatchController(MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService)
     {
         this.matchService = matchService;
         this.seriesService = seriesService;
@@ -55,10 +51,6 @@ public class MatchController extends Controller {
         this.winMarginTypeService = winMarginTypeService;
         this.stadiumService = stadiumService;
         this.playerService = playerService;
-        this.tourService = tourService;
-        this.seriesTypeService = seriesTypeService;
-        this.gameTypeService = gameTypeService;
-        this.seriesTeamsMapService = seriesTeamsMapService;
         this.matchPlayerMapService = matchPlayerMapService;
         this.battingScoreService = battingScoreService;
         this.dismissalModeService = dismissalModeService;
@@ -81,18 +73,10 @@ public class MatchController extends Controller {
             throw new NotFoundException("Series");
         }
         List<Long> countryIds = new ArrayList<>();
-        countryIds.add(series.getHomeCountryId());
-
-        Tour tour = tourService.getById(series.getId());
-        SeriesType seriesType = seriesTypeService.getById(series.getTypeId());
-        GameType gameType = gameTypeService.getById(series.getTypeId());
-        List<SeriesTeamsMap> seriesTeamsMaps = seriesTeamsMapService.getBySeriesIds(Collections.singletonList(series.getId()));
-        List<Long> seriesTeamIds = seriesTeamsMaps.stream().map(SeriesTeamsMap::getTeamId).collect(Collectors.toList());
 
         List<Long> teamIds = new ArrayList<>();
         teamIds.add(createRequest.getTeam1Id());
         teamIds.add(createRequest.getTeam2Id());
-        teamIds.addAll(seriesTeamIds);
         List<Team> teams = teamService.getByIds(teamIds);
         Map<Long, Team> teamMap = new HashMap<>();
         for(Team team: teams)
@@ -265,26 +249,11 @@ public class MatchController extends Controller {
             throw ex;
         }
 
-        List<TeamResponse> seriesTeamResponses = seriesTeamIds.stream().map(teamId -> {
-            Team team = teamMap.get(teamId);
-            return new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())));
-        }).collect(Collectors.toList());
-
-        SeriesResponse seriesResponse = new SeriesResponse(
-                series,
-                new CountryResponse(countryMap.get(series.getHomeCountryId())),
-                new TourResponse(tour),
-                new SeriesTypeResponse(seriesType),
-                new GameTypeResponse(gameType),
-                seriesTeamResponses,
-                new ArrayList<>()
-        );
-
         List<PlayerMiniResponse> playerResponses = allPlayers.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
 
         MatchResponse matchResponse = new MatchResponse(
             match,
-            seriesResponse,
+            series,
             new TeamResponse(team1, new CountryResponse(countryMap.get(team1.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team1.getTypeId()))),
             new TeamResponse(team2, new CountryResponse(countryMap.get(team2.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team2.getTypeId()))),
             new ResultTypeResponse(resultType),
