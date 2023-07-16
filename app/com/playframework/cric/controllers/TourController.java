@@ -41,4 +41,10 @@ public class TourController extends Controller {
         PaginatedResponse<TourResponse> paginatedResponse = new PaginatedResponse<>(totalCount, tourResponses, page, limit);
         return ok(Json.toJson(new Response(paginatedResponse)));
     }
+
+    public Result getAllYears()
+    {
+        List<Integer> years = tourService.getAllYears();
+        return ok(Json.toJson(new Response(years)));
+    }
 }

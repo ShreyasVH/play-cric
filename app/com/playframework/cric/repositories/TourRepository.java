@@ -3,11 +3,14 @@ package com.playframework.cric.repositories;
 import io.ebean.DB;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.playframework.cric.models.Tour;
 import com.playframework.cric.requests.tours.CreateRequest;
 import com.playframework.cric.utils.Utils;
+import io.ebean.SqlQuery;
+import io.ebean.SqlRow;
 
 public class TourRepository {
     public Tour create(CreateRequest createRequest) {
@@ -50,5 +53,19 @@ public class TourRepository {
                 .ge("startTime", startTime)
                 .le("startTime", endTime)
                 .findCount();
+    }
+
+    public List<Integer> getAllYears() {
+        String query = "SELECT DISTINCT YEAR(start_time) AS year FROM tours ORDER BY year DESC";
+        SqlQuery sqlQuery = DB.sqlQuery(query);
+        List<SqlRow> result = sqlQuery.findList();
+
+        List<Integer> years = new ArrayList<>();
+
+        for (SqlRow row: result) {
+            years.add(row.getInteger("year"));
+        }
+
+        return years;
     }
 }

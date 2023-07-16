@@ -46,4 +46,9 @@ public class TourService {
     {
         return tourRepository.getTotalCountForYear(year);
     }
+
+    public List<Integer> getAllYears()
+    {
+        return tourRepository.getAllYears();
+    }
 }

@@ -9,6 +9,7 @@ POST   	/cric/v1/teams				    com.playframework.cric.controllers.TeamController.
 GET		/cric/v1/teams				    com.playframework.cric.controllers.TeamController.getAll(page: Integer, limit: Integer)
 
 POST   	/cric/v1/tours				    com.playframework.cric.controllers.TourController.create(request: Request)
+GET     /cric/v1/tours/years            com.playframework.cric.controllers.TourController.getAllYears
 GET		/cric/v1/tours/year/:year	    com.playframework.cric.controllers.TourController.getAllForYear(year: Integer, page: Integer, limit: Integer)
 
 POST   	/cric/v1/players				com.playframework.cric.controllers.PlayerController.create(request: Request)
