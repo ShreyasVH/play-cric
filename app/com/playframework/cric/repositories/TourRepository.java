@@ -39,7 +39,7 @@ public class TourRepository {
                 .where()
                 .ge("startTime", startTime)
                 .le("startTime", endTime)
-                .orderBy("startTime asc")
+                .orderBy("startTime desc")
                 .setFirstRow((page - 1) * limit)
                 .setMaxRows(limit)
                 .findList();
