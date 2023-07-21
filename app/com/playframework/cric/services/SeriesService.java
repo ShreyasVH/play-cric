@@ -78,4 +78,9 @@ public class SeriesService {
 
         return existingSeries;
     }
+
+    public List<Series> getByTourId(long tourId)
+    {
+        return seriesRepository.getByTourId(tourId);
+    }
 }

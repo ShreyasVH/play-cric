@@ -38,9 +38,10 @@ public class MatchController extends Controller {
     private final ManOfTheMatchService manOfTheMatchService;
     private final CaptainService captainService;
     private final WicketKeeperService wicketKeeperService;
+    private final GameTypeService gameTypeService;
 
     @Inject
-    public MatchController(MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService)
+    public MatchController(MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService)
     {
         this.matchService = matchService;
         this.seriesService = seriesService;
@@ -61,6 +62,7 @@ public class MatchController extends Controller {
         this.manOfTheMatchService = manOfTheMatchService;
         this.captainService = captainService;
         this.wicketKeeperService = wicketKeeperService;
+        this.gameTypeService = gameTypeService;
     }
 
     public Result create(Http.Request request)
@@ -72,6 +74,9 @@ public class MatchController extends Controller {
         {
             throw new NotFoundException("Series");
         }
+
+        GameType gameType = gameTypeService.getById(series.getTypeId());
+
         List<Long> countryIds = new ArrayList<>();
 
         List<Long> teamIds = new ArrayList<>();
@@ -254,6 +259,7 @@ public class MatchController extends Controller {
         MatchResponse matchResponse = new MatchResponse(
             match,
             series,
+            gameType,
             new TeamResponse(team1, new CountryResponse(countryMap.get(team1.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team1.getTypeId()))),
             new TeamResponse(team2, new CountryResponse(countryMap.get(team2.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team2.getTypeId()))),
             new ResultTypeResponse(resultType),

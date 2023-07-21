@@ -11,6 +11,7 @@ GET		/cric/v1/teams				    com.playframework.cric.controllers.TeamController.get
 POST   	/cric/v1/tours				    com.playframework.cric.controllers.TourController.create(request: Request)
 GET     /cric/v1/tours/years            com.playframework.cric.controllers.TourController.getAllYears
 GET		/cric/v1/tours/year/:year	    com.playframework.cric.controllers.TourController.getAllForYear(year: Integer, page: Integer, limit: Integer)
+GET     /cric/v1/tours/:id              com.playframework.cric.controllers.TourController.getById(id: Long)
 
 POST   	/cric/v1/players				com.playframework.cric.controllers.PlayerController.create(request: Request)
 GET		/cric/v1/players/:id			com.playframework.cric.controllers.PlayerController.get(id: Long)

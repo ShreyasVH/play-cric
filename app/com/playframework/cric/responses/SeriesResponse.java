@@ -18,7 +18,7 @@ public class SeriesResponse {
     private Long id;
     private String name;
     private CountryResponse homeCountry;
-    private TourResponse tour;
+    private TourMiniResponse tour;
     private SeriesTypeResponse type;
     private GameTypeResponse gameType;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -28,7 +28,7 @@ public class SeriesResponse {
     private List<TeamResponse> teams;
     private List<PlayerMiniResponse> manOfTheSeriesList;
 
-    public SeriesResponse(Series series, CountryResponse country, TourResponse tour, SeriesTypeResponse seriesType, GameTypeResponse gameType, List<TeamResponse> teams, List<PlayerMiniResponse> manOfTheSeriesList) {
+    public SeriesResponse(Series series, CountryResponse country, TourMiniResponse tour, SeriesTypeResponse seriesType, GameTypeResponse gameType, List<TeamResponse> teams, List<PlayerMiniResponse> manOfTheSeriesList) {
         this.id = series.getId();
         this.name = series.getName();
         this.homeCountry = country;

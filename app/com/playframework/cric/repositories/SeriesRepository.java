@@ -39,4 +39,9 @@ public class SeriesRepository {
     public void update(Series series) {
         DB.save(series);
     }
+
+    public List<Series> getByTourId(Long tourId)
+    {
+        return DB.find(Series.class).where().eq("tourId", tourId).findList();
+    }
 }

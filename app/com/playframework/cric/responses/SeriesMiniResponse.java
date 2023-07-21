@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.playframework.cric.models.GameType;
 import com.playframework.cric.models.Series;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,20 +20,20 @@ public class SeriesMiniResponse {
     private Long homeCountryId;
     private Long tourId;
     private Integer typeId;
-    private Integer gameTypeId;
+    private GameTypeResponse gameType;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime startTime;
 
-    public SeriesMiniResponse(Series series)
+    public SeriesMiniResponse(Series series, GameType gameType)
     {
         this.id = series.getId();
         this.name = series.getName();
         this.homeCountryId = series.getHomeCountryId();
         this.tourId = series.getTourId();
         this.typeId = series.getTypeId();
-        this.gameTypeId = series.getGameTypeId();
+        this.gameType = new GameTypeResponse(gameType);
         this.startTime = series.getStartTime();
     }
 }

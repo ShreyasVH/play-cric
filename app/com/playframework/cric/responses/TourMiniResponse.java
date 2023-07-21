@@ -9,19 +9,17 @@ import lombok.Data;
 import com.playframework.cric.models.Tour;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class TourResponse {
+public class TourMiniResponse {
     private Long id;
     private String name;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime startTime;
-    private List<SeriesMiniResponse> seriesList;
 
-    public TourResponse(Tour tour) {
+    public TourMiniResponse(Tour tour) {
         this.id = tour.getId();
         this.name = tour.getName();
         this.startTime = tour.getStartTime();
