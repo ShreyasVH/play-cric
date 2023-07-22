@@ -42,6 +42,6 @@ public class SeriesRepository {
 
     public List<Series> getByTourId(Long tourId)
     {
-        return DB.find(Series.class).where().eq("tourId", tourId).findList();
+        return DB.find(Series.class).where().eq("tourId", tourId).order("startTime desc").findList();
     }
 }
