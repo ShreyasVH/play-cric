@@ -75,7 +75,7 @@ public class MatchController extends Controller {
             throw new NotFoundException("Series");
         }
 
-        GameType gameType = gameTypeService.getById(series.getTypeId());
+        GameType gameType = gameTypeService.getById(series.getGameTypeId());
 
         List<Long> countryIds = new ArrayList<>();
 
