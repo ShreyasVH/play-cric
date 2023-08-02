@@ -6,6 +6,8 @@ import com.playframework.cric.models.Match;
 import com.playframework.cric.repositories.MatchRepository;
 import com.playframework.cric.requests.matches.CreateRequest;
 
+import java.util.List;
+
 public class MatchService {
     private final MatchRepository matchRepository;
 
@@ -26,5 +28,10 @@ public class MatchService {
         }
 
         return matchRepository.create(createRequest);
+    }
+
+    public List<Match> getBySeriesId(Long seriesId)
+    {
+        return matchRepository.getBySeriesId(seriesId);
     }
 }

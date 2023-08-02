@@ -5,6 +5,8 @@ import com.google.inject.Inject;
 import com.playframework.cric.repositories.WinMarginTypeRepository;
 import com.playframework.cric.models.WinMarginType;
 
+import java.util.List;
+
 public class WinMarginTypeService {
     private final WinMarginTypeRepository winMarginTypeRepository;
 
@@ -15,5 +17,9 @@ public class WinMarginTypeService {
 
     public WinMarginType getById(Integer id) {
         return winMarginTypeRepository.getById(id);
+    }
+
+    public List<WinMarginType> getByIds(List<Integer> ids) {
+        return winMarginTypeRepository.getByIds(ids);
     }
 }

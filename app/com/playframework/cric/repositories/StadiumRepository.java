@@ -34,4 +34,9 @@ public class StadiumRepository {
     {
         return DB.find(Stadium.class).where().eq("id", id).findOne();
     }
+
+    public List<Stadium> getByIds(List<Long> ids)
+    {
+        return DB.find(Stadium.class).where().in("id", ids).findList();
+    }
 }

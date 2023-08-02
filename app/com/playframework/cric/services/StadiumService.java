@@ -40,4 +40,9 @@ public class StadiumService {
 	{
 		return stadiumRepository.getById(id);
 	}
+
+	public List<Stadium> getByIds(List<Long> ids)
+	{
+		return stadiumRepository.getByIds(ids);
+	}
 }

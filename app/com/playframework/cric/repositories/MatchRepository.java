@@ -7,6 +7,7 @@ import io.ebean.DB;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MatchRepository {
     public Match create(CreateRequest createRequest)
@@ -19,5 +20,10 @@ public class MatchRepository {
     public Match getByStadiumAndStartTime(Long stadiumId, LocalDateTime startTime)
     {
         return DB.find(Match.class).where().eq("stadiumId", stadiumId).eq("startTime", startTime).findOne();
+    }
+
+    public List<Match> getBySeriesId(Long seriesId)
+    {
+        return DB.find(Match.class).where().eq("seriesId", seriesId).orderBy("startTime ASC").findList();
     }
 }

@@ -29,9 +29,13 @@ public class SeriesController extends Controller {
     private final SeriesTeamsMapService seriesTeamsMapService;
     private final ManOfTheSeriesService manOfTheSeriesService;
     private final PlayerService playerService;
+    private final MatchService matchService;
+    private final ResultTypeService resultTypeService;
+    private final WinMarginTypeService winMarginTypeService;
+    private final StadiumService stadiumService;
 
     @Inject
-    public SeriesController (SeriesService seriesService, CountryService countryService, TourService tourService, SeriesTypeService seriesTypeService, GameTypeService gameTypeService, TeamService teamService, TeamTypeService teamTypeService, SeriesTeamsMapService seriesTeamsMapService, ManOfTheSeriesService manOfTheSeriesService, PlayerService playerService) {
+    public SeriesController (SeriesService seriesService, CountryService countryService, TourService tourService, SeriesTypeService seriesTypeService, GameTypeService gameTypeService, TeamService teamService, TeamTypeService teamTypeService, SeriesTeamsMapService seriesTeamsMapService, ManOfTheSeriesService manOfTheSeriesService, PlayerService playerService, MatchService matchService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService) {
         this.seriesService = seriesService;
         this.countryService = countryService;
         this.tourService = tourService;
@@ -42,6 +46,10 @@ public class SeriesController extends Controller {
         this.seriesTeamsMapService = seriesTeamsMapService;
         this.manOfTheSeriesService = manOfTheSeriesService;
         this.playerService = playerService;
+        this.matchService = matchService;
+        this.resultTypeService = resultTypeService;
+        this.winMarginTypeService = winMarginTypeService;
+        this.stadiumService = stadiumService;
     }
 
     public Result create(Http.Request request) {
@@ -304,5 +312,83 @@ public class SeriesController extends Controller {
 
         List<PlayerMiniResponse> playerResponses = players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
         return ok(Json.toJson(new Response(new SeriesResponse(existingSeries, new CountryResponse(country), new TourMiniResponse(tour), new SeriesTypeResponse(seriesType), new GameTypeResponse(gameType), teamResponses, playerResponses))));
+    }
+
+    public Result getById(Long id)
+    {
+        Series series = seriesService.getById(id);
+        if(null == series)
+        {
+            throw new NotFoundException("Series");
+        }
+
+        SeriesType seriesType = seriesTypeService.getById(series.getTypeId());
+        GameType gameType = gameTypeService.getById(series.getGameTypeId());
+
+        List<SeriesTeamsMap> seriesTeamsMaps = seriesTeamsMapService.getBySeriesIds(Collections.singletonList(id));
+        List<Long> teamIds = seriesTeamsMaps.stream().map(SeriesTeamsMap::getTeamId).collect(Collectors.toList());
+        List<Team> teams = teamService.getByIds(teamIds);
+        List<Integer> teamTypeIds = new ArrayList<>();
+        List<Long> countryIds = new ArrayList<>();
+
+        for(Team team: teams)
+        {
+            teamTypeIds.add(team.getTypeId());
+            countryIds.add(team.getCountryId());
+        }
+
+        List<TeamType> teamTypes = teamTypeService.getByIds(teamTypeIds);
+        Map<Integer, TeamType> teamTypeMap = teamTypes.stream().collect(Collectors.toMap(TeamType::getId, teamType -> teamType));
+
+        List<Match> matches = matchService.getBySeriesId(id);
+
+        List<Long> stadiumIds = new ArrayList<>();
+        List<Integer> resultTypeIds = new ArrayList<>();
+        List<Integer> winMarginTypeIds = new ArrayList<>();
+
+        for(Match match: matches)
+        {
+            stadiumIds.add(match.getStadiumId());
+            resultTypeIds.add(match.getResultTypeId());
+            if(null != match.getWinMarginTypeId())
+            {
+                winMarginTypeIds.add(match.getWinMarginTypeId());
+            }
+        }
+        List<Stadium> stadiums = stadiumService.getByIds(stadiumIds);
+        Map<Long, Stadium> stadiumMap = new HashMap<>();
+        for(Stadium stadium: stadiums)
+        {
+            stadiumMap.put(stadium.getId(), stadium);
+            countryIds.add(stadium.getCountryId());
+        }
+
+        List<Country> countries = countryService.getByIds(countryIds);
+        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
+
+        List<TeamResponse> teamResponses = teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
+        Map<Long, TeamResponse> teamResponseMap = teamResponses.stream().collect(Collectors.toMap(TeamResponse::getId, teamResponse -> teamResponse));
+
+        List<ResultType> resultTypes = resultTypeService.getByIds(resultTypeIds);
+        Map<Integer, ResultType> resultTypeMap = resultTypes.stream().collect(Collectors.toMap(ResultType::getId, resultType -> resultType));
+        List<WinMarginType> winMarginTypes = winMarginTypeService.getByIds(winMarginTypeIds);
+        Map<Integer, WinMarginType> winMarginTypeMap = winMarginTypes.stream().collect(Collectors.toMap(WinMarginType::getId, winMarginType -> winMarginType));
+
+        List<MatchMiniResponse> matchMiniResponses = matches.stream().map(match -> {
+            Stadium stadium = stadiumMap.get(match.getStadiumId());
+            return new MatchMiniResponse(
+                match,
+                teamResponseMap.get(match.getTeam1Id()),
+                teamResponseMap.get(match.getTeam2Id()),
+                resultTypeMap.get(match.getResultTypeId()),
+                winMarginTypeMap.getOrDefault(match.getWinMarginTypeId(), null),
+                new StadiumResponse(stadium, new CountryResponse(countryMap.get(stadium.getCountryId())))
+            );
+        }).collect(Collectors.toList());
+
+        SeriesDetailedResponse seriesResponse = new SeriesDetailedResponse(series, seriesType, gameType, teamResponses, matchMiniResponses);
+
+
+        return ok(Json.toJson(new Response(seriesResponse)));
     }
 }
