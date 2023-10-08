@@ -20,4 +20,9 @@ public class MatchPlayerMapService {
     {
         return matchPlayerMapRepository.add(matchId, playerIds, playerTeamMap);
     }
+
+    public List<MatchPlayerMap> getByMatchId(Integer matchId)
+    {
+        return matchPlayerMapRepository.getByMatchId(matchId);
+    }
 }

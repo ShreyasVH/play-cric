@@ -14,4 +14,9 @@ public class MatchPlayerMapRepository {
         DB.saveAll(matchPlayerMaps);
         return matchPlayerMaps;
     }
+
+    public List<MatchPlayerMap> getByMatchId(Integer matchId)
+    {
+        return DB.find(MatchPlayerMap.class).where().eq("matchId", matchId).findList();
+    }
 }

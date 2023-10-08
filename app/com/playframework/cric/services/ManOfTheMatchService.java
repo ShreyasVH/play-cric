@@ -20,4 +20,9 @@ public class ManOfTheMatchService {
     {
         return manOfTheMatchRepository.add(playerIds, matchPlayerMap);
     }
+
+    public List<ManOfTheMatch> getByMatchPlayerIds(List<Integer> matchPlayerIds)
+    {
+        return manOfTheMatchRepository.getByMatchPlayerIds(matchPlayerIds);
+    }
 }

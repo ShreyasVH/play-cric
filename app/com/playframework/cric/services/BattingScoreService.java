@@ -32,4 +32,9 @@ public class BattingScoreService {
     {
         return battingScoreRepository.getDismissalStats(playerId);
     }
+
+    public List<BattingScore> getBattingScores(List<Integer> matchPlayerIds)
+    {
+        return battingScoreRepository.getBattingScores(matchPlayerIds);
+    }
 }

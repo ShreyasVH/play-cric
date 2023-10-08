@@ -50,4 +50,9 @@ public class FielderDismissalRepository {
 
         return statsFinal;
     }
+
+    public List<FielderDismissal> get(List<Integer> matchPlayerIds)
+    {
+        return DB.find(FielderDismissal.class).where().in("matchPlayerId", matchPlayerIds).findList();
+    }
 }

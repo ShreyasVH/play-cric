@@ -14,4 +14,9 @@ public class ManOfTheMatchRepository {
         DB.saveAll(manOfTheMatchList);
         return manOfTheMatchList;
     }
+
+    public List<ManOfTheMatch> getByMatchPlayerIds(List<Integer> matchPlayerIds)
+    {
+        return DB.find(ManOfTheMatch.class).where().in("matchPlayerId", matchPlayerIds).findList();
+    }
 }

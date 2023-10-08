@@ -14,4 +14,9 @@ public class ExtrasRepository {
         DB.saveAll(extrasList);
         return extrasList;
     }
+
+    public List<Extras> getByMatchId(Integer matchId)
+    {
+        return DB.find(Extras.class).where().eq("matchId", matchId).orderBy("innings ASC, id ASC").findList();
+    }
 }

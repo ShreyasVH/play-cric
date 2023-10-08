@@ -25,4 +25,9 @@ public class FielderDismissalService {
     {
         return fielderDismissalRepository.getFieldingStats(playerId);
     }
+
+    public List<FielderDismissal> get(List<Integer> matchPlayerIds)
+    {
+        return fielderDismissalRepository.get(matchPlayerIds);
+    }
 }

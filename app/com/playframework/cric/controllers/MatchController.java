@@ -254,7 +254,17 @@ public class MatchController extends Controller {
             throw ex;
         }
 
-        List<PlayerMiniResponse> playerResponses = allPlayers.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+        Map<Long, List<PlayerMiniResponse>> teamPlayerMap = new HashMap<>();
+        for(Player player: allPlayers)
+        {
+            PlayerMiniResponse playerMiniResponse = new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())));
+            Long teamId = playerTeamMap.get(player.getId());
+            if(!teamPlayerMap.containsKey(teamId))
+            {
+                teamPlayerMap.put(teamId, new ArrayList<>());
+            }
+            teamPlayerMap.get(teamId).add(playerMiniResponse);
+        }
 
         MatchResponse matchResponse = new MatchResponse(
             match,
@@ -265,7 +275,7 @@ public class MatchController extends Controller {
             new ResultTypeResponse(resultType),
             winMarginTypeResponse,
             new StadiumResponse(stadium, new CountryResponse(countryMap.get(stadium.getCountryId()))),
-            playerResponses,
+            teamPlayerMap,
             battingScoreResponses,
             bowlingFigureResponses,
             extrasResponses,
@@ -275,5 +285,192 @@ public class MatchController extends Controller {
         );
 
         return created(Json.toJson(new Response(matchResponse)));
+    }
+
+    public Result getById(Integer id)
+    {
+        Match match = matchService.getById(id);
+        if(null == match)
+        {
+            throw new NotFoundException("Match");
+        }
+
+        Series series = seriesService.getById(match.getSeriesId());
+        if(null == series)
+        {
+            throw new NotFoundException("Series");
+        }
+
+        GameType gameType = gameTypeService.getById(series.getGameTypeId());
+
+        List<Long> countryIds = new ArrayList<>();
+
+        List<Long> teamIds = new ArrayList<>();
+        teamIds.add(match.getTeam1Id());
+        teamIds.add(match.getTeam2Id());
+        List<Team> teams = teamService.getByIds(teamIds);
+        Map<Long, Team> teamMap = new HashMap<>();
+        for(Team team: teams)
+        {
+            teamMap.put(team.getId(), team);
+            countryIds.add(team.getCountryId());
+        }
+
+        Team team1 = teamMap.get(match.getTeam1Id());
+        if(null == team1)
+        {
+            throw new NotFoundException("Team 1");
+        }
+
+        Team team2 = teamMap.get(match.getTeam2Id());
+        if(null == team2)
+        {
+            throw new NotFoundException("Team 2");
+        }
+
+        ResultType resultType = resultTypeService.getById(match.getResultTypeId());
+        if(null == resultType)
+        {
+            throw new NotFoundException("Result type");
+        }
+
+        WinMarginTypeResponse winMarginTypeResponse = null;
+        if(null != match.getWinMarginTypeId())
+        {
+            WinMarginType winMarginType = winMarginTypeService.getById(match.getWinMarginTypeId());
+            if(null == winMarginType)
+            {
+                throw new NotFoundException("Win margin type");
+            }
+            winMarginTypeResponse = new WinMarginTypeResponse(winMarginType);
+        }
+
+        Stadium stadium = stadiumService.getById(match.getStadiumId());
+        if(null == stadium)
+        {
+            throw new NotFoundException("Stadium");
+        }
+
+        List<MatchPlayerMap> matchPlayerMaps = matchPlayerMapService.getByMatchId(id);
+        List<Long> playerIds = new ArrayList<>();
+        Map<Integer, Long> matchPlayerToPlayerMap = new HashMap<>();
+        List<Integer> matchPlayerIds = new ArrayList<>();
+        Map<Long, Long> playerToTeamMap = new HashMap<>();
+        for(MatchPlayerMap matchPlayerMap: matchPlayerMaps)
+        {
+            playerIds.add(matchPlayerMap.getPlayerId());
+            matchPlayerToPlayerMap.put(matchPlayerMap.getId(), matchPlayerMap.getPlayerId());
+            matchPlayerIds.add(matchPlayerMap.getId());
+            playerToTeamMap.put(matchPlayerMap.getPlayerId(), matchPlayerMap.getTeamId());
+        }
+
+        List<Player> players = playerService.getByIds(playerIds);
+        List<Long> playerCountryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
+
+        countryIds.add(stadium.getCountryId());
+        countryIds.addAll(playerCountryIds);
+        List<Integer> teamTypeIds = Arrays.asList(team1.getTypeId(), team2.getTypeId());
+        List<TeamType> teamTypes = teamTypeService.getByIds(teamTypeIds);
+        Map<Integer, TeamType> teamTypeMap = teamTypes.stream().collect(Collectors.toMap(TeamType::getId, teamType -> teamType));
+
+        List<Country> countries = countryService.getByIds(countryIds);
+        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
+
+        Map<Long, PlayerMiniResponse> playerMap = new HashMap<>();
+        Map<Long, List<PlayerMiniResponse>> teamPlayerMap = new HashMap<>();
+        for(Player player: players)
+        {
+            PlayerMiniResponse playerMiniResponse = new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())));
+            playerMap.put(player.getId(), playerMiniResponse);
+            Long teamId = playerToTeamMap.get(player.getId());
+            if(!teamPlayerMap.containsKey(teamId))
+            {
+                teamPlayerMap.put(teamId, new ArrayList<>());
+            }
+            teamPlayerMap.get(teamId).add(playerMiniResponse);
+        }
+
+        List<ManOfTheMatch> manOfTheMatchList = manOfTheMatchService.getByMatchPlayerIds(matchPlayerIds);
+        List<Captain> captains = captainService.getByMatchPlayerIds(matchPlayerIds);
+        List<WicketKeeper> wicketKeepers = wicketKeeperService.getByMatchPlayerIds(matchPlayerIds);
+        List<BattingScore> battingScores = battingScoreService.getBattingScores(matchPlayerIds);
+        List<DismissalMode> dismissalModes = dismissalModeService.getAll();
+        Map<Integer, DismissalMode> dismissalModeMap = dismissalModes.stream().collect(Collectors.toMap(DismissalMode::getId, dismissalMode -> dismissalMode));
+        List<FielderDismissal> fielderDismissals = fielderDismissalService.get(matchPlayerIds);
+        Map<Integer, List<FielderDismissal>> fielderDismissalMap = fielderDismissals.stream().collect(Collectors.groupingBy(FielderDismissal::getScoreId, Collectors.mapping(fielderDismissal -> fielderDismissal, Collectors.toList())));
+
+        List<BattingScoreResponse> battingScoreResponses = new ArrayList<>();
+        for(BattingScore battingScore: battingScores)
+        {
+            PlayerMiniResponse batsmanPlayer = playerMap.get(matchPlayerToPlayerMap.get(battingScore.getMatchPlayerId()));
+
+            DismissalModeResponse dismissalModeResponse = null;
+            if(null != battingScore.getDismissalModeId())
+            {
+                dismissalModeResponse = new DismissalModeResponse(dismissalModeMap.get(battingScore.getDismissalModeId()));
+            }
+
+            PlayerMiniResponse bowlerPlayer = null;
+            if(null != battingScore.getBowlerId())
+            {
+                bowlerPlayer = playerMap.get(matchPlayerToPlayerMap.get(battingScore.getBowlerId()));
+            }
+
+            List<PlayerMiniResponse> fielders = new ArrayList<>();
+            if(fielderDismissalMap.containsKey(battingScore.getId()))
+            {
+                List<FielderDismissal> fielderDismissalList = fielderDismissalMap.get(battingScore.getId());
+                fielders = fielderDismissalList.stream().map(fd -> playerMap.get(matchPlayerToPlayerMap.get(fd.getMatchPlayerId()))).collect(Collectors.toList());
+            }
+
+            battingScoreResponses.add(new BattingScoreResponse(
+                battingScore,
+                batsmanPlayer,
+                dismissalModeResponse,
+                bowlerPlayer,
+                fielders
+            ));
+        }
+
+        List<BowlingFigure> bowlingFigures = bowlingFigureService.get(matchPlayerIds);
+        List<BowlingFigureResponse> bowlingFigureResponses = bowlingFigures.stream().map(bowlingFigure -> {
+            PlayerMiniResponse bowlerPlayer = playerMap.get(matchPlayerToPlayerMap.get(bowlingFigure.getMatchPlayerId()));
+            return new BowlingFigureResponse(bowlingFigure, bowlerPlayer);
+        }).collect(Collectors.toList());
+
+        List<ExtrasType> extrasTypes = extrasTypeService.getAll();
+        Map<Integer, ExtrasType> extrasTypeMap = extrasTypes.stream().collect(Collectors.toMap(ExtrasType::getId, extrasType -> extrasType));
+        List<Extras> extrasList = extrasService.getByMatchId(id);
+        List<ExtrasResponse> extrasResponses = extrasList.stream().map(extras -> {
+            ExtrasTypeResponse extrasTypeResponse = new ExtrasTypeResponse(extrasTypeMap.get(extras.getTypeId()));
+            Team battingTeam = teamMap.get(extras.getBattingTeamId());
+            Team bowlingTeam = teamMap.get(extras.getBowlingTeamId());
+            return new ExtrasResponse(
+                extras,
+                extrasTypeResponse,
+                new TeamResponse(battingTeam, new CountryResponse(countryMap.get(battingTeam.getCountryId())), new TeamTypeResponse(teamTypeMap.get(battingTeam.getTypeId()))),
+                new TeamResponse(bowlingTeam, new CountryResponse(countryMap.get(bowlingTeam.getCountryId())), new TeamTypeResponse(teamTypeMap.get(bowlingTeam.getTypeId())))
+            );
+        }).collect(Collectors.toList());
+
+        MatchResponse matchResponse = new MatchResponse(
+            match,
+            series,
+            gameType,
+            new TeamResponse(team1, new CountryResponse(countryMap.get(team1.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team1.getTypeId()))),
+            new TeamResponse(team2, new CountryResponse(countryMap.get(team2.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team2.getTypeId()))),
+            new ResultTypeResponse(resultType),
+            winMarginTypeResponse,
+            new StadiumResponse(stadium, new CountryResponse(countryMap.get(stadium.getCountryId()))),
+            teamPlayerMap,
+            battingScoreResponses,
+            bowlingFigureResponses,
+            extrasResponses,
+            manOfTheMatchList.stream().map(motm -> matchPlayerToPlayerMap.get(motm.getMatchPlayerId())).collect(Collectors.toList()),
+            captains.stream().map(captain -> matchPlayerToPlayerMap.get(captain.getMatchPlayerId())).collect(Collectors.toList()),
+            wicketKeepers.stream().map(wicketKeeper -> matchPlayerToPlayerMap.get(wicketKeeper.getMatchPlayerId())).collect(Collectors.toList())
+        );
+
+        return ok(Json.toJson(new Response(matchResponse)));
     }
 }

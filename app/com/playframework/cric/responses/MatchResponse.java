@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,12 +35,12 @@ public class MatchResponse {
     private List<BattingScoreResponse> battingScores;
     private List<BowlingFigureResponse> bowlingFigures;
     private List<ExtrasResponse> extras;
-    private List<PlayerMiniResponse> players;
+    private Map<Long, List<PlayerMiniResponse>> players;
     private List<PlayerMiniResponse> manOfTheMatchList;
     private List<PlayerMiniResponse> captains;
     private List<PlayerMiniResponse> wicketKeepers;
 
-    public MatchResponse(Match match, Series series, GameType gameType, TeamResponse team1, TeamResponse team2, ResultTypeResponse resultType, WinMarginTypeResponse winMarginType, StadiumResponse stadium, List<PlayerMiniResponse> players, List<BattingScoreResponse> battingScores, List<BowlingFigureResponse> bowlingFigures, List<ExtrasResponse> extras, List<Long> manOfTheMatchPlayerIds, List<Long> captainIds, List<Long> wicketKeeperIds)
+    public MatchResponse(Match match, Series series, GameType gameType, TeamResponse team1, TeamResponse team2, ResultTypeResponse resultType, WinMarginTypeResponse winMarginType, StadiumResponse stadium, Map<Long, List<PlayerMiniResponse>> players, List<BattingScoreResponse> battingScores, List<BowlingFigureResponse> bowlingFigures, List<ExtrasResponse> extras, List<Long> manOfTheMatchPlayerIds, List<Long> captainIds, List<Long> wicketKeeperIds)
     {
         this.id = match.getId();
         this.series = new SeriesMiniResponse(series, gameType);
@@ -67,7 +68,13 @@ public class MatchResponse {
         this.bowlingFigures = bowlingFigures;
         this.extras = extras;
         this.players = players;
-        Map<Long, PlayerMiniResponse> playerMap = players.stream().collect(Collectors.toMap(PlayerMiniResponse::getId, player -> player));
+        Map<Long, PlayerMiniResponse> playerMap = new HashMap<>();
+        for(Map.Entry<Long, List<PlayerMiniResponse>> entry: players.entrySet())
+        {
+            for (PlayerMiniResponse player: entry.getValue()) {
+                playerMap.put(player.getId(), player);
+            }
+        }
         this.manOfTheMatchList = manOfTheMatchPlayerIds.stream().map(playerMap::get).collect(Collectors.toList());
         this.captains = captainIds.stream().map(playerMap::get).collect(Collectors.toList());
         this.wicketKeepers = wicketKeeperIds.stream().map(playerMap::get).collect(Collectors.toList());

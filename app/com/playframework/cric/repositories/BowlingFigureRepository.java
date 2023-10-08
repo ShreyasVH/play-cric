@@ -49,4 +49,9 @@ public class BowlingFigureRepository {
 
         return statsFinal;
     }
+
+    public List<BowlingFigure> get(List<Integer> matchPlayerIds)
+    {
+        return DB.find(BowlingFigure.class).where().in("matchPlayerId", matchPlayerIds).findList();
+    }
 }

@@ -20,4 +20,9 @@ public class ExtrasService {
     {
         return extrasRepository.add(matchId, extrasRequests);
     }
+
+    public List<Extras> getByMatchId(Integer matchId)
+    {
+        return extrasRepository.getByMatchId(matchId);
+    }
 }

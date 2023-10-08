@@ -14,4 +14,9 @@ public class WicketKeeperRepository {
         DB.saveAll(wicketKeeperList);
         return wicketKeeperList;
     }
+
+    public List<WicketKeeper> getByMatchPlayerIds(List<Integer> matchPlayerIds)
+    {
+        return DB.find(WicketKeeper.class).where().in("matchPlayerId", matchPlayerIds).findList();
+    }
 }

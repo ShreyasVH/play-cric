@@ -34,4 +34,9 @@ public class MatchService {
     {
         return matchRepository.getBySeriesId(seriesId);
     }
+
+    public Match getById(Integer id)
+    {
+        return matchRepository.getById(id);
+    }
 }

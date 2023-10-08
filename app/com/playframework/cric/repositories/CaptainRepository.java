@@ -14,4 +14,9 @@ public class CaptainRepository {
         DB.saveAll(captainList);
         return captainList;
     }
+
+    public List<Captain> getByMatchPlayerIds(List<Integer> matchPlayerIds)
+    {
+        return DB.find(Captain.class).where().in("matchPlayerId", matchPlayerIds).findList();
+    }
 }

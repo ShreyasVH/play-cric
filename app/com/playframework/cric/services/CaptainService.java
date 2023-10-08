@@ -20,4 +20,9 @@ public class CaptainService {
     {
         return captainRepository.add(playerIds, matchPlayerMap);
     }
+
+    public List<Captain> getByMatchPlayerIds(List<Integer> matchPlayerIds)
+    {
+        return captainRepository.getByMatchPlayerIds(matchPlayerIds);
+    }
 }

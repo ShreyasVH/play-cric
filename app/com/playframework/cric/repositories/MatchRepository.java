@@ -26,4 +26,9 @@ public class MatchRepository {
     {
         return DB.find(Match.class).where().eq("seriesId", seriesId).orderBy("startTime ASC").findList();
     }
+
+    public Match getById(Integer id)
+    {
+        return DB.find(Match.class).where().eq("id", id).findOne();
+    }
 }

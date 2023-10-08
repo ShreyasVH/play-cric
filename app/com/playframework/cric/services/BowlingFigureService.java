@@ -26,4 +26,9 @@ public class BowlingFigureService {
     {
         return bowlingFigureRepository.getBasicBowlingStats(playerId);
     }
+
+    public List<BowlingFigure> get(List<Integer> matchPlayerIds)
+    {
+        return bowlingFigureRepository.get(matchPlayerIds);
+    }
 }

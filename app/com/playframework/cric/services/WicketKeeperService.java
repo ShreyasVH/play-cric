@@ -20,4 +20,9 @@ public class WicketKeeperService {
     {
         return wicketKeeperRepository.add(playerIds, matchPlayerMap);
     }
+
+    public List<WicketKeeper> getByMatchPlayerIds(List<Integer> matchPlayerIds)
+    {
+        return wicketKeeperRepository.getByMatchPlayerIds(matchPlayerIds);
+    }
 }

@@ -2,12 +2,10 @@ package com.playframework.cric.repositories;
 
 import com.playframework.cric.models.BattingScore;
 import com.playframework.cric.requests.matches.BattingScoreRequest;
-import com.playframework.cric.responses.BattingStats;
 import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,5 +80,10 @@ public class BattingScoreRepository {
         }
 
         return stats;
+    }
+
+    public List<BattingScore> getBattingScores(List<Integer> matchPlayerIds)
+    {
+        return DB.find(BattingScore.class).where().in("matchPlayerId", matchPlayerIds).findList();
     }
 }
