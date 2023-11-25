@@ -25,4 +25,9 @@ public class CaptainService {
     {
         return captainRepository.getByMatchPlayerIds(matchPlayerIds);
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        captainRepository.remove(matchPlayerIds);
+    }
 }

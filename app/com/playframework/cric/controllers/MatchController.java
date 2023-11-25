@@ -473,4 +473,38 @@ public class MatchController extends Controller {
 
         return ok(Json.toJson(new Response(matchResponse)));
     }
+
+    public Result remove(Integer id)
+    {
+        Match match = matchService.getById(id);
+        if(null == match)
+        {
+            throw new NotFoundException("Match");
+        }
+
+        Transaction transaction = DB.beginTransaction();
+        try {
+            List<MatchPlayerMap> matchPlayerMaps = matchPlayerMapService.getByMatchId(id);
+            List<Integer> matchPlayerIds = matchPlayerMaps.stream().map(MatchPlayerMap::getId).collect(Collectors.toList());
+            extrasService.remove(id);
+            captainService.remove(matchPlayerIds);
+            wicketKeeperService.remove(matchPlayerIds);
+            manOfTheMatchService.remove(matchPlayerIds);
+            fielderDismissalService.remove(matchPlayerIds);
+            battingScoreService.remove(matchPlayerIds);
+            bowlingFigureService.remove(matchPlayerIds);
+            matchPlayerMapService.remove(id);
+            matchService.remove(id);
+
+            transaction.commit();
+            transaction.end();
+        }
+        catch(Exception ex)
+        {
+            transaction.end();
+            throw ex;
+        }
+
+        return ok(Json.toJson(new Response("Deleted successfully")));
+    }
 }

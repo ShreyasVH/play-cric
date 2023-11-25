@@ -19,4 +19,9 @@ public class MatchPlayerMapRepository {
     {
         return DB.find(MatchPlayerMap.class).where().eq("matchId", matchId).findList();
     }
+
+    public void remove(Integer matchId)
+    {
+        DB.deleteAll(getByMatchId(matchId));
+    }
 }

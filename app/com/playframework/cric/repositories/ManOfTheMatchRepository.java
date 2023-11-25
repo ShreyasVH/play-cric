@@ -19,4 +19,9 @@ public class ManOfTheMatchRepository {
     {
         return DB.find(ManOfTheMatch.class).where().in("matchPlayerId", matchPlayerIds).findList();
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        DB.deleteAll(getByMatchPlayerIds(matchPlayerIds));
+    }
 }

@@ -19,4 +19,9 @@ public class WicketKeeperRepository {
     {
         return DB.find(WicketKeeper.class).where().in("matchPlayerId", matchPlayerIds).findList();
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        DB.deleteAll(getByMatchPlayerIds(matchPlayerIds));
+    }
 }

@@ -31,4 +31,9 @@ public class MatchRepository {
     {
         return DB.find(Match.class).where().eq("id", id).findOne();
     }
+
+    public void remove(Integer matchId)
+    {
+        DB.delete(getById(matchId));
+    }
 }

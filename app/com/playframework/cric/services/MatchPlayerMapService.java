@@ -25,4 +25,9 @@ public class MatchPlayerMapService {
     {
         return matchPlayerMapRepository.getByMatchId(matchId);
     }
+
+    public void remove(Integer matchId)
+    {
+        matchPlayerMapRepository.remove(matchId);
+    }
 }
