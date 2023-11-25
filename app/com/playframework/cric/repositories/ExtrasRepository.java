@@ -19,4 +19,9 @@ public class ExtrasRepository {
     {
         return DB.find(Extras.class).where().eq("matchId", matchId).orderBy("innings ASC, id ASC").findList();
     }
+
+    public void remove(Integer matchId)
+    {
+        DB.deleteAll(getByMatchId(matchId));
+    }
 }

@@ -19,4 +19,9 @@ public class CaptainRepository {
     {
         return DB.find(Captain.class).where().in("matchPlayerId", matchPlayerIds).findList();
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        DB.deleteAll(getByMatchPlayerIds(matchPlayerIds));
+    }
 }

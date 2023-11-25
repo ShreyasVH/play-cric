@@ -31,4 +31,9 @@ public class BowlingFigureService {
     {
         return bowlingFigureRepository.get(matchPlayerIds);
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        bowlingFigureRepository.remove(matchPlayerIds);
+    }
 }

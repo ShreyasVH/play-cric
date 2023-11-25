@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.playframework.cric.models.Extras;
 import com.playframework.cric.repositories.ExtrasRepository;
 import com.playframework.cric.requests.matches.ExtrasRequest;
+import io.ebean.DB;
 
 import java.util.List;
 
@@ -24,5 +25,10 @@ public class ExtrasService {
     public List<Extras> getByMatchId(Integer matchId)
     {
         return extrasRepository.getByMatchId(matchId);
+    }
+
+    public void remove(Integer matchId)
+    {
+        DB.deleteAll(getByMatchId(matchId));
     }
 }

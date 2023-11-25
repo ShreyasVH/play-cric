@@ -54,4 +54,9 @@ public class BowlingFigureRepository {
     {
         return DB.find(BowlingFigure.class).where().in("matchPlayerId", matchPlayerIds).findList();
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        DB.deleteAll(get(matchPlayerIds));
+    }
 }

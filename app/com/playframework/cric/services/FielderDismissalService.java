@@ -30,4 +30,9 @@ public class FielderDismissalService {
     {
         return fielderDismissalRepository.get(matchPlayerIds);
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        fielderDismissalRepository.remove(matchPlayerIds);
+    }
 }

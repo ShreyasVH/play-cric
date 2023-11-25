@@ -55,4 +55,9 @@ public class FielderDismissalRepository {
     {
         return DB.find(FielderDismissal.class).where().in("matchPlayerId", matchPlayerIds).findList();
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        DB.deleteAll(get(matchPlayerIds));
+    }
 }

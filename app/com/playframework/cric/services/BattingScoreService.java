@@ -37,4 +37,9 @@ public class BattingScoreService {
     {
         return battingScoreRepository.getBattingScores(matchPlayerIds);
     }
+
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        battingScoreRepository.remove(matchPlayerIds);
+    }
 }
