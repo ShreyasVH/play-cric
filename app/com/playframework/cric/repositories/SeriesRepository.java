@@ -44,4 +44,9 @@ public class SeriesRepository {
     {
         return DB.find(Series.class).where().eq("tourId", tourId).order("startTime desc").findList();
     }
+
+    public void remove(Long id)
+    {
+        DB.delete(getById(id));
+    }
 }

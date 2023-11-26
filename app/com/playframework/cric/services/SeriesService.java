@@ -83,4 +83,9 @@ public class SeriesService {
     {
         return seriesRepository.getByTourId(tourId);
     }
+
+    public void remove(Long id)
+    {
+        seriesRepository.remove(id);
+    }
 }

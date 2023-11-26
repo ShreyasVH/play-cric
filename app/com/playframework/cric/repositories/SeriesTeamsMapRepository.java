@@ -6,6 +6,7 @@ import com.playframework.cric.requests.series.CreateRequest;
 import com.playframework.cric.utils.Utils;
 import io.ebean.DB;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,5 +23,10 @@ public class SeriesTeamsMapRepository {
     public void delete(Long seriesId, List<Long> teamIds) {
         List<SeriesTeamsMap> seriesTeamsMaps = DB.find(SeriesTeamsMap.class).where().eq("seriesId", seriesId).in("teamId", teamIds).findList();
         DB.deleteAll(seriesTeamsMaps);
+    }
+
+    public void remove(Long seriesId)
+    {
+        DB.deleteAll(getBySeriesIds(Collections.singletonList(seriesId)));
     }
 }
