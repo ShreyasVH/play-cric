@@ -422,6 +422,6 @@ public class SeriesController extends Controller {
             throw ex;
         }
 
-        return ok(Json.toJson(new Response("Deleted successfully")));
+        return ok(Json.toJson(new Response("Deleted successfully", true)));
     }
 }
