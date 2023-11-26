@@ -3,6 +3,7 @@ package com.playframework.cric.repositories;
 import com.playframework.cric.models.ManOfTheSeries;
 import io.ebean.DB;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,5 +20,10 @@ public class ManOfTheSeriesRepository {
     public void delete(Long seriesId, List<Long> playerIds) {
         List<ManOfTheSeries> manOfTheSeriesList = DB.find(ManOfTheSeries.class).where().eq("seriesId", seriesId).in("playerId", playerIds).findList();
         DB.deleteAll(manOfTheSeriesList);
+    }
+
+    public void remove(Long seriesId)
+    {
+        DB.deleteAll(getBySeriesIds(Collections.singletonList(seriesId)));
     }
 }

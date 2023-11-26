@@ -25,4 +25,9 @@ public class ManOfTheSeriesService {
     public void delete(Long seriesId, List<Long> playerIds) {
         manOfTheSeriesRepository.delete(seriesId, playerIds);
     }
+
+    public void remove(Long seriesId)
+    {
+        manOfTheSeriesRepository.remove(seriesId);
+    }
 }

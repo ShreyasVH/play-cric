@@ -1,6 +1,7 @@
 package com.playframework.cric.controllers;
 
 import com.google.inject.Inject;
+import com.playframework.cric.exceptions.ConflictException;
 import com.playframework.cric.exceptions.NotFoundException;
 import com.playframework.cric.models.*;
 import com.playframework.cric.requests.series.CreateRequest;
@@ -390,5 +391,37 @@ public class SeriesController extends Controller {
 
 
         return ok(Json.toJson(new Response(seriesResponse)));
+    }
+
+    public Result remove(Long id)
+    {
+        Series series = seriesService.getById(id);
+        if(null == series)
+        {
+            throw new NotFoundException("Series");
+        }
+
+        List<Match> matches = matchService.getBySeriesId(id);
+        if(!matches.isEmpty())
+        {
+            throw new ConflictException("Matches still exist");
+        }
+
+        Transaction transaction = DB.beginTransaction();
+        try {
+            manOfTheSeriesService.remove(id);
+            seriesTeamsMapService.remove(id);
+            seriesService.remove(id);
+
+            transaction.commit();
+            transaction.end();
+        }
+        catch(Exception ex)
+        {
+            transaction.end();
+            throw ex;
+        }
+
+        return ok(Json.toJson(new Response("Deleted successfully")));
     }
 }

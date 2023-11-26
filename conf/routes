@@ -21,6 +21,7 @@ POST   	/cric/v1/series				    com.playframework.cric.controllers.SeriesControll
 GET   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.getAll(page: Integer, limit: Integer)
 PUT   	/cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.update(id: Long, request: Request)
 GET   	/cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.getById(id: Long)
+DELETE  /cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.remove(id: Long)
 
 POST   	/cric/v1/matches				com.playframework.cric.controllers.MatchController.create(request: Request)
 GET     /cric/v1/matches/:id            com.playframework.cric.controllers.MatchController.getById(id: Integer)

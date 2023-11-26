@@ -19,7 +19,11 @@ public class Response {
 	}
 
 	public Response(String message) {
-		this.success = false;
+		this(message, false);
+	}
+
+	public Response(String message, boolean success) {
+		this.success = success;
 		this.message = message;
 	}
 }
