@@ -39,8 +39,11 @@ public class MatchMiniResponse {
         if(null != match.getWinnerId())
         {
             this.winner = teamMap.get(match.getWinnerId());
-            this.winMargin = match.getWinMargin();
-            this.winMarginType = new WinMarginTypeResponse(winMarginType);
+            if (match.getWinMargin() != null)
+            {
+                this.winMargin = match.getWinMargin();
+                this.winMarginType = new WinMarginTypeResponse(winMarginType);
+            }
         }
         this.resultType = new ResultTypeResponse(resultType);
         this.stadium = stadium;
