@@ -84,7 +84,7 @@ public class BattingScoreRepository {
 
     public List<BattingScore> getBattingScores(List<Integer> matchPlayerIds)
     {
-        return DB.find(BattingScore.class).where().in("matchPlayerId", matchPlayerIds).findList();
+        return DB.find(BattingScore.class).where().in("matchPlayerId", matchPlayerIds).orderBy("innings").orderBy("number").findList();
     }
 
     public void remove(List<Integer> matchPlayerIds)
