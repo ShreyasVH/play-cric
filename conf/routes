@@ -16,6 +16,7 @@ GET     /cric/v1/tours/:id              com.playframework.cric.controllers.TourC
 POST   	/cric/v1/players				com.playframework.cric.controllers.PlayerController.create(request: Request)
 GET		/cric/v1/players/:id			com.playframework.cric.controllers.PlayerController.get(id: Long)
 GET		/cric/v1/players				com.playframework.cric.controllers.PlayerController.getAll(page: Integer, limit: Integer)
+POST	/cric/v1/players/merge			com.playframework.cric.controllers.PlayerController.merge(request: Request)
 
 POST   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.create(request: Request)
 GET   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.getAll(page: Integer, limit: Integer)

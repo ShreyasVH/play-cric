@@ -1,6 +1,7 @@
 package com.playframework.cric.repositories;
 
 import com.playframework.cric.models.MatchPlayerMap;
+import com.playframework.cric.requests.players.MergeRequest;
 import io.ebean.DB;
 
 import java.util.List;
@@ -23,5 +24,12 @@ public class MatchPlayerMapRepository {
     public void remove(Integer matchId)
     {
         DB.deleteAll(getByMatchId(matchId));
+    }
+
+    public void merge(MergeRequest mergeRequest)
+    {
+        List<MatchPlayerMap> matchPlayerMaps = DB.find(MatchPlayerMap.class).where().eq("playerId", mergeRequest.getPlayerIdToMerge()).findList();
+        matchPlayerMaps.forEach(matchPlayerMap -> matchPlayerMap.setPlayerId(mergeRequest.getOriginalPlayerId()));
+        DB.saveAll(matchPlayerMaps);
     }
 }
