@@ -39,4 +39,9 @@ public class PlayerRepository {
     {
         return DB.find(Player.class).where().eq("id", id).findOne();
     }
+
+    public void remove(Long id)
+    {
+        DB.delete(getById(id));
+    }
 }

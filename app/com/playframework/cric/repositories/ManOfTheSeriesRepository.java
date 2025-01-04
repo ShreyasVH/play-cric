@@ -1,6 +1,7 @@
 package com.playframework.cric.repositories;
 
 import com.playframework.cric.models.ManOfTheSeries;
+import com.playframework.cric.requests.players.MergeRequest;
 import io.ebean.DB;
 
 import java.util.Collections;
@@ -25,5 +26,12 @@ public class ManOfTheSeriesRepository {
     public void remove(Long seriesId)
     {
         DB.deleteAll(getBySeriesIds(Collections.singletonList(seriesId)));
+    }
+
+    public void merge(MergeRequest mergeRequest)
+    {
+        List<ManOfTheSeries> manOfTheSeriesList = DB.find(ManOfTheSeries.class).where().eq("playerId", mergeRequest.getPlayerIdToMerge()).findList();
+        manOfTheSeriesList.forEach(manOfTheSeries -> manOfTheSeries.setPlayerId(mergeRequest.getOriginalPlayerId()));
+        DB.saveAll(manOfTheSeriesList);
     }
 }

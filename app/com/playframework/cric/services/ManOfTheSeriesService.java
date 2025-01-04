@@ -3,6 +3,7 @@ package com.playframework.cric.services;
 import com.google.inject.Inject;
 import com.playframework.cric.models.ManOfTheSeries;
 import com.playframework.cric.repositories.ManOfTheSeriesRepository;
+import com.playframework.cric.requests.players.MergeRequest;
 
 import java.util.List;
 
@@ -29,5 +30,10 @@ public class ManOfTheSeriesService {
     public void remove(Long seriesId)
     {
         manOfTheSeriesRepository.remove(seriesId);
+    }
+
+    public void merge(MergeRequest mergeRequest)
+    {
+        manOfTheSeriesRepository.merge(mergeRequest);
     }
 }

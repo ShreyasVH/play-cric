@@ -1,6 +1,7 @@
 package com.playframework.cric.controllers;
 
 import com.google.inject.Inject;
+import com.playframework.cric.requests.players.MergeRequest;
 import com.playframework.cric.responses.*;
 import com.playframework.cric.services.*;
 import play.libs.Json;
@@ -25,14 +26,26 @@ public class PlayerController extends Controller {
     private final BattingScoreService battingScoreService;
     private final BowlingFigureService bowlingFigureService;
     private final FielderDismissalService fielderDismissalService;
+    private final ManOfTheSeriesService manOfTheSeriesService;
+    private final MatchPlayerMapService matchPlayerMapService;
 
     @Inject
-    public PlayerController(PlayerService playerService, CountryService countryService, BattingScoreService battingScoreService, BowlingFigureService bowlingFigureService, FielderDismissalService fielderDismissalService) {
+    public PlayerController(
+        PlayerService playerService,
+        CountryService countryService,
+        BattingScoreService battingScoreService,
+        BowlingFigureService bowlingFigureService,
+        FielderDismissalService fielderDismissalService,
+        ManOfTheSeriesService manOfTheSeriesService,
+        MatchPlayerMapService matchPlayerMapService
+    ) {
         this.playerService = playerService;
         this.countryService = countryService;
         this.battingScoreService = battingScoreService;
         this.bowlingFigureService = bowlingFigureService;
         this.fielderDismissalService = fielderDismissalService;
+        this.manOfTheSeriesService = manOfTheSeriesService;
+        this.matchPlayerMapService = matchPlayerMapService;
     }
 
     public Result create(Http.Request request) {
@@ -159,5 +172,27 @@ public class PlayerController extends Controller {
         }
 
         return ok(Json.toJson(new Response(playerResponse)));
+    }
+
+    public Result merge(Http.Request request) {
+        MergeRequest mergeRequest = Utils.convertObject(request.body().asJson(), MergeRequest.class);
+
+        Player player = playerService.getById(mergeRequest.getPlayerIdToMerge());
+        if(player == null)
+        {
+            throw new NotFoundException("Player");
+        }
+
+        Player originalPlayer = playerService.getById(mergeRequest.getOriginalPlayerId());
+        if(originalPlayer == null)
+        {
+            throw new NotFoundException("Original Player");
+        }
+
+        manOfTheSeriesService.merge(mergeRequest);
+        matchPlayerMapService.merge(mergeRequest);
+        playerService.remove(mergeRequest.getPlayerIdToMerge());
+
+        return created(Json.toJson(new Response("Success")));
     }
 }

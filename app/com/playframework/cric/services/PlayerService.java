@@ -7,6 +7,7 @@ import com.playframework.cric.exceptions.ConflictException;
 import com.playframework.cric.models.Player;
 import com.playframework.cric.repositories.PlayerRepository;
 import com.playframework.cric.requests.players.CreateRequest;
+import com.playframework.cric.requests.players.MergeRequest;
 
 public class PlayerService {
     private final PlayerRepository playerRepository;
@@ -43,5 +44,10 @@ public class PlayerService {
     public Player getById(Long id)
     {
         return playerRepository.getById(id);
+    }
+
+    public void remove(Long id)
+    {
+        playerRepository.remove(id);
     }
 }
