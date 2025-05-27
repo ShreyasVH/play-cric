@@ -3,3 +3,6 @@
 target
 project/target
 project/project
+compile.log
+server.log
+dist
