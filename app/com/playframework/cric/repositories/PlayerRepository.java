@@ -44,4 +44,20 @@ public class PlayerRepository {
     {
         DB.delete(getById(id));
     }
+
+    public List<Player> search(String keyword, int page, int limit) {
+        return DB.find(Player.class)
+                .where()
+                .icontains("name", keyword)
+                .orderBy("name asc")
+                .setFirstRow((page - 1) * limit)
+                .setMaxRows(limit)
+                .findList();
+    }
+    public int searchCount(String keyword) {
+        return DB.find(Player.class)
+                .where()
+                .icontains("name", keyword)
+                .findCount();
+    }
 }

@@ -50,4 +50,14 @@ public class PlayerService {
     {
         playerRepository.remove(id);
     }
+
+    public List<Player> search(String keyword, int page, int limit)
+    {
+        return playerRepository.search(keyword, page, limit);
+    }
+
+    public int searchCount(String keyword)
+    {
+        return playerRepository.searchCount(keyword);
+    }
 }

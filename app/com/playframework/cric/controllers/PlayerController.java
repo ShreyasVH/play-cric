@@ -193,6 +193,23 @@ public class PlayerController extends Controller {
         matchPlayerMapService.merge(mergeRequest);
         playerService.remove(mergeRequest.getPlayerIdToMerge());
 
-        return created(Json.toJson(new Response("Success")));
+        return ok(Json.toJson(new Response("Success")));
+    }
+
+    public Result search(String keyword, int page, int limit) {
+        List<Player> players = playerService.search(keyword, page, limit);
+        int totalCount = 0;
+        if(page == 1) {
+            totalCount = playerService.searchCount(keyword);
+        }
+
+        List<Long> countryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
+
+        List<Country> countries = countryService.getByIds(countryIds);
+        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
+
+        List<PlayerMiniResponse> playerResponses = players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+        PaginatedResponse<PlayerMiniResponse> paginatedResponse = new PaginatedResponse<>(totalCount, playerResponses, page, limit);
+        return ok(Json.toJson(new Response(paginatedResponse)));
     }
 }
