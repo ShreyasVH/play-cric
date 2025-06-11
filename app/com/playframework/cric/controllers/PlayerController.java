@@ -48,6 +48,16 @@ public class PlayerController extends Controller {
         this.matchPlayerMapService = matchPlayerMapService;
     }
 
+    private List<PlayerMiniResponse> getPlayerResponses(List<Player> players)
+    {
+        List<Long> countryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
+
+        List<Country> countries = countryService.getByIds(countryIds);
+        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
+
+        return players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+    }
+
     public Result create(Http.Request request) {
         CreateRequest createRequest = Utils.convertObject(request.body().asJson(), CreateRequest.class);
 
@@ -69,12 +79,7 @@ public class PlayerController extends Controller {
             totalCount = playerService.getTotalCount();
         }
 
-        List<Long> countryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
-
-        List<Country> countries = countryService.getByIds(countryIds);
-        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
-
-        List<PlayerMiniResponse> playerResponses = players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+        List<PlayerMiniResponse> playerResponses = getPlayerResponses(players);
         PaginatedResponse<PlayerMiniResponse> paginatedResponse = new PaginatedResponse<>(totalCount, playerResponses, page, limit);
         return ok(Json.toJson(new Response(paginatedResponse)));
     }
@@ -203,12 +208,7 @@ public class PlayerController extends Controller {
             totalCount = playerService.searchCount(keyword);
         }
 
-        List<Long> countryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
-
-        List<Country> countries = countryService.getByIds(countryIds);
-        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
-
-        List<PlayerMiniResponse> playerResponses = players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+        List<PlayerMiniResponse> playerResponses = getPlayerResponses(players);
         PaginatedResponse<PlayerMiniResponse> paginatedResponse = new PaginatedResponse<>(totalCount, playerResponses, page, limit);
         return ok(Json.toJson(new Response(paginatedResponse)));
     }
