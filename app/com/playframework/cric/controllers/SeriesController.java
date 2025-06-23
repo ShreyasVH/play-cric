@@ -68,6 +68,20 @@ public class SeriesController extends Controller {
             countryIds.add(team.getCountryId());
         }
 
+        List<Player> players = new ArrayList<>();
+        List<Long> manOfTheSeriesToAdd = new ArrayList<>();
+        if (null != createRequest.getManOfTheSeriesList()) {
+            players = playerService.getByIds(createRequest.getManOfTheSeriesList());
+            if(players.size() != createRequest.getManOfTheSeriesList().stream().distinct().count()) {
+                throw new NotFoundException("Player");
+            }
+
+            manOfTheSeriesToAdd = createRequest.getManOfTheSeriesList();
+        }
+
+        List<Long> playerCountryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
+        countryIds.addAll(playerCountryIds);
+
         countryIds.add(createRequest.getHomeCountryId());
         List<Country> countries = countryService.getByIds(countryIds);
         Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
@@ -97,6 +111,7 @@ public class SeriesController extends Controller {
         try {
             series = seriesService.create(createRequest);
             seriesTeamsMapService.create(series.getId(), createRequest.getTeams());
+            manOfTheSeriesService.add(series.getId(), manOfTheSeriesToAdd);
 
             transaction.commit();
             transaction.end();
@@ -110,7 +125,9 @@ public class SeriesController extends Controller {
 
         List<TeamResponse> teamResponses = teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
 
-        return created(Json.toJson(new Response(new SeriesResponse(series, new CountryResponse(country), new TourMiniResponse(tour), new SeriesTypeResponse(seriesType), new GameTypeResponse(gameType), teamResponses, new ArrayList<>()))));
+        List<PlayerMiniResponse> playerResponses = players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+
+        return created(Json.toJson(new Response(new SeriesResponse(series, new CountryResponse(country), new TourMiniResponse(tour), new SeriesTypeResponse(seriesType), new GameTypeResponse(gameType), teamResponses, playerResponses))));
     }
 
     public Result getAll(int page, int limit) {
