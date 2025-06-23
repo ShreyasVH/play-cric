@@ -137,8 +137,23 @@ public class PlayerRepository {
         return fieldName;
     }
 
-    public StatsResponse getBattingStats(FilterRequest filterRequest)
-    {
+    public List<Player> search(String keyword, int page, int limit) {
+        return DB.find(Player.class)
+                .where()
+                .icontains("name", keyword)
+                .orderBy("name asc")
+                .setFirstRow((page - 1) * limit)
+                .setMaxRows(limit)
+                .findList();
+    }
+    public int searchCount(String keyword) {
+        return DB.find(Player.class)
+                .where()
+                .icontains("name", keyword)
+                .findCount();
+    }
+
+    public StatsResponse getBattingStats(FilterRequest filterRequest) {
         StatsResponse statsResponse = new StatsResponse();
         List<Map<String, String>> statList = new ArrayList<>();
 //        String query = "select p.id as playerId, p.name AS name, sum(bs.runs) AS `runs`, count(0) AS `innings`, sum(`bs`.`balls`) AS `balls`, sum(`bs`.`fours`) AS `fours`, sum(`bs`.`sixes`) AS `sixes`, max(`bs`.`runs`) AS `highest`, count((case when (`bs`.`mode_of_dismissal` is null) then 1 end)) AS `notouts`, count((case when ((`bs`.`runs` >= 50) and (`bs`.`runs` < 100)) then 1 end)) AS `fifties`, count((case when ((`bs`.`runs` >= 100)) then 1 end)) AS `hundreds` from batting_scores bs " +
@@ -167,40 +182,33 @@ public class PlayerRepository {
 
         //where
         List<String> whereQueryParts = new ArrayList<>();
-        for(Map.Entry<String, List<String>> entry: filterRequest.getFilters().entrySet())
-        {
+        for (Map.Entry<String, List<String>> entry : filterRequest.getFilters().entrySet()) {
             String field = entry.getKey();
             List<String> valueList = entry.getValue();
 
             String fieldNameWithTablePrefix = getFieldNameWithTablePrefix(field);
-            if(!fieldNameWithTablePrefix.isEmpty() && !valueList.isEmpty())
-            {
+            if (!fieldNameWithTablePrefix.isEmpty() && !valueList.isEmpty()) {
                 whereQueryParts.add(fieldNameWithTablePrefix + " in (" + String.join(", ", valueList) + ")");
             }
         }
 
-        for(Map.Entry<String, Map<String, String>> entry: filterRequest.getRangeFilters().entrySet())
-        {
+        for (Map.Entry<String, Map<String, String>> entry : filterRequest.getRangeFilters().entrySet()) {
             String field = entry.getKey();
             Map<String, String> rangeValues = entry.getValue();
 
             String fieldNameWithTablePrefix = getFieldNameWithTablePrefix(field);
-            if(!fieldNameWithTablePrefix.isEmpty() && !rangeValues.isEmpty())
-            {
-                if(rangeValues.containsKey("from"))
-                {
-                    whereQueryParts.add(fieldNameWithTablePrefix + " >= " +  rangeValues.get("from"));
+            if (!fieldNameWithTablePrefix.isEmpty() && !rangeValues.isEmpty()) {
+                if (rangeValues.containsKey("from")) {
+                    whereQueryParts.add(fieldNameWithTablePrefix + " >= " + rangeValues.get("from"));
                 }
-                if(rangeValues.containsKey("to"))
-                {
-                    whereQueryParts.add(fieldNameWithTablePrefix + " <= " +  rangeValues.get("to"));
+                if (rangeValues.containsKey("to")) {
+                    whereQueryParts.add(fieldNameWithTablePrefix + " <= " + rangeValues.get("to"));
                 }
 
             }
         }
 
-        if(!whereQueryParts.isEmpty())
-        {
+        if (!whereQueryParts.isEmpty()) {
             query += " where " + String.join(" and ", whereQueryParts);
             countQuery += " where " + String.join(" and ", whereQueryParts);
         }
@@ -209,19 +217,16 @@ public class PlayerRepository {
 
         //sort
         List<String> sortList = new ArrayList<>();
-        for(Map.Entry<String, String> entry: filterRequest.getSortMap().entrySet())
-        {
+        for (Map.Entry<String, String> entry : filterRequest.getSortMap().entrySet()) {
             String field = entry.getKey();
             String value = entry.getValue();
 
             String sortFieldName = getFieldNameForDisplay(field);
-            if(!sortFieldName.isEmpty())
-            {
+            if (!sortFieldName.isEmpty()) {
                 sortList.add(sortFieldName + " " + value);
             }
         }
-        if(sortList.isEmpty())
-        {
+        if (sortList.isEmpty()) {
             sortList.add(getFieldNameForDisplay("runs") + " desc");
         }
         query += " order by " + String.join(", ", sortList);
@@ -236,11 +241,9 @@ public class PlayerRepository {
         SqlQuery sqlQuery = DB.sqlQuery(query);
         List<SqlRow> result = sqlQuery.findList();
 
-        for(SqlRow row: result)
-        {
+        for (SqlRow row : result) {
             Integer innings = row.getInteger("innings");
-            if(innings > 0)
-            {
+            if (innings > 0) {
                 Map<String, String> stats = new HashMap<>();
 
                 stats.put("id", row.getString("playerId"));
