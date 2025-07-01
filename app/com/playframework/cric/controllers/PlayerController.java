@@ -1,6 +1,7 @@
 package com.playframework.cric.controllers;
 
 import com.google.inject.Inject;
+import com.playframework.cric.exceptions.BadRequestException;
 import com.playframework.cric.requests.players.MergeRequest;
 import com.playframework.cric.responses.*;
 import com.playframework.cric.services.*;
@@ -181,6 +182,11 @@ public class PlayerController extends Controller {
 
     public Result merge(Http.Request request) {
         MergeRequest mergeRequest = Utils.convertObject(request.body().asJson(), MergeRequest.class);
+
+        if(mergeRequest.getPlayerIdToMerge() == mergeRequest.getOriginalPlayerId())
+        {
+            throw new BadRequestException("Same player given");
+        }
 
         Player player = playerService.getById(mergeRequest.getPlayerIdToMerge());
         if(player == null)
