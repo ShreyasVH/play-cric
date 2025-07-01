@@ -5,6 +5,8 @@ import com.playframework.cric.exceptions.BadRequestException;
 import com.playframework.cric.requests.players.MergeRequest;
 import com.playframework.cric.responses.*;
 import com.playframework.cric.services.*;
+import io.ebean.DB;
+import io.ebean.Transaction;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -200,9 +202,19 @@ public class PlayerController extends Controller {
             throw new NotFoundException("Original Player");
         }
 
-        manOfTheSeriesService.merge(mergeRequest);
-        matchPlayerMapService.merge(mergeRequest);
-        playerService.remove(mergeRequest.getPlayerIdToMerge());
+        Transaction transaction = DB.beginTransaction();
+        try {
+            manOfTheSeriesService.merge(mergeRequest);
+            matchPlayerMapService.merge(mergeRequest);
+            playerService.remove(mergeRequest.getPlayerIdToMerge());
+
+            transaction.commit();
+            transaction.end();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+
+            transaction.rollback();
+        }
 
         return ok(Json.toJson(new Response("Success")));
     }
