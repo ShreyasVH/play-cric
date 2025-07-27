@@ -16,6 +16,13 @@ import com.playframework.cric.exceptions.MyException;
 @Singleton
 public class ErrorHandler implements HttpErrorHandler {
     public CompletionStage<Result> onClientError(RequestHeader request, int statusCode, String message) {
+        System.out.println("Client error");
+        System.out.println(message);
+        System.out.println(statusCode);
+        System.out.println(request.method());
+        System.out.println(request.host());
+        System.out.println(request.path());
+        System.out.println(request.queryString());
         return CompletableFuture.completedFuture(Results.status(statusCode, "A client error occurred: " + message));
     }
 
@@ -30,6 +37,14 @@ public class ErrorHandler implements HttpErrorHandler {
             content = myException.getDescription();
         }
 
+        System.out.println("Server error");
+        System.out.println(exception.getMessage());
+        System.out.println(httpsStatusCode);
+        System.out.println(content);
+        System.out.println(request.method());
+        System.out.println(request.host());
+        System.out.println(request.path());
+        System.out.println(request.queryString());
         Response response = new Response(content);
 
         return CompletableFuture.completedFuture(Results.status(httpsStatusCode, Json.toJson(response)));
