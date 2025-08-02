@@ -14,8 +14,8 @@ public class StadiumRepository {
         return stadium;
     }
 
-    public Stadium getByNameAndCountryId(String name, Long countryId) {
-        return DB.find(Stadium.class).where().eq("name", name).eq("countryId", countryId).findOne();
+    public Stadium getByNameAndCountryIdAndCity(String name, Long countryId, String city) {
+        return DB.find(Stadium.class).where().eq("name", name).eq("countryId", countryId).eq("city", city).findOne();
     }
 
     public List<Stadium> getAll(int page, int limit) {

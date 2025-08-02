@@ -10,7 +10,7 @@
 
     <logger name="play" level="INFO" />
 
-    <logger name="io.ebean.SQL" level="TRACE" />
+    <logger name="io.ebean.SQL" level="ERROR" />
 
     <root level="ERROR">
         <appender-ref ref="STDOUT" />

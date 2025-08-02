@@ -27,6 +27,7 @@ public class CreateRequest {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime startTime;
     private List<Long> teams;
+    private List<Long> manOfTheSeriesList;
 
     public void validate() {
         if (StringUtils.isEmpty(name)) {
