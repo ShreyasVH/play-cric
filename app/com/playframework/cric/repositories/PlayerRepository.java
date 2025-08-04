@@ -156,14 +156,6 @@ public class PlayerRepository {
     public StatsResponse getBattingStats(FilterRequest filterRequest) {
         StatsResponse statsResponse = new StatsResponse();
         List<Map<String, String>> statList = new ArrayList<>();
-//        String query = "select p.id as playerId, p.name AS name, sum(bs.runs) AS `runs`, count(0) AS `innings`, sum(`bs`.`balls`) AS `balls`, sum(`bs`.`fours`) AS `fours`, sum(`bs`.`sixes`) AS `sixes`, max(`bs`.`runs`) AS `highest`, count((case when (`bs`.`mode_of_dismissal` is null) then 1 end)) AS `notouts`, count((case when ((`bs`.`runs` >= 50) and (`bs`.`runs` < 100)) then 1 end)) AS `fifties`, count((case when ((`bs`.`runs` >= 100)) then 1 end)) AS `hundreds` from batting_scores bs " +
-//                "inner join match_player_map mpm on mpm.id = bs.match_player_id" +
-//                "inner join players p on p.id = mpm.player_id " +
-//                "inner join matches m on m.id = mpm.match_id " +
-//                "inner join series s on s.id = m.series " +
-//                "inner join stadiums st on st.id = m.stadium_id " +
-//                "inner join teams t on t.id = bs.team_id";
-
         String query = "select p.id as playerId, p.name AS name, sum(bs.runs) AS `runs`, count(0) AS `innings`, sum(`bs`.`balls`) AS `balls`, sum(`bs`.`fours`) AS `fours`, sum(`bs`.`sixes`) AS `sixes`, max(`bs`.`runs`) AS `highest`, count((case when (`bs`.`dismissal_mode_id` is null) then 1 end)) AS `notouts`, count((case when ((`bs`.`runs` >= 50) and (`bs`.`runs` < 100)) then 1 end)) AS `fifties`, count((case when ((`bs`.`runs` >= 100)) then 1 end)) AS `hundreds` from batting_scores bs " +
                 "inner join match_player_map mpm on mpm.id = bs.match_player_id " +
                 "inner join players p on p.id = mpm.player_id " +
@@ -260,6 +252,123 @@ public class PlayerRepository {
                 stats.put("twoHundreds", row.getString("twoHundreds"));
                 stats.put("threeHundreds", row.getString("threeHundreds"));
                 stats.put("fourHundreds", row.getString("fourHundreds"));
+
+                statList.add(stats);
+            }
+        }
+
+        statsResponse.setStats(statList);
+
+        return statsResponse;
+    }
+
+    public StatsResponse getBowlingStats(FilterRequest filterRequest) {
+        StatsResponse statsResponse = new StatsResponse();
+        List<Map<String, String>> statList = new ArrayList<>();
+
+        String query = "select p.id as playerId, p.name AS name, sum(bf.wickets) AS wickets, sum(bf.runs) as runs, count(0) AS `innings`, sum(`bf`.`balls`) AS `balls`, sum(`bf`.`maidens`) AS `maidens`, count((case when ((`bf`.`wickets` >= 5) and (`bf`.`wickets` < 10)) then 1 end)) AS `fifers`, count((case when (`bf`.`wickets` = 10) then 1 end)) AS `tenWickets` from bowling_figures bf " +
+                "inner join match_player_map mpm on mpm.id = bf.match_player_id " +
+                "inner join players p on p.id = mpm.player_id " +
+                "inner join matches m on m.id = mpm.match_id " +
+                "inner join series s on s.id = m.series_id " +
+                "inner join stadiums st on st.id = m.stadium_id " +
+                "inner join teams t on t.id = mpm.team_id";
+
+        String countQuery = "select count(distinct p.id) as count from bowling_figures bf " +
+                "inner join match_player_map mpm on mpm.id = bf.match_player_id " +
+                "inner join players p on p.id = mpm.player_id " +
+                "inner join matches m on m.id = mpm.match_id " +
+                "inner join series s on s.id = m.series_id " +
+                "inner join stadiums st on st.id = m.stadium_id " +
+                "inner join teams t on t.id = mpm.team_id";
+
+        //where
+        List<String> whereQueryParts = new ArrayList<>();
+        for(Map.Entry<String, List<String>> entry: filterRequest.getFilters().entrySet())
+        {
+            String field = entry.getKey();
+            List<String> valueList = entry.getValue();
+
+            String fieldNameWithTablePrefix = getFieldNameWithTablePrefix(field);
+            if(!fieldNameWithTablePrefix.isEmpty() && !valueList.isEmpty())
+            {
+                whereQueryParts.add(fieldNameWithTablePrefix + " in (" + String.join(", ", valueList) + ")");
+            }
+        }
+
+        for(Map.Entry<String, Map<String, String>> entry: filterRequest.getRangeFilters().entrySet())
+        {
+            String field = entry.getKey();
+            Map<String, String> rangeValues = entry.getValue();
+
+            String fieldNameWithTablePrefix = getFieldNameWithTablePrefix(field);
+            if(!fieldNameWithTablePrefix.isEmpty() && !rangeValues.isEmpty())
+            {
+                if(rangeValues.containsKey("from"))
+                {
+                    whereQueryParts.add(fieldNameWithTablePrefix + " >= " +  rangeValues.get("from"));
+                }
+                if(rangeValues.containsKey("to"))
+                {
+                    whereQueryParts.add(fieldNameWithTablePrefix + " <= " +  rangeValues.get("to"));
+                }
+
+            }
+        }
+
+        if(!whereQueryParts.isEmpty())
+        {
+            query += " where " + String.join(" and ", whereQueryParts);
+            countQuery += " where " + String.join(" and ", whereQueryParts);
+        }
+
+        query += " group by playerId";
+
+        //sort
+        List<String> sortList = new ArrayList<>();
+        for(Map.Entry<String, String> entry: filterRequest.getSortMap().entrySet())
+        {
+            String field = entry.getKey();
+            String value = entry.getValue();
+
+            String sortFieldName = getFieldNameForDisplay(field);
+            if(!sortFieldName.isEmpty())
+            {
+                sortList.add(sortFieldName + " " + value);
+            }
+        }
+        if(sortList.isEmpty())
+        {
+            sortList.add(getFieldNameForDisplay("wickets") + " desc");
+        }
+        query += " order by " + String.join(", ", sortList);
+
+        //offset limit
+        query += " limit " + Integer.min(30, filterRequest.getCount()) + " offset " + filterRequest.getOffset();
+
+        SqlQuery sqlCountQuery = DB.sqlQuery(countQuery);
+        List<SqlRow> countResult = sqlCountQuery.findList();
+        statsResponse.setCount(countResult.get(0).getInteger("count"));
+
+        SqlQuery sqlQuery = DB.sqlQuery(query);
+        List<SqlRow> result = sqlQuery.findList();
+
+        for(SqlRow row: result)
+        {
+            Integer innings = row.getInteger("innings");
+            if(innings > 0)
+            {
+                Map<String, String> stats = new HashMap<>();
+
+                stats.put("id", row.getString("playerId"));
+                stats.put("name", row.getString("name"));
+                stats.put("innings", innings.toString());
+                stats.put("wickets", row.getString("wickets"));
+                stats.put("runs", row.getString("runs"));
+                stats.put("balls", row.getString("balls"));
+                stats.put("maidens", row.getString("maidens"));
+                stats.put("fifers", row.getString("fifers"));
+                stats.put("tenWickets", row.getString("tenWickets"));
 
                 statList.add(stats);
             }
