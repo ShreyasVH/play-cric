@@ -80,7 +80,7 @@ public class PlayerRepository {
                 fieldName = "s.id";
                 break;
             case "year":
-                fieldName = "FROM_UNIXTIME(m.start_time / 1000, '%Y')";
+                fieldName = "YEAR(m.start_time)";
                 break;
         }
 
