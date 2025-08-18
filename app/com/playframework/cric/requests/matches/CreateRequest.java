@@ -42,6 +42,7 @@ public class CreateRequest {
     private List<Long> captains;
     private List<Long> wicketKeepers;
     private Boolean isOfficial = true;
+    private List<TotalsRequestEntry> totals;
 
     public void validate() {
         if(null != battingScores)

@@ -39,9 +39,10 @@ public class MatchController extends Controller {
     private final CaptainService captainService;
     private final WicketKeeperService wicketKeeperService;
     private final GameTypeService gameTypeService;
+    private final TotalsService totalsService;
 
     @Inject
-    public MatchController(MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService)
+    public MatchController(MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService, TotalsService totalsService)
     {
         this.matchService = matchService;
         this.seriesService = seriesService;
@@ -63,6 +64,7 @@ public class MatchController extends Controller {
         this.captainService = captainService;
         this.wicketKeeperService = wicketKeeperService;
         this.gameTypeService = gameTypeService;
+        this.totalsService = totalsService;
     }
 
     public Result create(Http.Request request)
@@ -244,6 +246,7 @@ public class MatchController extends Controller {
             manOfTheMatchService.add(createRequest.getManOfTheMatchList(), playerToMatchPlayerMap);
             captainService.add(createRequest.getCaptains(), playerToMatchPlayerMap);
             wicketKeeperService.add(createRequest.getWicketKeepers(), playerToMatchPlayerMap);
+            totalsService.add(createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
 
             transaction.commit();
             transaction.end();
