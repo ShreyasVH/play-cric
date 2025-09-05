@@ -24,6 +24,10 @@ public class StatsService {
         {
             statsResponse = this.playerRepository.getBowlingStats(filterRequest);
         }
+        else if("fielding".equals(filterRequest.getType()))
+        {
+            statsResponse = this.playerRepository.getFieldingStats(filterRequest);
+        }
         return statsResponse;
     }
 }
