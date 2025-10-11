@@ -36,7 +36,7 @@ public class SeriesService {
         return seriesRepository.getTotalCount();
     }
 
-    public Series getById(Long id) {
+    public Series getById(Integer id) {
         return seriesRepository.getById(id);
     }
 
@@ -84,7 +84,7 @@ public class SeriesService {
         return seriesRepository.getByTourId(tourId);
     }
 
-    public void remove(Long id)
+    public void remove(Integer id)
     {
         seriesRepository.remove(id);
     }

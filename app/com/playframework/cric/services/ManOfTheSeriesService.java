@@ -15,19 +15,19 @@ public class ManOfTheSeriesService {
         this.manOfTheSeriesRepository = manOfTheSeriesRepository;
     }
 
-    public List<ManOfTheSeries> getBySeriesIds(List<Long> seriesIds) {
+    public List<ManOfTheSeries> getBySeriesIds(List<Integer> seriesIds) {
         return manOfTheSeriesRepository.getBySeriesIds(seriesIds);
     }
 
-    public void add(Long seriesId, List<Long> playerIds) {
+    public void add(Integer seriesId, List<Long> playerIds) {
         manOfTheSeriesRepository.add(seriesId, playerIds);
     }
 
-    public void delete(Long seriesId, List<Long> playerIds) {
+    public void delete(Integer seriesId, List<Long> playerIds) {
         manOfTheSeriesRepository.delete(seriesId, playerIds);
     }
 
-    public void remove(Long seriesId)
+    public void remove(Integer seriesId)
     {
         manOfTheSeriesRepository.remove(seriesId);
     }

@@ -6,9 +6,17 @@ import io.ebean.DB;
 import java.util.List;
 
 public class TagsRepository {
-    public List<Tag> getAll()
+    public List<Tag> getAll(int page, int limit)
     {
-        return DB.find(Tag.class).findList();
+        return DB.find(Tag.class)
+            .orderBy("name asc")
+            .setFirstRow((page - 1) * limit)
+            .setMaxRows(limit)
+            .findList();
+    }
+
+    public int getTotalCount() {
+        return DB.find(Tag.class).findCount();
     }
 
     public Tag getById(Integer typeId) {

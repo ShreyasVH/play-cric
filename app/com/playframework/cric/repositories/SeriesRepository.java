@@ -32,7 +32,7 @@ public class SeriesRepository {
         return DB.find(Series.class).findCount();
     }
 
-    public Series getById(Long id) {
+    public Series getById(Integer id) {
         return DB.find(Series.class).where().eq("id", id).findOne();
     }
 
@@ -45,7 +45,7 @@ public class SeriesRepository {
         return DB.find(Series.class).where().eq("tourId", tourId).order("startTime desc").findList();
     }
 
-    public void remove(Long id)
+    public void remove(Integer id)
     {
         DB.delete(getById(id));
     }

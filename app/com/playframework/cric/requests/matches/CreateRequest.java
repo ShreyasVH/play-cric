@@ -19,7 +19,7 @@ import com.playframework.cric.exceptions.BadRequestException;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateRequest {
-    private Long seriesId;
+    private Integer seriesId;
     private Long team1Id;
     private Long team2Id;
     private Long tossWinnerId;

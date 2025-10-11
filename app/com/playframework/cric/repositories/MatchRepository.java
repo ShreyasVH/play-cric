@@ -22,7 +22,7 @@ public class MatchRepository {
         return DB.find(Match.class).where().eq("stadiumId", stadiumId).eq("startTime", startTime).findOne();
     }
 
-    public List<Match> getBySeriesId(Long seriesId)
+    public List<Match> getBySeriesId(Integer seriesId)
     {
         return DB.find(Match.class).where().eq("seriesId", seriesId).orderBy("startTime ASC").findList();
     }

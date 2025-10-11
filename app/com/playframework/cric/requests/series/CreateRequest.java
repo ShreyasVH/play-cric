@@ -28,6 +28,7 @@ public class CreateRequest {
     private LocalDateTime startTime;
     private List<Long> teams;
     private List<Long> manOfTheSeriesList;
+    private List<Integer> tags;
 
     public void validate() {
         if (StringUtils.isEmpty(name)) {

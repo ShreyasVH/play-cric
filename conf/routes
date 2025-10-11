@@ -21,15 +21,17 @@ POST	/cric/v1/players/merge			com.playframework.cric.controllers.PlayerControlle
 
 POST   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.create(request: Request)
 GET   	/cric/v1/series				    com.playframework.cric.controllers.SeriesController.getAll(page: Integer, limit: Integer)
-PUT   	/cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.update(id: Long, request: Request)
-GET   	/cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.getById(id: Long)
-DELETE  /cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.remove(id: Long)
+PUT   	/cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.update(id: Integer, request: Request)
+GET   	/cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.getById(id: Integer)
+DELETE  /cric/v1/series/:id				com.playframework.cric.controllers.SeriesController.remove(id: Integer)
 
 POST   	/cric/v1/matches				com.playframework.cric.controllers.MatchController.create(request: Request)
 GET     /cric/v1/matches/:id            com.playframework.cric.controllers.MatchController.getById(id: Integer)
 DELETE  /cric/v1/matches/:id            com.playframework.cric.controllers.MatchController.remove(id: Integer)
 
 POST    /cric/v1/stats                  com.playframework.cric.controllers.StatsController.getStats(request: Request)
+
+GET		/cric/v1/tags				    com.playframework.cric.controllers.TagsController.getAll(page: Integer, limit: Integer)
 
 GET /swagger.json        controllers.Assets.at(path="/public", file="swagger.json")
 

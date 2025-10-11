@@ -1,16 +1,19 @@
 package com.playframework.cric.repositories;
 
-import com.playframework.cric.models.SeriesTeamsMap;
+import com.playframework.cric.models.TagMap;
 import io.ebean.DB;
-
-import com.playframework.cric.models.ResultType;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TagMapRepository {
-    public void create(Integer entityId, List<Long> teamIds) {
-        List<SeriesTeamsMap> seriesTeamsMaps = teamIds.stream().map(teamId -> new SeriesTeamsMap(null, seriesId, teamId)).collect(Collectors.toList());
-        DB.saveAll(seriesTeamsMaps);
+    public void create(Integer entityId, List<Integer> tagIds, String tagEntityType) {
+        List<TagMap> tagMaps = tagIds.stream().map(tagId -> new TagMap(null, tagEntityType, tagId, entityId)).collect(Collectors.toList());
+        DB.saveAll(tagMaps);
+    }
+
+    public List<TagMap> get(Integer entityId, String tagEntityType)
+    {
+        return DB.find(TagMap.class).where().eq("entityId", entityId).eq("entityType", tagEntityType).findList();
     }
 }

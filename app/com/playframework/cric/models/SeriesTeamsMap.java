@@ -15,6 +15,6 @@ public class SeriesTeamsMap extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long seriesId;
+    private Integer seriesId;
     private Long teamId;
 }

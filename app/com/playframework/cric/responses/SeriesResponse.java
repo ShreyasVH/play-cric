@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class SeriesResponse {
-    private Long id;
+    private Integer id;
     private String name;
     private CountryResponse homeCountry;
     private TourMiniResponse tour;

@@ -1,6 +1,7 @@
 package com.playframework.cric.controllers;
 
 import com.google.inject.Inject;
+import com.playframework.cric.enums.TagEntityType;
 import com.playframework.cric.exceptions.ConflictException;
 import com.playframework.cric.exceptions.NotFoundException;
 import com.playframework.cric.models.*;
@@ -34,9 +35,11 @@ public class SeriesController extends Controller {
     private final ResultTypeService resultTypeService;
     private final WinMarginTypeService winMarginTypeService;
     private final StadiumService stadiumService;
+    private final TagMapService tagMapService;
+    private final TagsService tagsService;
 
     @Inject
-    public SeriesController (SeriesService seriesService, CountryService countryService, TourService tourService, SeriesTypeService seriesTypeService, GameTypeService gameTypeService, TeamService teamService, TeamTypeService teamTypeService, SeriesTeamsMapService seriesTeamsMapService, ManOfTheSeriesService manOfTheSeriesService, PlayerService playerService, MatchService matchService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService) {
+    public SeriesController (SeriesService seriesService, CountryService countryService, TourService tourService, SeriesTypeService seriesTypeService, GameTypeService gameTypeService, TeamService teamService, TeamTypeService teamTypeService, SeriesTeamsMapService seriesTeamsMapService, ManOfTheSeriesService manOfTheSeriesService, PlayerService playerService, MatchService matchService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, TagMapService tagMapService, TagsService tagsService) {
         this.seriesService = seriesService;
         this.countryService = countryService;
         this.tourService = tourService;
@@ -51,6 +54,8 @@ public class SeriesController extends Controller {
         this.resultTypeService = resultTypeService;
         this.winMarginTypeService = winMarginTypeService;
         this.stadiumService = stadiumService;
+        this.tagMapService = tagMapService;
+        this.tagsService = tagsService;
     }
 
     public Result create(Http.Request request) {
@@ -112,6 +117,7 @@ public class SeriesController extends Controller {
             series = seriesService.create(createRequest);
             seriesTeamsMapService.create(series.getId(), createRequest.getTeams());
             manOfTheSeriesService.add(series.getId(), manOfTheSeriesToAdd);
+            tagMapService.create(series.getId(), createRequest.getTags(), TagEntityType.SERIES.name());
 
             transaction.commit();
             transaction.end();
@@ -141,7 +147,7 @@ public class SeriesController extends Controller {
         List<Integer> seriesTypeIds = new ArrayList<>();
         List<Integer> gameTypeIds = new ArrayList<>();
         List<Long> tourIds = new ArrayList<>();
-        List<Long> seriesIds = new ArrayList<>();
+        List<Integer> seriesIds = new ArrayList<>();
 
         for (Series series: seriesList) {
             countryIds.add(series.getHomeCountryId());
@@ -192,7 +198,7 @@ public class SeriesController extends Controller {
         return ok(Json.toJson(new Response(paginatedResponse)));
     }
 
-    public Result update(Long id, Http.Request request) {
+    public Result update(Integer id, Http.Request request) {
         UpdateRequest updateRequest = Utils.convertObject(request.body().asJson(), UpdateRequest.class);
 
         Series existingSeries = seriesService.getById(id);
@@ -332,7 +338,7 @@ public class SeriesController extends Controller {
         return ok(Json.toJson(new Response(new SeriesResponse(existingSeries, new CountryResponse(country), new TourMiniResponse(tour), new SeriesTypeResponse(seriesType), new GameTypeResponse(gameType), teamResponses, playerResponses))));
     }
 
-    public Result getById(Long id)
+    public Result getById(Integer id)
     {
         Series series = seriesService.getById(id);
         if(null == series)
@@ -404,13 +410,17 @@ public class SeriesController extends Controller {
             );
         }).collect(Collectors.toList());
 
-        SeriesDetailedResponse seriesResponse = new SeriesDetailedResponse(series, seriesType, gameType, teamResponses, matchMiniResponses);
+        List<TagMap> tagMaps = tagMapService.get(id, TagEntityType.SERIES.name());
+        List<Integer> tagIds = tagMaps.stream().map(TagMap::getTagId).collect(Collectors.toList());
+        List<Tag> tags = tagsService.get(tagIds);
+
+        SeriesDetailedResponse seriesResponse = new SeriesDetailedResponse(series, seriesType, gameType, teamResponses, matchMiniResponses, tags);
 
 
         return ok(Json.toJson(new Response(seriesResponse)));
     }
 
-    public Result remove(Long id)
+    public Result remove(Integer id)
     {
         Series series = seriesService.getById(id);
         if(null == series)

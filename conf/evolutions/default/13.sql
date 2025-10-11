@@ -1,6 +1,18 @@
 # --- !Ups
 
+ALTER TABLE `series_teams_map` DROP FOREIGN KEY `fk_series_teams_map_series`;
+ALTER TABLE `man_of_the_series` DROP FOREIGN KEY `fk_mots_series`;
+ALTER TABLE `matches` DROP FOREIGN KEY `fk_m_series`;
+
 ALTER TABLE `series` CHANGE `id` `id` MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `series_teams_map` CHANGE `series_id` `series_id` MEDIUMINT UNSIGNED NOT NULL;
+ALTER TABLE `man_of_the_series` CHANGE `series_id` `series_id` MEDIUMINT UNSIGNED NOT NULL;
+ALTER TABLE `matches` CHANGE `series_id` `series_id` MEDIUMINT UNSIGNED NOT NULL;
+
+ALTER TABLE `series_teams_map` ADD CONSTRAINT `fk_series_teams_map_series` FOREIGN KEY (`series_id`) REFERENCES `series` (`id`);
+ALTER TABLE `man_of_the_series` ADD CONSTRAINT `fk_mots_series` FOREIGN KEY (`series_id`) REFERENCES `series` (`id`);
+ALTER TABLE `matches` ADD CONSTRAINT `fk_m_series` FOREIGN KEY (`series_id`) REFERENCES `series` (`id`);
 
 create table `tags` (
   `id`                            smallint unsigned auto_increment not null,
@@ -37,4 +49,19 @@ DROP TABLE `tags_map`;
 
 DROP TABLE `tags`;
 
+ALTER TABLE `series_teams_map` DROP FOREIGN KEY `fk_series_teams_map_series`;
+ALTER TABLE `man_of_the_series` DROP FOREIGN KEY `fk_mots_series`;
+ALTER TABLE `matches` DROP FOREIGN KEY `fk_m_series`;
+
+ALTER TABLE `series_teams_map` CHANGE `series_id` `series_id` BIGINT UNSIGNED NOT NULL;
+ALTER TABLE `man_of_the_series` CHANGE `series_id` `series_id` BIGINT UNSIGNED NOT NULL
+ALTER TABLE `matches` CHANGE `series_id` `series_id` BIGINT UNSIGNED NOT NULL
+
 ALTER TABLE `series` CHANGE `id` `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `series_teams_map` ADD CONSTRAINT `fk_series_teams_map_series` FOREIGN KEY (`series_id`) REFERENCES `series` (`id`);
+ALTER TABLE `man_of_the_series` ADD CONSTRAINT `fk_mots_series` FOREIGN KEY (`series_id`) REFERENCES `series` (`id`);
+ALTER TABLE `matches` ADD CONSTRAINT `fk_m_series` FOREIGN KEY (`series_id`) REFERENCES `series` (`id`);
+
+
+
