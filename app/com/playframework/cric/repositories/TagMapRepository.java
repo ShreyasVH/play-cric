@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class TagMapRepository {
     public void create(Integer entityId, List<Integer> tagIds, String tagEntityType) {
-        List<TagMap> tagMaps = tagIds.stream().map(tagId -> new TagMap(null, tagEntityType, tagId, entityId)).collect(Collectors.toList());
+        List<TagMap> tagMaps = tagIds.stream().map(tagId -> new TagMap(null, tagEntityType, entityId, tagId)).collect(Collectors.toList());
         DB.saveAll(tagMaps);
     }
 
