@@ -439,6 +439,7 @@ public class SeriesController extends Controller {
             manOfTheSeriesService.remove(id);
             seriesTeamsMapService.remove(id);
             seriesService.remove(id);
+            tagMapService.remove(id, TagEntityType.SERIES.name());
 
             transaction.commit();
             transaction.end();

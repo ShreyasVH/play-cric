@@ -22,4 +22,9 @@ public class TagMapService {
     {
         return tagMapRepository.get(entityId, tagEntityType);
     }
+
+    public void remove(Integer entityId, String tagEntityType)
+    {
+        tagMapRepository.remove(entityId, tagEntityType);
+    }
 }
