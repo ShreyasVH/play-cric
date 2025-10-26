@@ -19,4 +19,9 @@ public class TotalsService {
     {
         this.totalsRepository.add(totals);
     }
+
+    public void remove(Integer matchId)
+    {
+        this.totalsRepository.remove(matchId);
+    }
 }

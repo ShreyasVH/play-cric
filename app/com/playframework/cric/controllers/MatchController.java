@@ -497,6 +497,7 @@ public class MatchController extends Controller {
             battingScoreService.remove(matchPlayerIds);
             bowlingFigureService.remove(matchPlayerIds);
             matchPlayerMapService.remove(id);
+            totalsService.remove(id);
             matchService.remove(id);
 
             transaction.commit();
