@@ -10,11 +10,12 @@ import io.ebean.Model;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "series_teams_map")
-public class SeriesTeamsMap extends Model {
+@Table(name = "tags_map")
+public class TagMap extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer seriesId;
-    private Long teamId;
+    private String entityType;
+    private Integer entityId;
+    private Integer tagId;
 }

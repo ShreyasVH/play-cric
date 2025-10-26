@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class SeriesMiniResponse {
-    private Long id;
+    private Integer id;
     private String name;
     private Long homeCountryId;
     private Long tourId;

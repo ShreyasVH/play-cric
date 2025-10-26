@@ -9,21 +9,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ManOfTheSeriesRepository {
-    public List<ManOfTheSeries> getBySeriesIds(List<Long> seriesIds) {
+    public List<ManOfTheSeries> getBySeriesIds(List<Integer> seriesIds) {
         return DB.find(ManOfTheSeries.class).where().in("seriesId", seriesIds).findList();
     }
 
-    public void add(Long seriesId, List<Long> playerIds) {
+    public void add(Integer seriesId, List<Long> playerIds) {
         List<ManOfTheSeries> manOfTheSeriesList = playerIds.stream().map(playerId -> new ManOfTheSeries(null, seriesId, playerId)).collect(Collectors.toList());
         DB.saveAll(manOfTheSeriesList);
     }
 
-    public void delete(Long seriesId, List<Long> playerIds) {
+    public void delete(Integer seriesId, List<Long> playerIds) {
         List<ManOfTheSeries> manOfTheSeriesList = DB.find(ManOfTheSeries.class).where().eq("seriesId", seriesId).in("playerId", playerIds).findList();
         DB.deleteAll(manOfTheSeriesList);
     }
 
-    public void remove(Long seriesId)
+    public void remove(Integer seriesId)
     {
         DB.deleteAll(getBySeriesIds(Collections.singletonList(seriesId)));
     }

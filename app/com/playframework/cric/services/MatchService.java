@@ -30,7 +30,7 @@ public class MatchService {
         return matchRepository.create(createRequest);
     }
 
-    public List<Match> getBySeriesId(Long seriesId)
+    public List<Match> getBySeriesId(Integer seriesId)
     {
         return matchRepository.getBySeriesId(seriesId);
     }

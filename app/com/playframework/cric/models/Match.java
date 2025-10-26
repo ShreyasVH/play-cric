@@ -22,7 +22,7 @@ public class Match extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Long seriesId;
+    private Integer seriesId;
     @Column(name = "team_1_id")
     private Long team1Id;
     @Column(name = "team_2_id")
