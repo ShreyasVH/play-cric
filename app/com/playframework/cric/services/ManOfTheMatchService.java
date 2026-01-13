@@ -3,6 +3,7 @@ package com.playframework.cric.services;
 import com.google.inject.Inject;
 import com.playframework.cric.models.ManOfTheMatch;
 import com.playframework.cric.repositories.ManOfTheMatchRepository;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -29,5 +30,10 @@ public class ManOfTheMatchService {
     public void remove(List<Integer> matchPlayerIds)
     {
         manOfTheMatchRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        manOfTheMatchRepository.remove(em, matchPlayerIds);
     }
 }

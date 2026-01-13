@@ -3,15 +3,14 @@ package com.playframework.cric.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import javax.persistence.*;
-import io.ebean.Model;
+import jakarta.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "wicket_keepers")
-public class WicketKeeper extends Model {
+public class WicketKeeper {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

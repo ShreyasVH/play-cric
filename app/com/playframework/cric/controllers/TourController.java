@@ -42,7 +42,7 @@ public class TourController extends Controller {
 
     public Result getAllForYear(int year, int page, int limit) {
         List<Tour> tours = tourService.getAllForYear(year, page, limit);
-        int totalCount = 0;
+        long totalCount = 0;
         if(page == 1) {
             totalCount = tourService.getTotalCountForYear(year);
         }

@@ -39,7 +39,7 @@ public class CountryController extends Controller {
 
 	public Result getAll(int page, int limit) {
 		List<Country> countries = countryService.getAll(page, limit);
-		int totalCount = 0;
+		long totalCount = 0L;
 		if(page == 1) {
 			totalCount = countryService.getTotalCount();
 		}

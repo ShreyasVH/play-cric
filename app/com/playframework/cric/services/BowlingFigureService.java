@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.playframework.cric.models.BowlingFigure;
 import com.playframework.cric.repositories.BowlingFigureRepository;
 import com.playframework.cric.requests.matches.BowlingFigureRequest;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -35,5 +36,10 @@ public class BowlingFigureService {
     public void remove(List<Integer> matchPlayerIds)
     {
         bowlingFigureRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        bowlingFigureRepository.remove(em, matchPlayerIds);
     }
 }

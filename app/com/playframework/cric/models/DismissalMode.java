@@ -3,15 +3,14 @@ package com.playframework.cric.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import javax.persistence.*;
-import io.ebean.Model;
+import jakarta.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "dismissal_modes")
-public class DismissalMode extends Model {
+public class DismissalMode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

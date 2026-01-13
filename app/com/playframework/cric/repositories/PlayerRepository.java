@@ -1,55 +1,110 @@
 package com.playframework.cric.repositories;
 
+import com.google.inject.Inject;
 import com.playframework.cric.requests.FilterRequest;
 import com.playframework.cric.responses.StatsResponse;
-import io.ebean.DB;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.playframework.cric.models.Player;
 import com.playframework.cric.requests.players.CreateRequest;
 import com.playframework.cric.utils.Utils;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
+import jakarta.persistence.EntityManager;
+import play.db.jpa.JPAApi;
 
 public class PlayerRepository {
+    private final JPAApi jpaApi;
+
+    @Inject
+    public PlayerRepository(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
+    }
+
     public Player create(CreateRequest createRequest) {
         Player player = Utils.convertObject(createRequest, Player.class);
-        DB.save(player);
-        return player;
+        return jpaApi.withTransaction(em -> {
+            em.persist(player);
+            return player;
+        });
     }
 
     public Player getByNameAndCountryIdAndDateOfBirth(String name, Long countryId, LocalDate dateOfBirth) {
-        return DB.find(Player.class).where().eq("name", name).eq("countryId", countryId).eq("dateOfBirth", dateOfBirth).findOne();
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery("SELECT p FROM Player p WHERE p.name = :name AND p.countryId = :countryId AND p.dateOfBirth = :dateOfBirth", Player.class)
+                .setParameter("name", name)
+                .setParameter("countryId", countryId)
+                .setParameter("dateOfBirth", dateOfBirth)
+                .getSingleResultOrNull();
+        });
     }
 
     public List<Player> getAll(int page, int limit) {
-        return DB.find(Player.class)
-                .orderBy("name asc")
-                .setFirstRow((page - 1) * limit)
-                .setMaxRows(limit)
-                .findList();
+        int offset = (page - 1) * limit;
+
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery(
+                "SELECT p FROM Player p ORDER BY p.name ASC",
+                Player.class
+            )
+            .setFirstResult(offset)
+            .setMaxResults(limit)
+            .getResultList();
+        });
     }
 
-    public int getTotalCount() {
-        return DB.find(Player.class).findCount();
+    public long getTotalCount() {
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery(
+                "SELECT COUNT(p) FROM Player p",
+                Long.class
+            )
+            .getSingleResult();
+        });
     }
 
     public List<Player> getByIds(List<Long> ids) {
-        return DB.find(Player.class).where().in("id", ids).findList();
+        return jpaApi.withTransaction(em -> {
+            return getByIds(em, ids);
+        });
+    }
+
+    public List<Player> getByIds(EntityManager em, List<Long> ids) {
+        return em.createQuery("SELECT p FROM Player p WHERE p.id IN :ids", Player.class)
+                .setParameter("ids", ids)
+                .getResultList();
     }
 
     public Player getById(Long id)
     {
-        return DB.find(Player.class).where().eq("id", id).findOne();
+        return jpaApi.withTransaction(em -> {
+            return getById(em, id);
+        });
+    }
+
+    public Player getById(EntityManager em, Long id)
+    {
+        return em.createQuery("SELECT p FROM Player p WHERE p.id = :id", Player.class)
+                .setParameter("id", id)
+                .getSingleResultOrNull();
     }
 
     public void remove(Long id)
     {
-        DB.delete(getById(id));
+        jpaApi.withTransaction(em -> {
+            remove(em, id);
+        });
+    }
+
+    public void remove(EntityManager em, Long id)
+    {
+        em.createQuery(
+                "DELETE FROM Player p WHERE p.id = :id",
+                Player.class
+        )
+        .setParameter("id", id)
+        .executeUpdate();
     }
 
     public String getFieldNameWithTablePrefix(String field)
@@ -153,19 +208,28 @@ public class PlayerRepository {
     }
 
     public List<Player> search(String keyword, int page, int limit) {
-        return DB.find(Player.class)
-                .where()
-                .icontains("name", keyword)
-                .orderBy("name asc")
-                .setFirstRow((page - 1) * limit)
-                .setMaxRows(limit)
-                .findList();
+        int offset = (page - 1) * limit;
+
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery(
+                "SELECT p FROM Player p WHERE LOWER(p.name) like LOWER(:name) ORDER BY p.name ASC",
+                Player.class
+            )
+            .setParameter("name", "%" + keyword + "%")
+            .setFirstResult(offset)
+            .setMaxResults(limit)
+            .getResultList();
+        });
     }
-    public int searchCount(String keyword) {
-        return DB.find(Player.class)
-                .where()
-                .icontains("name", keyword)
-                .findCount();
+    public long searchCount(String keyword) {
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery(
+                    "SELECT COUNT(p) FROM Player p WHERE LOWER(p.name) like LOWER(:name)",
+                    Long.class
+            )
+            .setParameter("name", "%" + keyword + "%")
+            .getSingleResult();
+        });
     }
 
     public StatsResponse getBattingStats(FilterRequest filterRequest) {
@@ -241,36 +305,43 @@ public class PlayerRepository {
         //offset limit
         query += " limit " + Integer.min(30, filterRequest.getCount()) + " offset " + filterRequest.getOffset();
 
-        SqlQuery sqlCountQuery = DB.sqlQuery(countQuery);
-        List<SqlRow> countResult = sqlCountQuery.findList();
-        statsResponse.setCount(countResult.get(0).getInteger("count"));
+        String finalCountQuery = countQuery;
+        jpaApi.withTransaction(em -> {
+            List<Object[]> countResult = em.createNativeQuery(finalCountQuery).getResultList();
+//            statsResponse.setCount(countResult.get(0).getInteger("count"));
+            String sh = "sh";
+        });
 
-        SqlQuery sqlQuery = DB.sqlQuery(query);
-        List<SqlRow> result = sqlQuery.findList();
+        String finalQuery = query;
+        jpaApi.withTransaction(em -> {
+            List<Object[]> result = em.createNativeQuery(finalQuery).getResultList();
+            for(Object[] row: result)
+            {
+                String sh = "sh";
 
-        for (SqlRow row : result) {
-            Integer innings = row.getInteger("innings");
-            if (innings > 0) {
-                Map<String, String> stats = new HashMap<>();
-
-                stats.put("id", row.getString("playerId"));
-                stats.put("name", row.getString("name"));
-                stats.put("innings", innings.toString());
-                stats.put("runs", row.getString("runs"));
-                stats.put("balls", row.getString("balls"));
-                stats.put("notOuts", row.getString("notouts"));
-                stats.put("fours", row.getString("fours"));
-                stats.put("sixes", row.getString("sixes"));
-                stats.put("highest", row.getString("highest"));
-                stats.put("fifties", row.getString("fifties"));
-                stats.put("hundreds", row.getString("hundreds"));
-                stats.put("twoHundreds", row.getString("twoHundreds"));
-                stats.put("threeHundreds", row.getString("threeHundreds"));
-                stats.put("fourHundreds", row.getString("fourHundreds"));
-
-                statList.add(stats);
+//                Integer innings = row.getInteger("innings");
+//                if (innings > 0) {
+//                    Map<String, String> stats = new HashMap<>();
+//
+//                    stats.put("id", row.getString("playerId"));
+//                    stats.put("name", row.getString("name"));
+//                    stats.put("innings", innings.toString());
+//                    stats.put("runs", row.getString("runs"));
+//                    stats.put("balls", row.getString("balls"));
+//                    stats.put("notOuts", row.getString("notouts"));
+//                    stats.put("fours", row.getString("fours"));
+//                    stats.put("sixes", row.getString("sixes"));
+//                    stats.put("highest", row.getString("highest"));
+//                    stats.put("fifties", row.getString("fifties"));
+//                    stats.put("hundreds", row.getString("hundreds"));
+//                    stats.put("twoHundreds", row.getString("twoHundreds"));
+//                    stats.put("threeHundreds", row.getString("threeHundreds"));
+//                    stats.put("fourHundreds", row.getString("fourHundreds"));
+//
+//                    statList.add(stats);
+//                }
             }
-        }
+        });
 
         statsResponse.setStats(statList);
 
@@ -361,33 +432,38 @@ public class PlayerRepository {
         //offset limit
         query += " limit " + Integer.min(30, filterRequest.getCount()) + " offset " + filterRequest.getOffset();
 
-        SqlQuery sqlCountQuery = DB.sqlQuery(countQuery);
-        List<SqlRow> countResult = sqlCountQuery.findList();
-        statsResponse.setCount(countResult.get(0).getInteger("count"));
+        String finalCountQuery = countQuery;
+        jpaApi.withTransaction(em -> {
+            List<Object[]> countResult = em.createNativeQuery(finalCountQuery).getResultList();
+//            statsResponse.setCount(countResult.get(0).getInteger("count"));
+            String sh = "sh";
+        });
 
-        SqlQuery sqlQuery = DB.sqlQuery(query);
-        List<SqlRow> result = sqlQuery.findList();
+        String finalQuery = query;
+        jpaApi.withTransaction(em -> {
+            List<Object[]> result = em.createNativeQuery(finalQuery).getResultList();
+            for (Object[] row : result) {
+                String sh = "sh";
 
-        for(SqlRow row: result)
-        {
-            Integer innings = row.getInteger("innings");
-            if(innings > 0)
-            {
-                Map<String, String> stats = new HashMap<>();
-
-                stats.put("id", row.getString("playerId"));
-                stats.put("name", row.getString("name"));
-                stats.put("innings", innings.toString());
-                stats.put("wickets", row.getString("wickets"));
-                stats.put("runs", row.getString("runs"));
-                stats.put("balls", row.getString("balls"));
-                stats.put("maidens", row.getString("maidens"));
-                stats.put("fifers", row.getString("fifers"));
-                stats.put("tenWickets", row.getString("tenWickets"));
-
-                statList.add(stats);
+//                Integer innings = row.getInteger("innings");
+//                if(innings > 0)
+//                {
+//                    Map<String, String> stats = new HashMap<>();
+//
+//                    stats.put("id", row.getString("playerId"));
+//                    stats.put("name", row.getString("name"));
+//                    stats.put("innings", innings.toString());
+//                    stats.put("wickets", row.getString("wickets"));
+//                    stats.put("runs", row.getString("runs"));
+//                    stats.put("balls", row.getString("balls"));
+//                    stats.put("maidens", row.getString("maidens"));
+//                    stats.put("fifers", row.getString("fifers"));
+//                    stats.put("tenWickets", row.getString("tenWickets"));
+//
+//                    statList.add(stats);
+//                }
             }
-        }
+        });
 
         statsResponse.setStats(statList);
 
@@ -488,26 +564,31 @@ public class PlayerRepository {
         //offset limit
         query += " limit " + Integer.min(30, filterRequest.getCount()) + " offset " + filterRequest.getOffset();
 
-        SqlQuery sqlCountQuery = DB.sqlQuery(countQuery);
-        List<SqlRow> countResult = sqlCountQuery.findList();
-        statsResponse.setCount(countResult.get(0).getInteger("count"));
+        String finalCountQuery = countQuery;
+        jpaApi.withTransaction(em -> {
+            List<Object[]> countResult = em.createNativeQuery(finalCountQuery).getResultList();
+//            statsResponse.setCount(countResult.get(0).getInteger("count"));
+            String sh = "sh";
+        });
 
-        SqlQuery sqlQuery = DB.sqlQuery(query);
-        List<SqlRow> result = sqlQuery.findList();
+        String finalQuery = query;
+        jpaApi.withTransaction(em -> {
+            List<Object[]> result = em.createNativeQuery(finalQuery).getResultList();
+            for (Object[] row : result) {
+                String sh = "sh";
 
-        for(SqlRow row: result)
-        {
-            Map<String, String> stats = new HashMap<>();
-
-            stats.put("id", row.getString("playerId"));
-            stats.put("name", row.getString("name"));
-            stats.put("fielderCatches", row.getString("fielderCatches"));
-            stats.put("keeperCatches", row.getString("keeperCatches"));
-            stats.put("stumpings", row.getString("stumpings"));
-            stats.put("runOuts", row.getString("runOuts"));
-
-            statList.add(stats);
-        }
+//                Map<String, String> stats = new HashMap<>();
+//
+//                stats.put("id", row.getString("playerId"));
+//                stats.put("name", row.getString("name"));
+//                stats.put("fielderCatches", row.getString("fielderCatches"));
+//                stats.put("keeperCatches", row.getString("keeperCatches"));
+//                stats.put("stumpings", row.getString("stumpings"));
+//                stats.put("runOuts", row.getString("runOuts"));
+//
+//                statList.add(stats);
+            }
+        });
 
         statsResponse.setStats(statList);
 

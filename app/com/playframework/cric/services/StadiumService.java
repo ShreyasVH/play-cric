@@ -32,7 +32,7 @@ public class StadiumService {
 		return stadiumRepository.getAll(page, limit);
 	}
 
-	public int getTotalCount() {
+	public long getTotalCount() {
 		return stadiumRepository.getTotalCount();
 	}
 

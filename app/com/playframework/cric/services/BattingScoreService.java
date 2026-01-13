@@ -5,6 +5,7 @@ import com.playframework.cric.models.BattingScore;
 import com.playframework.cric.repositories.BattingScoreRepository;
 import com.playframework.cric.requests.matches.BattingScoreRequest;
 import com.playframework.cric.responses.BattingStats;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -41,5 +42,10 @@ public class BattingScoreService {
     public void remove(List<Integer> matchPlayerIds)
     {
         battingScoreRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        battingScoreRepository.remove(em, matchPlayerIds);
     }
 }

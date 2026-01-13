@@ -3,6 +3,7 @@ package com.playframework.cric.services;
 import com.google.inject.Inject;
 import com.playframework.cric.models.FielderDismissal;
 import com.playframework.cric.repositories.FielderDismissalRepository;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -34,5 +35,10 @@ public class FielderDismissalService {
     public void remove(List<Integer> matchPlayerIds)
     {
         fielderDismissalRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        fielderDismissalRepository.remove(em, matchPlayerIds);
     }
 }

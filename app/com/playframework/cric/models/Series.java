@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import io.ebean.Model;
 import java.time.LocalDateTime;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "series")
-public class Series extends Model {
+public class Series {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

@@ -4,15 +4,14 @@ import com.playframework.cric.requests.matches.ExtrasRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import javax.persistence.*;
-import io.ebean.Model;
+import jakarta.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "extras")
-public class Extras extends Model {
+public class Extras {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

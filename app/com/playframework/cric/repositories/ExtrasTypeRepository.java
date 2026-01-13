@@ -1,13 +1,27 @@
 package com.playframework.cric.repositories;
 
-import io.ebean.DB;
+import com.google.inject.Inject;
 
 import com.playframework.cric.models.ExtrasType;
+import play.db.jpa.JPAApi;
 
 import java.util.List;
 
 public class ExtrasTypeRepository {
+    private final JPAApi jpaApi;
+
+    @Inject
+    public ExtrasTypeRepository(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
+    }
+
     public List<ExtrasType> getAll() {
-        return DB.find(ExtrasType.class).findList();
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery(
+                    "SELECT et FROM ExtrasType et",
+                    ExtrasType.class
+            )
+            .getResultList();
+        });
     }
 }

@@ -6,6 +6,7 @@ import com.playframework.cric.repositories.TourRepository;
 import com.playframework.cric.requests.tours.CreateRequest;
 import com.playframework.cric.models.Tour;
 import com.playframework.cric.exceptions.ConflictException;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
@@ -33,6 +34,10 @@ public class TourService {
         return tourRepository.getById(id);
     }
 
+    public Tour getById(EntityManager em, Long id) {
+        return tourRepository.getById(em, id);
+    }
+
     public List<Tour> getByIds(List<Long> ids) {
         return tourRepository.getByIds(ids);
     }
@@ -42,7 +47,7 @@ public class TourService {
         return tourRepository.getAll(year, page, limit);
     }
 
-    public int getTotalCountForYear(int year)
+    public long getTotalCountForYear(int year)
     {
         return tourRepository.getTotalCountForYear(year);
     }

@@ -1,6 +1,6 @@
 package com.playframework.cric.repositories;
 
-import io.ebean.DB;
+import com.google.inject.Inject;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,62 +9,99 @@ import java.util.List;
 import com.playframework.cric.models.Tour;
 import com.playframework.cric.requests.tours.CreateRequest;
 import com.playframework.cric.utils.Utils;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
+import jakarta.persistence.EntityManager;
+import play.db.jpa.JPAApi;
 
 public class TourRepository {
+    private final JPAApi jpaApi;
+
+    @Inject
+    public TourRepository(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
+    }
+
     public Tour create(CreateRequest createRequest) {
         Tour tour = Utils.convertObject(createRequest, Tour.class);
-        DB.save(tour);
-        return tour;
+        return jpaApi.withTransaction(em -> {
+            em.persist(tour);
+            return tour;
+        });
     }
 
     public Tour getByNameAndStartTime(String name, LocalDateTime startTime) {
-        return DB.find(Tour.class).where().eq("name", name).eq("startTime", startTime).findOne();
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery("SELECT t FROM Tour t WHERE t.name = :name AND t.startTime = :startTime", Tour.class)
+                .setParameter("name", name)
+                .setParameter("startTime", startTime)
+                .getSingleResultOrNull();
+        });
     }
 
     public Tour getById(Long id) {
-        return DB.find(Tour.class).where().eq("id", id).findOne();
+        return jpaApi.withTransaction(em -> {
+            return getById(em, id);
+        });
+    }
+
+    public Tour getById(EntityManager em, Long id) {
+        return em.createQuery("SELECT t FROM Tour t WHERE t.id = :id", Tour.class)
+                .setParameter("id", id)
+                .getSingleResultOrNull();
     }
 
     public List<Tour> getByIds(List<Long> ids) {
-        return DB.find(Tour.class).where().in("id", ids).findList();
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery("SELECT t FROM Tour t WHERE t.id IN :ids", Tour.class)
+                .setParameter("ids", ids)
+                .getResultList();
+        });
     }
 
     public List<Tour> getAll(int year, int page, int limit) {
         LocalDateTime startTime = LocalDateTime.of(year, 1, 1, 0, 0, 0);
         LocalDateTime endTime = startTime.plusYears(1L);
 
-        return DB.find(Tour.class)
-                .where()
-                .ge("startTime", startTime)
-                .le("startTime", endTime)
-                .orderBy("startTime desc")
-                .setFirstRow((page - 1) * limit)
-                .setMaxRows(limit)
-                .findList();
+        int offset = (page - 1) * limit;
+
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery(
+                    "SELECT t FROM Tour t WHERE t.startTime >= :startTime AND t.startTime <= :endTime ORDER BY t.startTime DESC",
+                    Tour.class
+            )
+            .setParameter("startTime", startTime)
+            .setParameter("endTime", endTime)
+            .setFirstResult(offset)
+            .setMaxResults(limit)
+            .getResultList();
+        });
     }
 
-    public int getTotalCountForYear(int year) {
+    public long getTotalCountForYear(int year) {
         LocalDateTime startTime = LocalDateTime.of(year, 1, 1, 0, 0, 0);
         LocalDateTime endTime = startTime.plusYears(1L);
-        return DB.find(Tour.class)
-                .where()
-                .ge("startTime", startTime)
-                .le("startTime", endTime)
-                .findCount();
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery(
+                "SELECT COUNT(t) FROM Tour t WHERE t.startTime >= :startTime AND t.startTime <= :endTime",
+                Long.class
+            )
+            .setParameter("startTime", startTime)
+            .setParameter("endTime", endTime)
+            .getSingleResult();
+        });
     }
 
     public List<Integer> getAllYears() {
-        String query = "SELECT DISTINCT YEAR(start_time) AS year FROM tours ORDER BY year DESC";
-        SqlQuery sqlQuery = DB.sqlQuery(query);
-        List<SqlRow> result = sqlQuery.findList();
-
         List<Integer> years = new ArrayList<>();
+        String query = "SELECT DISTINCT YEAR(start_time) AS year FROM tours ORDER BY year DESC";
+        jpaApi.withTransaction(em -> {
+            List<Object[]> rows = em.createNativeQuery(query).getResultList();
 
-        for (SqlRow row: result) {
-            years.add(row.getInteger("year"));
-        }
+            for (Object[] row: rows) {
+                String sh = "sh";
+//                years.add(row.getInteger("year"));
+            }
+
+        });
 
         return years;
     }
