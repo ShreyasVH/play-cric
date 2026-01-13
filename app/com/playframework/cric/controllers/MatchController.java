@@ -72,6 +72,17 @@ public class MatchController extends Controller {
     {
         CreateRequest createRequest = Utils.convertObject(request.body().asJson(), CreateRequest.class);
 
+        class TransactionalResult
+        {
+            Match match;
+            Series series;
+            GameType gameType;
+            WinMarginTypeResponse winMarginTypeResponse;
+            List<BattingScoreResponse> battingScoreResponses;
+            List<BowlingFigureResponse> bowlingFigureResponses;
+            List<ExtrasResponse> extrasResponses;
+        }
+
         Series series = seriesService.getById(createRequest.getSeriesId());
         if(null == series)
         {
@@ -156,12 +167,16 @@ public class MatchController extends Controller {
         List<Country> countries = countryService.getByIds(countryIds);
         Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
 
-        Map<String, Object> transactionResult = jpaApi.withTransaction(em -> {
-            Match match = matchService.create(createRequest);
-            List<MatchPlayerMap> matchPlayerMapList = matchPlayerMapService.add(match.getId(), allPlayerIds, playerTeamMap);
+        List<DismissalMode> dismissalModes = dismissalModeService.getAll();
+        List<ExtrasType> extrasTypes = extrasTypeService.getAll();
+
+        WinMarginTypeResponse finalWinMarginTypeResponse = winMarginTypeResponse;
+        TransactionalResult transactionResult = jpaApi.withTransaction(em -> {
+            Match match = matchService.create(em, createRequest);
+            List<MatchPlayerMap> matchPlayerMapList = matchPlayerMapService.add(em, match.getId(), allPlayerIds, playerTeamMap);
             Map<Long, Integer> playerToMatchPlayerMap = matchPlayerMapList.stream().collect(Collectors.toMap(MatchPlayerMap::getPlayerId, MatchPlayerMap::getId));
-            List<BattingScore> battingScores = battingScoreService.add(createRequest.getBattingScores(), playerToMatchPlayerMap);
-            List<DismissalMode> dismissalModes = dismissalModeService.getAll();
+            List<BattingScore> battingScores = battingScoreService.add(em, createRequest.getBattingScores(), playerToMatchPlayerMap);
+
             Map<Integer, DismissalMode> dismissalModeMap = dismissalModes.stream().collect(Collectors.toMap(DismissalMode::getId, dismissalMode -> dismissalMode));
             Map<String, BattingScore> battingScoreMap = battingScores.stream().collect(Collectors.toMap(battingScore -> battingScore.getMatchPlayerId() + "_" + battingScore.getInnings(), battingScore -> battingScore));
             Map<Integer, List<Long>> scoreFielderMap = new HashMap<>();
@@ -202,8 +217,8 @@ public class MatchController extends Controller {
                 );
             }).collect(Collectors.toList());
 
-            fielderDismissalService.add(scoreFielderMap, playerToMatchPlayerMap);
-            List<BowlingFigure> bowlingFigures = bowlingFigureService.add(createRequest.getBowlingFigures(), playerToMatchPlayerMap);
+            fielderDismissalService.add(em, scoreFielderMap, playerToMatchPlayerMap);
+            List<BowlingFigure> bowlingFigures = bowlingFigureService.add(em, createRequest.getBowlingFigures(), playerToMatchPlayerMap);
             Map<String, BowlingFigure> bowlingFigureMap = bowlingFigures.stream().collect(Collectors.toMap(bowlingFigure -> bowlingFigure.getMatchPlayerId() + "_" + bowlingFigure.getInnings(), bowlingFigure -> bowlingFigure));
             List<BowlingFigureResponse> bowlingFigureResponses = createRequest.getBowlingFigures().stream().map(bowlingFigureRequest -> {
                 String key = playerToMatchPlayerMap.get(bowlingFigureRequest.getPlayerId()) + "_" + bowlingFigureRequest.getInnings();
@@ -214,9 +229,8 @@ public class MatchController extends Controller {
                 return new BowlingFigureResponse(bowlingFigure, new PlayerMiniResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId()))));
             }).collect(Collectors.toList());
 
-            List<ExtrasType> extrasTypes = extrasTypeService.getAll();
             Map<Integer, ExtrasType> extrasTypeMap = extrasTypes.stream().collect(Collectors.toMap(ExtrasType::getId, extrasType -> extrasType));
-            List<Extras> extrasList = extrasService.add(match.getId(), createRequest.getExtras());
+            List<Extras> extrasList = extrasService.add(em, match.getId(), createRequest.getExtras());
             List<ExtrasResponse> extrasResponses = extrasList.stream()
                     .map(extras -> {
                         Team battingTeam = teamMap.get(extras.getBattingTeamId());
@@ -238,17 +252,22 @@ public class MatchController extends Controller {
                     })
                     .collect(Collectors.toList());
 
-            manOfTheMatchService.add(createRequest.getManOfTheMatchList(), playerToMatchPlayerMap);
-            captainService.add(createRequest.getCaptains(), playerToMatchPlayerMap);
-            wicketKeeperService.add(createRequest.getWicketKeepers(), playerToMatchPlayerMap);
-            totalsService.add(createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
+            manOfTheMatchService.add(em, createRequest.getManOfTheMatchList(), playerToMatchPlayerMap);
+            captainService.add(em, createRequest.getCaptains(), playerToMatchPlayerMap);
+            wicketKeeperService.add(em, createRequest.getWicketKeepers(), playerToMatchPlayerMap);
+            totalsService.add(em, createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
 
-            return Map.of(
-                "match", match,
-                "battingScoreResponses", battingScoreResponses,
-                "bowlingFigureResponses", bowlingFigureResponses,
-                "extrasResponses", extrasResponses
-            );
+            TransactionalResult transactionalResult = new TransactionalResult();
+
+            transactionalResult.match = match;
+            transactionalResult.series = series;
+            transactionalResult.gameType = gameType;
+            transactionalResult.winMarginTypeResponse = finalWinMarginTypeResponse;
+            transactionalResult.battingScoreResponses = battingScoreResponses;
+            transactionalResult.bowlingFigureResponses = bowlingFigureResponses;
+            transactionalResult.extrasResponses = extrasResponses;
+
+            return transactionalResult;
         });
 
         Map<Long, List<PlayerMiniResponse>> teamPlayerMap = new HashMap<>();
@@ -264,18 +283,18 @@ public class MatchController extends Controller {
         }
 
         MatchResponse matchResponse = new MatchResponse(
-            (Match) transactionResult.get("match"),
-            series,
-            gameType,
+            transactionResult.match,
+            transactionResult.series,
+            transactionResult.gameType,
             new TeamResponse(team1, new CountryResponse(countryMap.get(team1.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team1.getTypeId()))),
             new TeamResponse(team2, new CountryResponse(countryMap.get(team2.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team2.getTypeId()))),
             new ResultTypeResponse(resultType),
-            winMarginTypeResponse,
+            transactionResult.winMarginTypeResponse,
             new StadiumResponse(stadium, new CountryResponse(countryMap.get(stadium.getCountryId()))),
             teamPlayerMap,
-            (List<BattingScoreResponse>) transactionResult.get("battingScoreResponses"),
-            (List<BowlingFigureResponse>) transactionResult.get("bowlingFigureResponses"),
-            (List<ExtrasResponse>) transactionResult.get("extrasResponses"),
+            transactionResult.battingScoreResponses,
+            transactionResult.bowlingFigureResponses,
+            transactionResult.extrasResponses,
             createRequest.getManOfTheMatchList(),
             createRequest.getCaptains(),
             createRequest.getWicketKeepers()
