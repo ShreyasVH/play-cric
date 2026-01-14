@@ -21,11 +21,16 @@ public class MatchPlayerMapRepository {
 
     public List<MatchPlayerMap> add(Integer matchId, List<Long> playerIds, Map<Long, Long> playerTeamMap)
     {
-        List<MatchPlayerMap> matchPlayerMaps = playerIds.stream().map(playerId -> new MatchPlayerMap(null, matchId, playerId, playerTeamMap.get(playerId))).collect(Collectors.toList());
         return jpaApi.withTransaction(em -> {
-            matchPlayerMaps.forEach(em::persist);
-            return matchPlayerMaps;
+            return add(em, matchId, playerIds, playerTeamMap);
         });
+    }
+
+    public List<MatchPlayerMap> add(EntityManager em, Integer matchId, List<Long> playerIds, Map<Long, Long> playerTeamMap)
+    {
+        List<MatchPlayerMap> matchPlayerMaps = playerIds.stream().map(playerId -> new MatchPlayerMap(null, matchId, playerId, playerTeamMap.get(playerId))).collect(Collectors.toList());
+        matchPlayerMaps.forEach(em::persist);
+        return matchPlayerMaps;
     }
 
     public List<MatchPlayerMap> getByMatchId(Integer matchId)

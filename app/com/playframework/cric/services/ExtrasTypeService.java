@@ -19,8 +19,4 @@ public class ExtrasTypeService {
     public List<ExtrasType> getAll() {
         return extrasTypeRepository.getAll();
     }
-
-    public List<ExtrasType> getAll(EntityManager em) {
-        return extrasTypeRepository.getAll(em);
-    }
 }

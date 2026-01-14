@@ -21,15 +21,20 @@ public class FielderDismissalRepository {
 
     public List<FielderDismissal> add(Map<Integer, List<Long>> scorePlayerMap, Map<Long, Integer> matchPlayerMap)
     {
+        return jpaApi.withTransaction(em -> {
+            return add(em, scorePlayerMap, matchPlayerMap);
+        });
+    }
+
+    public List<FielderDismissal> add(EntityManager em, Map<Integer, List<Long>> scorePlayerMap, Map<Long, Integer> matchPlayerMap)
+    {
         List<FielderDismissal> fielderDismissals = new ArrayList<>();
         for(Map.Entry<Integer, List<Long>> scorePlayerEntry: scorePlayerMap.entrySet())
         {
             fielderDismissals.addAll(scorePlayerEntry.getValue().stream().map(playerId -> new FielderDismissal(null, scorePlayerEntry.getKey(), matchPlayerMap.get(playerId))).collect(Collectors.toList()));
         }
-        return jpaApi.withTransaction(em -> {
-            fielderDismissals.forEach(em::persist);
-            return fielderDismissals;
-        });
+        fielderDismissals.forEach(em::persist);
+        return fielderDismissals;
     }
 
     public Map<String, Map<String, Integer>> getFieldingStats(Long playerId)

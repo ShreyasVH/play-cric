@@ -42,11 +42,6 @@ public class StadiumService {
 		return stadiumRepository.getById(id);
 	}
 
-	public Stadium getById(EntityManager em, Long id)
-	{
-		return stadiumRepository.getById(em, id);
-	}
-
 	public List<Stadium> getByIds(List<Long> ids)
 	{
 		return stadiumRepository.getByIds(ids);

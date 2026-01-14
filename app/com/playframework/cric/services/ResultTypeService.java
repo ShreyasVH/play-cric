@@ -20,10 +20,6 @@ public class ResultTypeService {
         return resultTypeRepository.getById(id);
     }
 
-    public ResultType getById(EntityManager em, Integer id) {
-        return resultTypeRepository.getById(em, id);
-    }
-
     public List<ResultType> getByIds(List<Integer> ids) {
         return resultTypeRepository.getByIds(ids);
     }

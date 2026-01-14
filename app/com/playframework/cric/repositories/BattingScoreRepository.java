@@ -21,11 +21,16 @@ public class BattingScoreRepository {
 
     public List<BattingScore> add(List<BattingScoreRequest> battingScoreRequests, Map<Long, Integer> matchPlayerMaps)
     {
-        List<BattingScore> battingScores = battingScoreRequests.stream().map(battingScoreRequest -> new BattingScore(battingScoreRequest, matchPlayerMaps)).collect(Collectors.toList());
         return jpaApi.withTransaction(em -> {
-            battingScores.forEach(em::persist);
-            return battingScores;
+            return add(em, battingScoreRequests, matchPlayerMaps);
         });
+    }
+
+    public List<BattingScore> add(EntityManager em, List<BattingScoreRequest> battingScoreRequests, Map<Long, Integer> matchPlayerMaps)
+    {
+        List<BattingScore> battingScores = battingScoreRequests.stream().map(battingScoreRequest -> new BattingScore(battingScoreRequest, matchPlayerMaps)).collect(Collectors.toList());
+        battingScores.forEach(em::persist);
+        return battingScores;
     }
 
     public Map<String, Map<String, Integer>> getBattingStats(Long playerId)

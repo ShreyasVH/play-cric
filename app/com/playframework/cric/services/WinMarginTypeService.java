@@ -20,10 +20,6 @@ public class WinMarginTypeService {
         return winMarginTypeRepository.getById(id);
     }
 
-    public WinMarginType getById(EntityManager em, Integer id) {
-        return winMarginTypeRepository.getById(em, id);
-    }
-
     public List<WinMarginType> getByIds(List<Integer> ids) {
         return winMarginTypeRepository.getByIds(ids);
     }

@@ -19,11 +19,16 @@ public class ExtrasRepository {
 
     public List<Extras> add(Integer matchId, List<ExtrasRequest> extrasRequests)
     {
-        List<Extras> extrasList = extrasRequests.stream().map(extrasRequest -> new Extras(matchId, extrasRequest)).collect(Collectors.toList());
         return jpaApi.withTransaction(em -> {
-            extrasList.forEach(em::persist);
-            return extrasList;
+            return add(em, matchId, extrasRequests);
         });
+    }
+
+    public List<Extras> add(EntityManager em, Integer matchId, List<ExtrasRequest> extrasRequests)
+    {
+        List<Extras> extrasList = extrasRequests.stream().map(extrasRequest -> new Extras(matchId, extrasRequest)).collect(Collectors.toList());
+        extrasList.forEach(em::persist);
+        return extrasList;
     }
 
     public List<Extras> getByMatchId(Integer matchId)

@@ -19,11 +19,16 @@ public class CaptainRepository {
 
     public List<Captain> add(List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
     {
-        List<Captain> captainList = playerIds.stream().map(playerId -> new Captain(null, matchPlayerMap.get(playerId))).collect(Collectors.toList());
         return jpaApi.withTransaction(em -> {
-            captainList.forEach(em::persist);
-            return captainList;
+            return add(em, playerIds, matchPlayerMap);
         });
+    }
+
+    public List<Captain> add(EntityManager em, List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
+    {
+        List<Captain> captainList = playerIds.stream().map(playerId -> new Captain(null, matchPlayerMap.get(playerId))).collect(Collectors.toList());
+        captainList.forEach(em::persist);
+        return captainList;
     }
 
     public List<Captain> getByMatchPlayerIds(List<Integer> matchPlayerIds)

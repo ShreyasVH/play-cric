@@ -19,11 +19,16 @@ public class ManOfTheMatchRepository {
 
     public List<ManOfTheMatch> add(List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
     {
-        List<ManOfTheMatch> manOfTheMatchList = playerIds.stream().map(playerId -> new ManOfTheMatch(null, matchPlayerMap.get(playerId))).collect(Collectors.toList());
         return jpaApi.withTransaction(em -> {
-            manOfTheMatchList.forEach(em::persist);
-            return manOfTheMatchList;
+            return add(em, playerIds, matchPlayerMap);
         });
+    }
+
+    public List<ManOfTheMatch> add(EntityManager em, List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
+    {
+        List<ManOfTheMatch> manOfTheMatchList = playerIds.stream().map(playerId -> new ManOfTheMatch(null, matchPlayerMap.get(playerId))).collect(Collectors.toList());
+        manOfTheMatchList.forEach(em::persist);
+        return manOfTheMatchList;
     }
 
     public List<ManOfTheMatch> getByMatchPlayerIds(List<Integer> matchPlayerIds)

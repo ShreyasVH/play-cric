@@ -21,11 +21,16 @@ public class MatchRepository {
 
     public Match create(CreateRequest createRequest)
     {
-        Match match = Utils.convertObject(createRequest, Match.class);
         return jpaApi.withTransaction(em -> {
-            em.persist(match);
-            return match;
+            return create(em, createRequest);
         });
+    }
+
+    public Match create(EntityManager em, CreateRequest createRequest)
+    {
+        Match match = Utils.convertObject(createRequest, Match.class);
+        em.persist(match);
+        return match;
     }
 
     public Match getByStadiumAndStartTime(Long stadiumId, LocalDateTime startTime)

@@ -18,8 +18,13 @@ public class TotalsRepository {
     public void add(List<Total> totals)
     {
         jpaApi.withTransaction(em -> {
-            totals.forEach(em::persist);
+            add(em, totals);
         });
+    }
+
+    public void add(EntityManager em, List<Total> totals)
+    {
+        totals.forEach(em::persist);
     }
 
     public List<Total> getByMatchId(Integer matchId)

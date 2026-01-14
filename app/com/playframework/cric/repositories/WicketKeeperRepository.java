@@ -19,11 +19,16 @@ public class WicketKeeperRepository {
 
     public List<WicketKeeper> add(List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
     {
-        List<WicketKeeper> captainList = playerIds.stream().map(playerId -> new WicketKeeper(null, matchPlayerMap.get(playerId))).collect(Collectors.toList());
         return jpaApi.withTransaction(em -> {
-            captainList.forEach(em::persist);
-            return captainList;
+            return add(em, playerIds, matchPlayerMap);
         });
+    }
+
+    public List<WicketKeeper> add(EntityManager em, List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
+    {
+        List<WicketKeeper> captainList = playerIds.stream().map(playerId -> new WicketKeeper(null, matchPlayerMap.get(playerId))).collect(Collectors.toList());
+        captainList.forEach(em::persist);
+        return captainList;
     }
 
     public List<WicketKeeper> getByMatchPlayerIds(List<Integer> matchPlayerIds)

@@ -21,11 +21,16 @@ public class BowlingFigureRepository {
 
     public List<BowlingFigure> add(List<BowlingFigureRequest> bowlingFigureRequests, Map<Long, Integer> matchPlayerMap)
     {
-        List<BowlingFigure> bowlingFigures = bowlingFigureRequests.stream().map(bowlingFigureRequest -> new BowlingFigure(bowlingFigureRequest, matchPlayerMap)).collect(Collectors.toList());
         return jpaApi.withTransaction(em -> {
-            bowlingFigures.forEach(em::persist);
-            return bowlingFigures;
+            return add(em, bowlingFigureRequests, matchPlayerMap);
         });
+    }
+
+    public List<BowlingFigure> add(EntityManager em, List<BowlingFigureRequest> bowlingFigureRequests, Map<Long, Integer> matchPlayerMap)
+    {
+        List<BowlingFigure> bowlingFigures = bowlingFigureRequests.stream().map(bowlingFigureRequest -> new BowlingFigure(bowlingFigureRequest, matchPlayerMap)).collect(Collectors.toList());
+        bowlingFigures.forEach(em::persist);
+        return bowlingFigures;
     }
 
     public Map<String, Map<String, Integer>> getBasicBowlingStats(Long playerId)
