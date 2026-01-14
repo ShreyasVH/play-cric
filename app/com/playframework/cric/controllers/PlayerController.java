@@ -192,19 +192,19 @@ public class PlayerController extends Controller {
             throw new BadRequestException("Same player given");
         }
 
+        Player player = playerService.getById(mergeRequest.getPlayerIdToMerge());
+        if(player == null)
+        {
+            throw new NotFoundException("Player");
+        }
+
+        Player originalPlayer = playerService.getById(mergeRequest.getOriginalPlayerId());
+        if(originalPlayer == null)
+        {
+            throw new NotFoundException("Original Player");
+        }
+
         jpaApi.withTransaction(em -> {
-            Player player = playerService.getById(em, mergeRequest.getPlayerIdToMerge());
-            if(player == null)
-            {
-                throw new NotFoundException("Player");
-            }
-
-            Player originalPlayer = playerService.getById(em, mergeRequest.getOriginalPlayerId());
-            if(originalPlayer == null)
-            {
-                throw new NotFoundException("Original Player");
-            }
-
             manOfTheSeriesService.merge(em, mergeRequest);
             matchPlayerMapService.merge(em, mergeRequest);
             playerService.remove(em, mergeRequest.getPlayerIdToMerge());

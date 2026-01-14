@@ -492,14 +492,14 @@ public class MatchController extends Controller {
 
     public Result remove(Integer id)
     {
+        Match match = matchService.getById(id);
+
+        if(null == match)
+        {
+            throw new NotFoundException("Match");
+        }
+
         jpaApi.withTransaction(em -> {
-            Match match = matchService.getById(em, id);
-
-            if(null == match)
-            {
-                throw new NotFoundException("Match");
-            }
-
             List<MatchPlayerMap> matchPlayerMaps = matchPlayerMapService.getByMatchId(em, id);
             List<Integer> matchPlayerIds = matchPlayerMaps.stream().map(MatchPlayerMap::getId).collect(Collectors.toList());
             extrasService.remove(em, id);

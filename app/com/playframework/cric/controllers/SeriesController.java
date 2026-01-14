@@ -64,97 +64,80 @@ public class SeriesController extends Controller {
 
         class TransactionalResult
         {
-            Country country;
-            List<TeamType> teamTypes;
-            Map<Long, Country> countryMap;
-            List<Team> teams;
-            List<Player> players;
-            Tour tour;
-            SeriesType seriesType;
-            GameType gameType;
             Series series;
         }
 
+        List<Team> teams = teamService.getByIds(createRequest.getTeams());
+        if(teams.size() != createRequest.getTeams().stream().distinct().count()) {
+            throw new NotFoundException("Team");
+        }
+
+        List<Integer> teamTypeIds = new ArrayList<>();
+        List<Long> countryIds = new ArrayList<>();
+        for(Team team: teams) {
+            teamTypeIds.add(team.getTypeId());
+            countryIds.add(team.getCountryId());
+        }
+
+        List<Player> players = new ArrayList<>();
+        List<Long> manOfTheSeriesToAdd = new ArrayList<>();
+        if (null != createRequest.getManOfTheSeriesList()) {
+            players = playerService.getByIds(createRequest.getManOfTheSeriesList());
+            if(players.size() != createRequest.getManOfTheSeriesList().stream().distinct().count()) {
+                throw new NotFoundException("Player");
+            }
+
+            manOfTheSeriesToAdd = createRequest.getManOfTheSeriesList();
+        }
+
+        List<Long> playerCountryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
+        countryIds.addAll(playerCountryIds);
+
+        countryIds.add(createRequest.getHomeCountryId());
+        List<Country> countries = countryService.getByIds(countryIds);
+        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
+
+        Country country = countryMap.get(createRequest.getHomeCountryId());
+        if(null == country) {
+            throw new NotFoundException("Home country");
+        }
+
+        Tour tour = tourService.getById(createRequest.getTourId());
+        if(null == tour) {
+            throw new NotFoundException("Tour");
+        }
+
+        SeriesType seriesType = seriesTypeService.getById(createRequest.getTypeId());
+        if(null == seriesType) {
+            throw new NotFoundException("Type");
+        }
+
+        GameType gameType = gameTypeService.getById(createRequest.getGameTypeId());
+        if(null == gameType) {
+            throw new NotFoundException("Game type");
+        }
+
+        List<TeamType> teamTypes = teamTypeService.getByIds(teamTypeIds);
+
+        List<Long> finalManOfTheSeriesToAdd = manOfTheSeriesToAdd;
         TransactionalResult transactionResult = jpaApi.withTransaction(em -> {
-            List<Team> teams = teamService.getByIds(em, createRequest.getTeams());
-            if(teams.size() != createRequest.getTeams().stream().distinct().count()) {
-                throw new NotFoundException("Team");
-            }
-
-            List<Integer> teamTypeIds = new ArrayList<>();
-            List<Long> countryIds = new ArrayList<>();
-            for(Team team: teams) {
-                teamTypeIds.add(team.getTypeId());
-                countryIds.add(team.getCountryId());
-            }
-
-            List<Player> players = new ArrayList<>();
-            List<Long> manOfTheSeriesToAdd = new ArrayList<>();
-            if (null != createRequest.getManOfTheSeriesList()) {
-                players = playerService.getByIds(em, createRequest.getManOfTheSeriesList());
-                if(players.size() != createRequest.getManOfTheSeriesList().stream().distinct().count()) {
-                    throw new NotFoundException("Player");
-                }
-
-                manOfTheSeriesToAdd = createRequest.getManOfTheSeriesList();
-            }
-
-            List<Long> playerCountryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
-            countryIds.addAll(playerCountryIds);
-
-            countryIds.add(createRequest.getHomeCountryId());
-            List<Country> countries = countryService.getByIds(em, countryIds);
-            Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
-
-            Country country = countryMap.get(createRequest.getHomeCountryId());
-            if(null == country) {
-                throw new NotFoundException("Home country");
-            }
-
-            Tour tour = tourService.getById(em, createRequest.getTourId());
-            if(null == tour) {
-                throw new NotFoundException("Tour");
-            }
-
-            SeriesType seriesType = seriesTypeService.getById(em, createRequest.getTypeId());
-            if(null == seriesType) {
-                throw new NotFoundException("Type");
-            }
-
-            GameType gameType = gameTypeService.getById(em, createRequest.getGameTypeId());
-            if(null == gameType) {
-                throw new NotFoundException("Game type");
-            }
-
             Series series = seriesService.create(em, createRequest);
             seriesTeamsMapService.create(em, series.getId(), createRequest.getTeams());
-            manOfTheSeriesService.add(em, series.getId(), manOfTheSeriesToAdd);
+            manOfTheSeriesService.add(em, series.getId(), finalManOfTheSeriesToAdd);
             tagMapService.create(em, series.getId(), createRequest.getTags(), TagEntityType.SERIES.name());
 
-            List<TeamType> teamTypes = teamTypeService.getByIds(em, teamTypeIds);
-
             TransactionalResult transactionalResult = new TransactionalResult();
-
-            transactionalResult.teamTypes = teamTypes;
-            transactionalResult.countryMap = countryMap;
-            transactionalResult.teams = teams;
-            transactionalResult.players = players;
-            transactionalResult.country = country;
-            transactionalResult.tour = tour;
-            transactionalResult.seriesType = seriesType;
-            transactionalResult.gameType = gameType;
             transactionalResult.series = series;
 
             return transactionalResult;
         });
 
-        Map<Integer, TeamType> teamTypeMap = transactionResult.teamTypes.stream().collect(Collectors.toMap(TeamType::getId, teamType -> teamType));
-        Map<Long, Country> countryMap = transactionResult.countryMap;
-        List<TeamResponse> teamResponses = transactionResult.teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
+        Map<Integer, TeamType> teamTypeMap = teamTypes.stream().collect(Collectors.toMap(TeamType::getId, teamType -> teamType));
+        List<TeamResponse> teamResponses = teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
 
-        List<PlayerMiniResponse> playerResponses = transactionResult.players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+        List<PlayerMiniResponse> playerResponses = players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
 
-        return created(Json.toJson(new Response(new SeriesResponse(transactionResult.series, new CountryResponse(transactionResult.country), new TourMiniResponse(transactionResult.tour), new SeriesTypeResponse(transactionResult.seriesType), new GameTypeResponse(transactionResult.gameType), teamResponses, playerResponses))));
+        return created(Json.toJson(new Response(new SeriesResponse(transactionResult.series, new CountryResponse(country), new TourMiniResponse(tour), new SeriesTypeResponse(seriesType), new GameTypeResponse(gameType), teamResponses, playerResponses))));
     }
 
     public Result getAll(int page, int limit) {
@@ -224,159 +207,144 @@ public class SeriesController extends Controller {
 
         class TransactionalResult
         {
-            Country country;
-            List<TeamType> teamTypes;
-            Map<Long, Country> countryMap;
-            List<Team> teams;
-            List<Player> players;
             Series existingSeries;
-            Tour tour;
-            SeriesType seriesType;
-            GameType gameType;
         }
 
+        Series existingSeries = seriesService.getById(id);
+        if (null == existingSeries) {
+            throw new NotFoundException("Series");
+        }
+
+        List<Long> teamsToDelete = new ArrayList<>();
+        List<Long> teamsToAdd = new ArrayList<>();
+        List<Long> manOfTheSeriesToDelete = new ArrayList<>();
+        List<Long> manOfTheSeriesToAdd = new ArrayList<>();
+        List<Team> teams;
+        List<SeriesTeamsMap> seriesTeamsMaps = seriesTeamsMapService.getBySeriesIds(Collections.singletonList(id));
+        List<Long> existingTeamIds = new ArrayList<>();
+        for (SeriesTeamsMap seriesTeamsMap: seriesTeamsMaps) {
+            existingTeamIds.add(seriesTeamsMap.getTeamId());
+            if (null != updateRequest.getTeams() && !updateRequest.getTeams().contains(seriesTeamsMap.getTeamId())) {
+                teamsToDelete.add(seriesTeamsMap.getTeamId());
+            }
+        }
+        if (null != updateRequest.getTeams()) {
+            teams = teamService.getByIds(updateRequest.getTeams());
+            if(teams.size() != updateRequest.getTeams().stream().distinct().count()) {
+                throw new NotFoundException("Team");
+            }
+
+            teamsToAdd = updateRequest.getTeams().stream().filter(teamId -> !existingTeamIds.contains(teamId)).collect(Collectors.toList());
+        } else {
+            teams = teamService.getByIds(existingTeamIds);
+        }
+
+        List<Integer> teamTypeIds = new ArrayList<>();
+        List<Long> countryIds = new ArrayList<>();
+        for(Team team: teams) {
+            teamTypeIds.add(team.getTypeId());
+            countryIds.add(team.getCountryId());
+        }
+
+        if(null != updateRequest.getHomeCountryId()) {
+            countryIds.add(updateRequest.getHomeCountryId());
+        } else {
+            countryIds.add(existingSeries.getHomeCountryId());
+        }
+
+        List<Player> players;
+        List<ManOfTheSeries> manOfTheSeriesList = manOfTheSeriesService.getBySeriesIds(Collections.singletonList(id));
+        List<Long> existingPlayerIds = new ArrayList<>();
+        for (ManOfTheSeries manOfTheSeries: manOfTheSeriesList) {
+            existingPlayerIds.add(manOfTheSeries.getPlayerId());
+            if (null != updateRequest.getManOfTheSeriesList() && !updateRequest.getManOfTheSeriesList().contains(manOfTheSeries.getPlayerId())) {
+                manOfTheSeriesToDelete.add(manOfTheSeries.getPlayerId());
+            }
+        }
+        if (null != updateRequest.getManOfTheSeriesList()) {
+            players = playerService.getByIds(updateRequest.getManOfTheSeriesList());
+            if(players.size() != updateRequest.getManOfTheSeriesList().stream().distinct().count()) {
+                throw new NotFoundException("Player");
+            }
+
+            manOfTheSeriesToAdd = updateRequest.getManOfTheSeriesList().stream().filter(playerId -> !existingPlayerIds.contains(playerId)).collect(Collectors.toList());
+        } else {
+            players = playerService.getByIds(existingPlayerIds);
+        }
+
+        List<Long> playerCountryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
+        countryIds.addAll(playerCountryIds);
+
+        List<Country> countries = countryService.getByIds(countryIds);
+        Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
+
+        Long homeCountryId;
+        if (null != updateRequest.getHomeCountryId()) {
+            homeCountryId = updateRequest.getHomeCountryId();
+        } else {
+            homeCountryId = existingSeries.getHomeCountryId();
+        }
+        Country country = countryMap.get(homeCountryId);
+        if(null == country) {
+            throw new NotFoundException("Home country");
+        }
+
+        Long tourId;
+        if (null != updateRequest.getTourId()) {
+            tourId = updateRequest.getTourId();
+        } else {
+            tourId = existingSeries.getTourId();
+        }
+        Tour tour = tourService.getById(tourId);
+        if(null == tour) {
+            throw new NotFoundException("Tour");
+        }
+
+        Integer seriesTypeId;
+        if (null != updateRequest.getTypeId()) {
+            seriesTypeId = updateRequest.getTypeId();
+        } else {
+            seriesTypeId = existingSeries.getTypeId();
+        }
+        SeriesType seriesType = seriesTypeService.getById(seriesTypeId);
+        if(null == seriesType) {
+            throw new NotFoundException("Type");
+        }
+
+        Integer gameTypeId;
+        if (null != updateRequest.getGameTypeId()) {
+            gameTypeId = updateRequest.getGameTypeId();
+        } else {
+            gameTypeId = existingSeries.getGameTypeId();
+        }
+        GameType gameType = gameTypeService.getById(gameTypeId);
+        if(null == gameType) {
+            throw new NotFoundException("Game type");
+        }
+
+        List<TeamType> teamTypes = teamTypeService.getByIds(teamTypeIds);
+
+        List<Long> finalTeamsToAdd = teamsToAdd;
+        List<Long> finalManOfTheSeriesToAdd = manOfTheSeriesToAdd;
         TransactionalResult transactionResult = jpaApi.withTransaction(em -> {
-            Series existingSeries = seriesService.getById(id);
-            if (null == existingSeries) {
-                throw new NotFoundException("Series");
-            }
-
-            List<Long> teamsToDelete = new ArrayList<>();
-            List<Long> teamsToAdd = new ArrayList<>();
-            List<Long> manOfTheSeriesToDelete = new ArrayList<>();
-            List<Long> manOfTheSeriesToAdd = new ArrayList<>();
-            List<Team> teams;
-            List<SeriesTeamsMap> seriesTeamsMaps = seriesTeamsMapService.getBySeriesIds(Collections.singletonList(id));
-            List<Long> existingTeamIds = new ArrayList<>();
-            for (SeriesTeamsMap seriesTeamsMap: seriesTeamsMaps) {
-                existingTeamIds.add(seriesTeamsMap.getTeamId());
-                if (null != updateRequest.getTeams() && !updateRequest.getTeams().contains(seriesTeamsMap.getTeamId())) {
-                    teamsToDelete.add(seriesTeamsMap.getTeamId());
-                }
-            }
-            if (null != updateRequest.getTeams()) {
-                teams = teamService.getByIds(updateRequest.getTeams());
-                if(teams.size() != updateRequest.getTeams().stream().distinct().count()) {
-                    throw new NotFoundException("Team");
-                }
-
-                teamsToAdd = updateRequest.getTeams().stream().filter(teamId -> !existingTeamIds.contains(teamId)).collect(Collectors.toList());
-            } else {
-                teams = teamService.getByIds(existingTeamIds);
-            }
-
-            List<Integer> teamTypeIds = new ArrayList<>();
-            List<Long> countryIds = new ArrayList<>();
-            for(Team team: teams) {
-                teamTypeIds.add(team.getTypeId());
-                countryIds.add(team.getCountryId());
-            }
-
-            if(null != updateRequest.getHomeCountryId()) {
-                countryIds.add(updateRequest.getHomeCountryId());
-            } else {
-                countryIds.add(existingSeries.getHomeCountryId());
-            }
-
-            List<Player> players;
-            List<ManOfTheSeries> manOfTheSeriesList = manOfTheSeriesService.getBySeriesIds(Collections.singletonList(id));
-            List<Long> existingPlayerIds = new ArrayList<>();
-            for (ManOfTheSeries manOfTheSeries: manOfTheSeriesList) {
-                existingPlayerIds.add(manOfTheSeries.getPlayerId());
-                if (null != updateRequest.getManOfTheSeriesList() && !updateRequest.getManOfTheSeriesList().contains(manOfTheSeries.getPlayerId())) {
-                    manOfTheSeriesToDelete.add(manOfTheSeries.getPlayerId());
-                }
-            }
-            if (null != updateRequest.getManOfTheSeriesList()) {
-                players = playerService.getByIds(updateRequest.getManOfTheSeriesList());
-                if(players.size() != updateRequest.getManOfTheSeriesList().stream().distinct().count()) {
-                    throw new NotFoundException("Player");
-                }
-
-                manOfTheSeriesToAdd = updateRequest.getManOfTheSeriesList().stream().filter(playerId -> !existingPlayerIds.contains(playerId)).collect(Collectors.toList());
-            } else {
-                players = playerService.getByIds(existingPlayerIds);
-            }
-
-            List<Long> playerCountryIds = players.stream().map(Player::getCountryId).collect(Collectors.toList());
-            countryIds.addAll(playerCountryIds);
-
-            List<Country> countries = countryService.getByIds(countryIds);
-            Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
-
-            Long homeCountryId;
-            if (null != updateRequest.getHomeCountryId()) {
-                homeCountryId = updateRequest.getHomeCountryId();
-            } else {
-                homeCountryId = existingSeries.getHomeCountryId();
-            }
-            Country country = countryMap.get(homeCountryId);
-            if(null == country) {
-                throw new NotFoundException("Home country");
-            }
-
-            Long tourId;
-            if (null != updateRequest.getTourId()) {
-                tourId = updateRequest.getTourId();
-            } else {
-                tourId = existingSeries.getTourId();
-            }
-            Tour tour = tourService.getById(tourId);
-            if(null == tour) {
-                throw new NotFoundException("Tour");
-            }
-
-            Integer seriesTypeId;
-            if (null != updateRequest.getTypeId()) {
-                seriesTypeId = updateRequest.getTypeId();
-            } else {
-                seriesTypeId = existingSeries.getTypeId();
-            }
-            SeriesType seriesType = seriesTypeService.getById(seriesTypeId);
-            if(null == seriesType) {
-                throw new NotFoundException("Type");
-            }
-
-            Integer gameTypeId;
-            if (null != updateRequest.getGameTypeId()) {
-                gameTypeId = updateRequest.getGameTypeId();
-            } else {
-                gameTypeId = existingSeries.getGameTypeId();
-            }
-            GameType gameType = gameTypeService.getById(gameTypeId);
-            if(null == gameType) {
-                throw new NotFoundException("Game type");
-            }
-
             seriesService.update(em, existingSeries, updateRequest);
-            seriesTeamsMapService.create(em, id, teamsToAdd);
+            seriesTeamsMapService.create(em, id, finalTeamsToAdd);
             seriesTeamsMapService.delete(em, id, teamsToDelete);
-            manOfTheSeriesService.add(em, id, manOfTheSeriesToAdd);
+            manOfTheSeriesService.add(em, id, finalManOfTheSeriesToAdd);
             manOfTheSeriesService.delete(em, id, manOfTheSeriesToDelete);
-
-            List<TeamType> teamTypes = teamTypeService.getByIds(teamTypeIds);
 
             TransactionalResult transactionalResult = new TransactionalResult();
 
-            transactionalResult.teamTypes = teamTypes;
-            transactionalResult.countryMap = countryMap;
-            transactionalResult.teams = teams;
-            transactionalResult.players = players;
             transactionalResult.existingSeries = existingSeries;
-            transactionalResult.country = country;
-            transactionalResult.tour = tour;
-            transactionalResult.seriesType = seriesType;
-            transactionalResult.gameType = gameType;
 
             return transactionalResult;
         });
 
-        Map<Integer, TeamType> teamTypeMap = transactionResult.teamTypes.stream().collect(Collectors.toMap(TeamType::getId, teamType -> teamType));
-        Map<Long, Country> countryMap = transactionResult.countryMap;
-        List<TeamResponse> teamResponses = transactionResult.teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
+        Map<Integer, TeamType> teamTypeMap = teamTypes.stream().collect(Collectors.toMap(TeamType::getId, teamType -> teamType));
+        List<TeamResponse> teamResponses = teams.stream().map(team -> new TeamResponse(team, new CountryResponse(countryMap.get(team.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team.getTypeId())))).collect(Collectors.toList());
 
-        List<PlayerMiniResponse> playerResponses = transactionResult.players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
-        return ok(Json.toJson(new Response(new SeriesResponse(transactionResult.existingSeries, new CountryResponse(transactionResult.country), new TourMiniResponse(transactionResult.tour), new SeriesTypeResponse(transactionResult.seriesType), new GameTypeResponse(transactionResult.gameType), teamResponses, playerResponses))));
+        List<PlayerMiniResponse> playerResponses = players.stream().map(player -> new PlayerMiniResponse(player, new CountryResponse(countryMap.get(player.getCountryId())))).collect(Collectors.toList());
+        return ok(Json.toJson(new Response(new SeriesResponse(transactionResult.existingSeries, new CountryResponse(country), new TourMiniResponse(tour), new SeriesTypeResponse(seriesType), new GameTypeResponse(gameType), teamResponses, playerResponses))));
     }
 
     public Result getById(Integer id)
@@ -463,19 +431,18 @@ public class SeriesController extends Controller {
 
     public Result remove(Integer id)
     {
+        Series series = seriesService.getById(id);
+        if(null == series)
+        {
+            throw new NotFoundException("Series");
+        }
+
+        List<Match> matches = matchService.getBySeriesId(id);
+        if(!matches.isEmpty())
+        {
+            throw new ConflictException("Matches still exist");
+        }
         jpaApi.withTransaction(em -> {
-            Series series = seriesService.getById(em, id);
-            if(null == series)
-            {
-                throw new NotFoundException("Series");
-            }
-
-            List<Match> matches = matchService.getBySeriesId(em, id);
-            if(!matches.isEmpty())
-            {
-                throw new ConflictException("Matches still exist");
-            }
-
             manOfTheSeriesService.remove(em, id);
             seriesTeamsMapService.remove(em, id);
             seriesService.remove(em, id);
