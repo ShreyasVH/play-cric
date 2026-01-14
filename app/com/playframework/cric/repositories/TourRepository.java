@@ -94,11 +94,10 @@ public class TourRepository {
         List<Integer> years = new ArrayList<>();
         String query = "SELECT DISTINCT YEAR(start_time) AS year FROM tours ORDER BY year DESC";
         jpaApi.withTransaction(em -> {
-            List<Object[]> rows = em.createNativeQuery(query).getResultList();
+            List<Integer> rows = em.createNativeQuery(query).getResultList();
 
-            for (Object[] row: rows) {
-                String sh = "sh";
-//                years.add(row.getInteger("year"));
+            for (int year: rows) {
+                years.add(year);
             }
 
         });

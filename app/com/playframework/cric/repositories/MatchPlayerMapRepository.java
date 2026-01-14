@@ -43,7 +43,7 @@ public class MatchPlayerMapRepository {
     public List<MatchPlayerMap> getByMatchId(EntityManager em, Integer matchId)
     {
         return em.createQuery(
-            "SELECT mpm FROM MatchPlayerMap mpm WHERE mpm.matchId = matchId",
+            "SELECT mpm FROM MatchPlayerMap mpm WHERE mpm.matchId = :matchId",
             MatchPlayerMap.class
         )
         .setParameter("matchId", matchId)
