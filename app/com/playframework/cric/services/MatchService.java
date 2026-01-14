@@ -31,6 +31,19 @@ public class MatchService {
         return matchRepository.create(createRequest);
     }
 
+    public Match create(EntityManager em, CreateRequest createRequest)
+    {
+        createRequest.validate();
+
+        Match existingMatch = matchRepository.getByStadiumAndStartTime(createRequest.getStadiumId(), createRequest.getStartTime());
+        if(null != existingMatch)
+        {
+            throw new ConflictException("Match");
+        }
+
+        return matchRepository.create(em, createRequest);
+    }
+
     public List<Match> getBySeriesId(Integer seriesId)
     {
         return matchRepository.getBySeriesId(seriesId);

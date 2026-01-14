@@ -23,6 +23,11 @@ public class MatchPlayerMapService {
         return matchPlayerMapRepository.add(matchId, playerIds, playerTeamMap);
     }
 
+    public List<MatchPlayerMap> add(EntityManager em, Integer matchId, List<Long> playerIds, Map<Long, Long> playerTeamMap)
+    {
+        return matchPlayerMapRepository.add(em, matchId, playerIds, playerTeamMap);
+    }
+
     public List<MatchPlayerMap> getByMatchId(Integer matchId)
     {
         return matchPlayerMapRepository.getByMatchId(matchId);

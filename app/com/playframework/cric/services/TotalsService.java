@@ -22,6 +22,11 @@ public class TotalsService {
         this.totalsRepository.add(totals);
     }
 
+    public void add(EntityManager em, List<Total> totals)
+    {
+        this.totalsRepository.add(em, totals);
+    }
+
     public void remove(Integer matchId)
     {
         this.totalsRepository.remove(matchId);

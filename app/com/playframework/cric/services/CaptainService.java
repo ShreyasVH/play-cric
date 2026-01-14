@@ -22,6 +22,11 @@ public class CaptainService {
         return captainRepository.add(playerIds, matchPlayerMap);
     }
 
+    public List<Captain> add(EntityManager em, List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
+    {
+        return captainRepository.add(em, playerIds, matchPlayerMap);
+    }
+
     public List<Captain> getByMatchPlayerIds(List<Integer> matchPlayerIds)
     {
         return captainRepository.getByMatchPlayerIds(matchPlayerIds);

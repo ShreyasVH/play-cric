@@ -22,6 +22,11 @@ public class ManOfTheMatchService {
         return manOfTheMatchRepository.add(playerIds, matchPlayerMap);
     }
 
+    public List<ManOfTheMatch> add(EntityManager em, List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
+    {
+        return manOfTheMatchRepository.add(em, playerIds, matchPlayerMap);
+    }
+
     public List<ManOfTheMatch> getByMatchPlayerIds(List<Integer> matchPlayerIds)
     {
         return manOfTheMatchRepository.getByMatchPlayerIds(matchPlayerIds);

@@ -7,6 +7,7 @@ import com.playframework.cric.repositories.StadiumRepository;
 import com.playframework.cric.requests.stadiums.CreateRequest;
 import com.playframework.cric.models.Stadium;
 import com.playframework.cric.exceptions.ConflictException;
+import jakarta.persistence.EntityManager;
 
 public class StadiumService {
 	private final StadiumRepository stadiumRepository;
@@ -39,6 +40,11 @@ public class StadiumService {
 	public Stadium getById(Long id)
 	{
 		return stadiumRepository.getById(id);
+	}
+
+	public Stadium getById(EntityManager em, Long id)
+	{
+		return stadiumRepository.getById(em, id);
 	}
 
 	public List<Stadium> getByIds(List<Long> ids)

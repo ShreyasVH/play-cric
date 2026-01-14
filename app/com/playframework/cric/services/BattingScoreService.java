@@ -24,6 +24,11 @@ public class BattingScoreService {
         return battingScoreRepository.add(battingScoreRequests, matchPlayerMaps);
     }
 
+    public List<BattingScore> add(EntityManager em, List<BattingScoreRequest> battingScoreRequests, Map<Long, Integer> matchPlayerMaps)
+    {
+        return battingScoreRepository.add(em, battingScoreRequests, matchPlayerMaps);
+    }
+
     public Map<String, Map<String, Integer>> getBattingStats(Long playerId)
     {
         return battingScoreRepository.getBattingStats(playerId);

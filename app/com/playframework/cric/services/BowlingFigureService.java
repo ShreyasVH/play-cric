@@ -23,6 +23,11 @@ public class BowlingFigureService {
         return bowlingFigureRepository.add(bowlingFigureRequests, matchPlayerMap);
     }
 
+    public List<BowlingFigure> add(EntityManager em, List<BowlingFigureRequest> bowlingFigureRequests, Map<Long, Integer> matchPlayerMap)
+    {
+        return bowlingFigureRepository.add(em, bowlingFigureRequests, matchPlayerMap);
+    }
+
     public Map<String, Map<String, Integer>> getBasicBowlingStats(Long playerId)
     {
         return bowlingFigureRepository.getBasicBowlingStats(playerId);

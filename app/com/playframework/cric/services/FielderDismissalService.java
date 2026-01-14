@@ -22,6 +22,11 @@ public class FielderDismissalService {
         return fielderDismissalRepository.add(scorePlayerMap, matchPlayerMap);
     }
 
+    public List<FielderDismissal> add(EntityManager em, Map<Integer, List<Long>> scorePlayerMap, Map<Long, Integer> matchPlayerMap)
+    {
+        return fielderDismissalRepository.add(em, scorePlayerMap, matchPlayerMap);
+    }
+
     public Map<String, Map<String, Integer>> getFieldingStats(Long playerId)
     {
         return fielderDismissalRepository.getFieldingStats(playerId);

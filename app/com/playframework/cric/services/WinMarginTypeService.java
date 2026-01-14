@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 
 import com.playframework.cric.repositories.WinMarginTypeRepository;
 import com.playframework.cric.models.WinMarginType;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
@@ -17,6 +18,10 @@ public class WinMarginTypeService {
 
     public WinMarginType getById(Integer id) {
         return winMarginTypeRepository.getById(id);
+    }
+
+    public WinMarginType getById(EntityManager em, Integer id) {
+        return winMarginTypeRepository.getById(em, id);
     }
 
     public List<WinMarginType> getByIds(List<Integer> ids) {

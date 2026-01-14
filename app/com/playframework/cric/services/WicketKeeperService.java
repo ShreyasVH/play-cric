@@ -22,6 +22,11 @@ public class WicketKeeperService {
         return wicketKeeperRepository.add(playerIds, matchPlayerMap);
     }
 
+    public List<WicketKeeper> add(EntityManager em, List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
+    {
+        return wicketKeeperRepository.add(em, playerIds, matchPlayerMap);
+    }
+
     public List<WicketKeeper> getByMatchPlayerIds(List<Integer> matchPlayerIds)
     {
         return wicketKeeperRepository.getByMatchPlayerIds(matchPlayerIds);

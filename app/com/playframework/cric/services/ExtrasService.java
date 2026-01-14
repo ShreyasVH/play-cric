@@ -22,6 +22,11 @@ public class ExtrasService {
         return extrasRepository.add(matchId, extrasRequests);
     }
 
+    public List<Extras> add(EntityManager em, Integer matchId, List<ExtrasRequest> extrasRequests)
+    {
+        return extrasRepository.add(em, matchId, extrasRequests);
+    }
+
     public List<Extras> getByMatchId(Integer matchId)
     {
         return extrasRepository.getByMatchId(matchId);
