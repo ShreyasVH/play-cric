@@ -15,6 +15,5 @@ public class Stadium {
     private String name;
     private String city;
     private String state;
-//    @Column(name = "country_id")
     private Long countryId;
 }

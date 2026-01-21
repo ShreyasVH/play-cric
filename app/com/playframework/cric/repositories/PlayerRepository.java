@@ -5,6 +5,7 @@ import com.playframework.cric.requests.FilterRequest;
 import com.playframework.cric.responses.StatsResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -234,7 +235,7 @@ public class PlayerRepository {
 
     public StatsResponse getBattingStats(FilterRequest filterRequest) {
         StatsResponse statsResponse = new StatsResponse();
-        List<Map<String, String>> statList = new ArrayList<>();
+        List<Map<String, Object>> statList = new ArrayList<>();
         String query = "select p.id as playerId, p.name AS name, sum(bs.runs) AS `runs`, count(0) AS `innings`, sum(`bs`.`balls`) AS `balls`, sum(`bs`.`fours`) AS `fours`, sum(`bs`.`sixes`) AS `sixes`, max(`bs`.`runs`) AS `highest`, count((case when (`bs`.`dismissal_mode_id` is null) then 1 end)) AS `notouts`, count((case when ((`bs`.`runs` >= 50) and (`bs`.`runs` < 100)) then 1 end)) AS `fifties`, count((case when ((`bs`.`runs` >= 100)) then 1 end)) AS `hundreds` from batting_scores bs " +
                 "inner join match_player_map mpm on mpm.id = bs.match_player_id " +
                 "inner join players p on p.id = mpm.player_id " +
@@ -307,9 +308,8 @@ public class PlayerRepository {
 
         String finalCountQuery = countQuery;
         jpaApi.withTransaction(em -> {
-            List<Object[]> countResult = em.createNativeQuery(finalCountQuery).getResultList();
-//            statsResponse.setCount(countResult.get(0).getInteger("count"));
-            String sh = "sh";
+            List<Long> countResult = em.createNativeQuery(finalCountQuery).getResultList();
+            statsResponse.setCount(countResult.get(0));
         });
 
         String finalQuery = query;
@@ -317,29 +317,27 @@ public class PlayerRepository {
             List<Object[]> result = em.createNativeQuery(finalQuery).getResultList();
             for(Object[] row: result)
             {
-                String sh = "sh";
+                long innings = (Long) row[3];
+                if (innings > 0) {
+                    Map<String, Object> stats = new HashMap<>();
 
-//                Integer innings = row.getInteger("innings");
-//                if (innings > 0) {
-//                    Map<String, String> stats = new HashMap<>();
-//
-//                    stats.put("id", row.getString("playerId"));
-//                    stats.put("name", row.getString("name"));
-//                    stats.put("innings", innings.toString());
-//                    stats.put("runs", row.getString("runs"));
-//                    stats.put("balls", row.getString("balls"));
-//                    stats.put("notOuts", row.getString("notouts"));
-//                    stats.put("fours", row.getString("fours"));
-//                    stats.put("sixes", row.getString("sixes"));
-//                    stats.put("highest", row.getString("highest"));
-//                    stats.put("fifties", row.getString("fifties"));
-//                    stats.put("hundreds", row.getString("hundreds"));
+                    stats.put("id", row[0]);
+                    stats.put("name", row[1]);
+                    stats.put("innings", innings);
+                    stats.put("runs", row[2]);
+                    stats.put("balls", row[4]);
+                    stats.put("notOuts", row[8]);
+                    stats.put("fours", row[5]);
+                    stats.put("sixes", row[6]);
+                    stats.put("highest", row[7]);
+                    stats.put("fifties", row[9]);
+                    stats.put("hundreds", row[10]);
 //                    stats.put("twoHundreds", row.getString("twoHundreds"));
 //                    stats.put("threeHundreds", row.getString("threeHundreds"));
 //                    stats.put("fourHundreds", row.getString("fourHundreds"));
-//
-//                    statList.add(stats);
-//                }
+
+                    statList.add(stats);
+                }
             }
         });
 
@@ -350,7 +348,7 @@ public class PlayerRepository {
 
     public StatsResponse getBowlingStats(FilterRequest filterRequest) {
         StatsResponse statsResponse = new StatsResponse();
-        List<Map<String, String>> statList = new ArrayList<>();
+        List<Map<String, Object>> statList = new ArrayList<>();
 
         String query = "select p.id as playerId, p.name AS name, sum(bf.wickets) AS wickets, sum(bf.runs) as runs, count(0) AS `innings`, sum(`bf`.`balls`) AS `balls`, sum(`bf`.`maidens`) AS `maidens`, count((case when ((`bf`.`wickets` >= 5) and (`bf`.`wickets` < 10)) then 1 end)) AS `fifers`, count((case when (`bf`.`wickets` = 10) then 1 end)) AS `tenWickets` from bowling_figures bf " +
                 "inner join match_player_map mpm on mpm.id = bf.match_player_id " +
@@ -434,34 +432,31 @@ public class PlayerRepository {
 
         String finalCountQuery = countQuery;
         jpaApi.withTransaction(em -> {
-            List<Object[]> countResult = em.createNativeQuery(finalCountQuery).getResultList();
-//            statsResponse.setCount(countResult.get(0).getInteger("count"));
-            String sh = "sh";
+            List<Long> countResult = em.createNativeQuery(finalCountQuery).getResultList();
+            statsResponse.setCount(countResult.get(0));
         });
 
         String finalQuery = query;
         jpaApi.withTransaction(em -> {
             List<Object[]> result = em.createNativeQuery(finalQuery).getResultList();
             for (Object[] row : result) {
-                String sh = "sh";
+                Long innings = (Long) row[4];
+                if(innings > 0)
+                {
+                    Map<String, Object> stats = new HashMap<>();
 
-//                Integer innings = row.getInteger("innings");
-//                if(innings > 0)
-//                {
-//                    Map<String, String> stats = new HashMap<>();
-//
-//                    stats.put("id", row.getString("playerId"));
-//                    stats.put("name", row.getString("name"));
-//                    stats.put("innings", innings.toString());
-//                    stats.put("wickets", row.getString("wickets"));
-//                    stats.put("runs", row.getString("runs"));
-//                    stats.put("balls", row.getString("balls"));
-//                    stats.put("maidens", row.getString("maidens"));
-//                    stats.put("fifers", row.getString("fifers"));
-//                    stats.put("tenWickets", row.getString("tenWickets"));
-//
-//                    statList.add(stats);
-//                }
+                    stats.put("id", row[0]);
+                    stats.put("name", row[1]);
+                    stats.put("innings", innings);
+                    stats.put("wickets", row[2]);
+                    stats.put("runs", row[3]);
+                    stats.put("balls", row[5]);
+                    stats.put("maidens", row[6]);
+                    stats.put("fifers", row[7]);
+                    stats.put("tenWickets", row[8]);
+
+                    statList.add(stats);
+                }
             }
         });
 
@@ -472,7 +467,7 @@ public class PlayerRepository {
 
     public StatsResponse getFieldingStats(FilterRequest filterRequest) {
         StatsResponse statsResponse = new StatsResponse();
-        List<Map<String, String>> statList = new ArrayList<>();
+        List<Map<String, Object>> statList = new ArrayList<>();
 
         String query = "select p.id as playerId, p.name AS name, SUM(case when dm.name = 'Caught' and wk.id is null then 1 else 0 end) as `fielderCatches`, SUM(case when dm.name = 'Caught' and wk.id is not null then 1 else 0 end) as `keeperCatches`, SUM(case when dm.name = 'Stumped' then 1 else 0 end) as `stumpings`, SUM(case when dm.name = 'Run Out' then 1 else 0 end) as `runOuts` from fielder_dismissals fd " +
                 "inner join match_player_map mpm on mpm.id = fd.match_player_id " +
@@ -566,27 +561,24 @@ public class PlayerRepository {
 
         String finalCountQuery = countQuery;
         jpaApi.withTransaction(em -> {
-            List<Object[]> countResult = em.createNativeQuery(finalCountQuery).getResultList();
-//            statsResponse.setCount(countResult.get(0).getInteger("count"));
-            String sh = "sh";
+            List<Long> countResult = em.createNativeQuery(finalCountQuery).getResultList();
+            statsResponse.setCount(countResult.get(0));
         });
 
         String finalQuery = query;
         jpaApi.withTransaction(em -> {
             List<Object[]> result = em.createNativeQuery(finalQuery).getResultList();
             for (Object[] row : result) {
-                String sh = "sh";
+                Map<String, Object> stats = new HashMap<>();
 
-//                Map<String, String> stats = new HashMap<>();
-//
-//                stats.put("id", row.getString("playerId"));
-//                stats.put("name", row.getString("name"));
-//                stats.put("fielderCatches", row.getString("fielderCatches"));
-//                stats.put("keeperCatches", row.getString("keeperCatches"));
-//                stats.put("stumpings", row.getString("stumpings"));
-//                stats.put("runOuts", row.getString("runOuts"));
-//
-//                statList.add(stats);
+                stats.put("id", row[0]);
+                stats.put("name", row[1]);
+                stats.put("fielderCatches", row[2]);
+                stats.put("keeperCatches", row[3]);
+                stats.put("stumpings", row[4]);
+                stats.put("runOuts", row[5]);
+
+                statList.add(stats);
             }
         });
 

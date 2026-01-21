@@ -46,19 +46,22 @@ public class FielderDismissalRepository {
             List<Object[]> rows = em.createNativeQuery(query).getResultList();
 
             for (Object[] row : rows) {
-//                String gameType = row.getString("gameType");
-//                if(statsFinal.containsKey(gameType))
-//                {
-//                    statsFinal.get(gameType).put(row.getString("dismissalMode"), row.getInteger("count"));
-//                }
-//                else
-//                {
-//                    statsFinal.put(gameType, new HashMap<>(){
-//                        {
-//                            put(row.getString("dismissalMode"), row.getInteger("count"));
-//                        }
-//                    });
-//                }
+                String gameType = (String) row[2];
+                String dismissalMode = (String) row[0];
+                int dismissalCount = ((Long) row[1]).intValue();
+                if(statsFinal.containsKey(gameType))
+                {
+                    statsFinal.get(gameType).put(dismissalMode, dismissalCount);
+                }
+                else
+                {
+                    statsFinal.put(gameType, new HashMap<>(){
+                        {
+                            put(dismissalMode, dismissalCount);
+                        }
+                    });
+                }
+                String sh = "sh";
             }
         });
 

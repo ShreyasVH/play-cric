@@ -6,6 +6,7 @@ import com.playframework.cric.requests.matches.BattingScoreRequest;
 import jakarta.persistence.EntityManager;
 import play.db.jpa.JPAApi;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,26 +43,27 @@ public class BattingScoreRepository {
 
             for (Object[] row: rows)
             {
-//                Integer innings = row.getInteger("innings");
-//                if(innings > 0)
-//                {
-//                    Map<String, Integer> stats = new HashMap<>();
-//
-//                    stats.put("innings", innings);
-//                    stats.put("runs", row.getInteger("runs"));
-//                    stats.put("balls", row.getInteger("balls"));
-//                    stats.put("fours", row.getInteger("fours"));
-//                    stats.put("sixes", row.getInteger("sixes"));
-//                    stats.put("highest", row.getInteger("highest"));
-//                    stats.put("fifties", row.getInteger("fifties"));
-//                    stats.put("hundreds", row.getInteger("hundreds"));
-//                    stats.put("twoHundreds", row.getInteger("twoHundreds"));
-//                    stats.put("threeHundreds", row.getInteger("threeHundreds"));
-//                    stats.put("fourHundreds", row.getInteger("fourHundreds"));
-//
-//                    String gameType = row.getString("gameType");
-//                    statsFinal.put(gameType, stats);
-//                }
+                int innings = ((Long) row[0]).intValue();
+                if(innings > 0)
+                {
+                    Map<String, Integer> stats = new HashMap<>();
+
+                    stats.put("innings", innings);
+                    stats.put("runs", ((BigDecimal) row[1]).intValue());
+                    stats.put("balls", ((BigDecimal) row[2]).intValue());
+                    stats.put("fours", ((BigDecimal) row[3]).intValue());
+                    stats.put("sixes", ((BigDecimal) row[4]).intValue());
+                    stats.put("highest", Integer.valueOf(row[5].toString()));
+                    stats.put("fifties", ((Long) row[7]).intValue());
+                    stats.put("hundreds", ((Long) row[8]).intValue());
+                    stats.put("twoHundreds", ((Long) row[9]).intValue());
+                    stats.put("threeHundreds", ((Long) row[10]).intValue());
+                    stats.put("fourHundreds", ((Long) row[11]).intValue());
+
+                    String gameType = (String) row[6];
+                    statsFinal.put(gameType, stats);
+                }
+                String sh = "sh";
             }
         });
 
@@ -78,20 +80,23 @@ public class BattingScoreRepository {
 
             for (Object[] row : rows)
             {
-//                String gameType = row.getString("gameType");
-//                if(stats.containsKey(gameType))
-//                {
-//                    stats.get(gameType).put(row.getString("dismissalMode"), row.getInteger("count"));
-//                }
-//                else
-//                {
-//                    Map<String, Integer> partStats = new HashMap<>(){
-//                        {
-//                            put(row.getString("dismissalMode"), row.getInteger("count"));
-//                        }
-//                    };
-//                    stats.put(gameType, partStats);
-//                }
+                String gameType = (String) row[2];
+                String dismissalMode = (String) row[0];
+                int dismissalCount = ((Long) row[1]).intValue();
+                if(stats.containsKey(gameType))
+                {
+                    stats.get(gameType).put(dismissalMode, dismissalCount);
+                }
+                else
+                {
+                    Map<String, Integer> partStats = new HashMap<>(){
+                        {
+                            put(dismissalMode, dismissalCount);
+                        }
+                    };
+                    stats.put(gameType, partStats);
+                }
+                String sh = "sh";
             }
         });
 

@@ -11,6 +11,6 @@ import java.util.Map;
 @Setter
 public class StatsResponse
 {
-    private Integer count = 0;
-    private List<Map<String, String>> stats = new ArrayList<>();
+    private long count = 0;
+    private List<Map<String, Object>> stats = new ArrayList<>();
 }

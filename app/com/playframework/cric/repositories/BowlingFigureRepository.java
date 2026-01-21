@@ -6,6 +6,7 @@ import com.playframework.cric.requests.matches.BowlingFigureRequest;
 import jakarta.persistence.EntityManager;
 import play.db.jpa.JPAApi;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,22 +43,23 @@ public class BowlingFigureRepository {
             List<Object[]> rows = em.createNativeQuery(query).getResultList();
 
             for (Object[] row : rows) {
-//                String gameType = row.getString("gameType");
-//                Integer innings = row.getInteger("innings");
-//                if(innings > 0)
-//                {
-//                    Map<String, Integer> stats = new HashMap<>();
-//
-//                    stats.put("innings", innings);
-//                    stats.put("runs", row.getInteger("runs"));
-//                    stats.put("balls", row.getInteger("balls"));
-//                    stats.put("maidens", row.getInteger("maidens"));
-//                    stats.put("wickets", row.getInteger("wickets"));
-//                    stats.put("fifers", row.getInteger("fifers"));
-//                    stats.put("tenWickets", row.getInteger("tenWickets"));
-//
-//                    statsFinal.put(gameType, stats);
-//                }
+                String gameType = (String) row[5];
+                Integer innings = ((Long) row[0]).intValue();
+                if(innings > 0)
+                {
+                    Map<String, Integer> stats = new HashMap<>();
+
+                    stats.put("innings", innings);
+                    stats.put("runs", ((BigDecimal) row[3]).intValue());
+                    stats.put("balls", ((BigDecimal) row[1]).intValue());
+                    stats.put("maidens", ((BigDecimal) row[2]).intValue());
+                    stats.put("wickets", ((BigDecimal) row[4]).intValue());
+                    stats.put("fifers", ((Long) row[6]).intValue());
+                    stats.put("tenWickets", ((Long) row[7]).intValue());
+
+                    statsFinal.put(gameType, stats);
+                }
+                String sh = "sh";
             }
         });
         return statsFinal;
