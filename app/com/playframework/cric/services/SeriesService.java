@@ -8,6 +8,7 @@ import com.playframework.cric.repositories.SeriesRepository;
 import com.playframework.cric.requests.series.CreateRequest;
 import com.playframework.cric.exceptions.ConflictException;
 import com.playframework.cric.requests.series.UpdateRequest;
+import jakarta.persistence.EntityManager;
 
 public class SeriesService {
     private final SeriesRepository seriesRepository;
@@ -28,11 +29,22 @@ public class SeriesService {
         return seriesRepository.create(createRequest);
     }
 
+    public Series create(EntityManager em, CreateRequest createRequest) {
+        createRequest.validate();
+
+        Series existingSeries = seriesRepository.getByNameAndTourIdAndGameTypeId(em, createRequest.getName(), createRequest.getTourId(), createRequest.getGameTypeId());
+        if(null != existingSeries) {
+            throw new ConflictException("Series");
+        }
+
+        return seriesRepository.create(em, createRequest);
+    }
+
     public List<Series> getAll(int page, int limit) {
         return seriesRepository.getAll(page, limit);
     }
 
-    public int getTotalCount() {
+    public long getTotalCount() {
         return seriesRepository.getTotalCount();
     }
 
@@ -40,7 +52,11 @@ public class SeriesService {
         return seriesRepository.getById(id);
     }
 
-    public Series update(Series existingSeries, UpdateRequest updateRequest) {
+    public Series getById(EntityManager em, Integer id) {
+        return seriesRepository.getById(em, id);
+    }
+
+    public Series update(EntityManager em, Series existingSeries, UpdateRequest updateRequest) {
         boolean isUpdateRequired = false;
         if (null != updateRequest.getName() && !updateRequest.getName().equals(existingSeries.getName())) {
             isUpdateRequired = true;
@@ -73,7 +89,7 @@ public class SeriesService {
         }
 
         if (isUpdateRequired) {
-            seriesRepository.update(existingSeries);
+            seriesRepository.update(em, existingSeries);
         }
 
         return existingSeries;
@@ -87,5 +103,10 @@ public class SeriesService {
     public void remove(Integer id)
     {
         seriesRepository.remove(id);
+    }
+
+    public void remove(EntityManager em, Integer id)
+    {
+        seriesRepository.remove(em, id);
     }
 }

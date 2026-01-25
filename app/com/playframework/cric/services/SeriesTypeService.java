@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.playframework.cric.repositories.SeriesTypeRepository;
 import com.playframework.cric.models.SeriesType;
+import jakarta.persistence.EntityManager;
 
 public class SeriesTypeService {
     private final SeriesTypeRepository seriesTypeRepository;
@@ -16,6 +17,10 @@ public class SeriesTypeService {
 
     public SeriesType getById(Integer id) {
         return seriesTypeRepository.getById(id);
+    }
+
+    public SeriesType getById(EntityManager em, Integer id) {
+        return seriesTypeRepository.getById(em, id);
     }
 
     public List<SeriesType> getByIds(List<Integer> ids) {

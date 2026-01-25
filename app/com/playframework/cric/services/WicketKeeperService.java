@@ -3,6 +3,7 @@ package com.playframework.cric.services;
 import com.google.inject.Inject;
 import com.playframework.cric.models.WicketKeeper;
 import com.playframework.cric.repositories.WicketKeeperRepository;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,11 @@ public class WicketKeeperService {
         return wicketKeeperRepository.add(playerIds, matchPlayerMap);
     }
 
+    public List<WicketKeeper> add(EntityManager em, List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
+    {
+        return wicketKeeperRepository.add(em, playerIds, matchPlayerMap);
+    }
+
     public List<WicketKeeper> getByMatchPlayerIds(List<Integer> matchPlayerIds)
     {
         return wicketKeeperRepository.getByMatchPlayerIds(matchPlayerIds);
@@ -29,5 +35,10 @@ public class WicketKeeperService {
     public void remove(List<Integer> matchPlayerIds)
     {
         wicketKeeperRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        wicketKeeperRepository.remove(em, matchPlayerIds);
     }
 }

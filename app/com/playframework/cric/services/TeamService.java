@@ -9,6 +9,7 @@ import com.playframework.cric.repositories.TeamTypeRepository;
 import com.playframework.cric.requests.teams.CreateRequest;
 import com.playframework.cric.models.Team;
 import com.playframework.cric.exceptions.ConflictException;
+import jakarta.persistence.EntityManager;
 
 public class TeamService {
     private final TeamRepository teamRepository;
@@ -35,11 +36,15 @@ public class TeamService {
         return teamRepository.getAll(page, limit);
     }
 
-    public int getTotalCount() {
+    public long getTotalCount() {
         return teamRepository.getTotalCount();
     }
 
     public List<Team> getByIds(List<Long> teamIds) {
         return teamRepository.getByIds(teamIds);
+    }
+
+    public List<Team> getByIds(EntityManager em, List<Long> teamIds) {
+        return teamRepository.getByIds(em, teamIds);
     }
 }

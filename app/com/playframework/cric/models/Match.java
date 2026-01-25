@@ -8,8 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import javax.persistence.*;
-import io.ebean.Model;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +17,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "matches")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Match extends Model {
+public class Match {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

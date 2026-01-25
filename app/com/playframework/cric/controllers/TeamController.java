@@ -55,7 +55,7 @@ public class TeamController extends Controller {
 
     public Result getAll(int page, int limit) {
         List<Team> teams = teamService.getAll(page, limit);
-        int totalCount = 0;
+        long totalCount = 0;
         if(page == 1) {
             totalCount = teamService.getTotalCount();
         }

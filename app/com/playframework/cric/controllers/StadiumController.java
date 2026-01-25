@@ -47,7 +47,7 @@ public class StadiumController extends Controller {
 
     public Result getAll(int page, int limit) {
         List<Stadium> stadiums = stadiumService.getAll(page, limit);
-        int totalCount = 0;
+        long totalCount = 0;
         if(page == 1) {
             totalCount = stadiumService.getTotalCount();
         }

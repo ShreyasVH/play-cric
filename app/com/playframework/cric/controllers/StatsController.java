@@ -13,7 +13,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class StatsController extends Controller {
     private final StatsService statsService;

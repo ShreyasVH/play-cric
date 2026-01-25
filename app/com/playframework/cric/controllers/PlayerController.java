@@ -5,8 +5,7 @@ import com.playframework.cric.exceptions.BadRequestException;
 import com.playframework.cric.requests.players.MergeRequest;
 import com.playframework.cric.responses.*;
 import com.playframework.cric.services.*;
-import io.ebean.DB;
-import io.ebean.Transaction;
+import play.db.jpa.JPAApi;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -24,6 +23,7 @@ import com.playframework.cric.requests.players.CreateRequest;
 import com.playframework.cric.utils.Utils;
 
 public class PlayerController extends Controller {
+    private final JPAApi jpaApi;
     private final PlayerService playerService;
     private final CountryService countryService;
     private final BattingScoreService battingScoreService;
@@ -34,6 +34,7 @@ public class PlayerController extends Controller {
 
     @Inject
     public PlayerController(
+        JPAApi jpaApi,
         PlayerService playerService,
         CountryService countryService,
         BattingScoreService battingScoreService,
@@ -42,6 +43,7 @@ public class PlayerController extends Controller {
         ManOfTheSeriesService manOfTheSeriesService,
         MatchPlayerMapService matchPlayerMapService
     ) {
+        this.jpaApi = jpaApi;
         this.playerService = playerService;
         this.countryService = countryService;
         this.battingScoreService = battingScoreService;
@@ -77,7 +79,7 @@ public class PlayerController extends Controller {
 
     public Result getAll(int page, int limit) {
         List<Player> players = playerService.getAll(page, limit);
-        int totalCount = 0;
+        long totalCount = 0;
         if(page == 1) {
             totalCount = playerService.getTotalCount();
         }
@@ -202,26 +204,18 @@ public class PlayerController extends Controller {
             throw new NotFoundException("Original Player");
         }
 
-        Transaction transaction = DB.beginTransaction();
-        try {
-            manOfTheSeriesService.merge(mergeRequest);
-            matchPlayerMapService.merge(mergeRequest);
-            playerService.remove(mergeRequest.getPlayerIdToMerge());
-
-            transaction.commit();
-            transaction.end();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-
-            transaction.rollback();
-        }
+        jpaApi.withTransaction(em -> {
+            manOfTheSeriesService.merge(em, mergeRequest);
+            matchPlayerMapService.merge(em, mergeRequest);
+            playerService.remove(em, mergeRequest.getPlayerIdToMerge());
+        });
 
         return ok(Json.toJson(new Response("Success")));
     }
 
     public Result search(String keyword, int page, int limit) {
         List<Player> players = playerService.search(keyword, page, limit);
-        int totalCount = 0;
+        long totalCount = 0;
         if(page == 1) {
             totalCount = playerService.searchCount(keyword);
         }

@@ -6,6 +6,7 @@ import java.util.List;
 import com.playframework.cric.repositories.TeamTypeRepository;
 import com.playframework.cric.models.TeamType;
 import com.playframework.cric.exceptions.ConflictException;
+import jakarta.persistence.EntityManager;
 
 public class TeamTypeService {
     private final TeamTypeRepository teamTypeRepository;
@@ -21,5 +22,9 @@ public class TeamTypeService {
 
     public List<TeamType> getByIds(List<Integer> ids) {
         return teamTypeRepository.getByIds(ids);
+    }
+
+    public List<TeamType> getByIds(EntityManager em, List<Integer> ids) {
+        return teamTypeRepository.getByIds(em, ids);
     }
 }

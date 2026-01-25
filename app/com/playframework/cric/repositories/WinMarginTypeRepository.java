@@ -1,17 +1,33 @@
 package com.playframework.cric.repositories;
 
-import io.ebean.DB;
+import com.google.inject.Inject;
 
 import com.playframework.cric.models.WinMarginType;
+import play.db.jpa.JPAApi;
 
 import java.util.List;
 
 public class WinMarginTypeRepository {
-    public WinMarginType getById(Integer typeId) {
-        return DB.find(WinMarginType.class).where().eq("id", typeId).findOne();
+    private final JPAApi jpaApi;
+
+    @Inject
+    public WinMarginTypeRepository(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
     }
 
-    public List<WinMarginType> getByIds(List<Integer> typeIds) {
-        return DB.find(WinMarginType.class).where().in("id", typeIds).findList();
+    public WinMarginType getById(Integer seriesTypeId) {
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery("SELECT wt FROM WinMarginType wt WHERE wt.id = :id", WinMarginType.class)
+                .setParameter("id", seriesTypeId)
+                .getSingleResult();
+        });
+    }
+
+    public List<WinMarginType> getByIds(List<Integer> seriesTypeIds) {
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery("SELECT wt FROM WinMarginType wt WHERE wt.id IN :ids", WinMarginType.class)
+                .setParameter("ids", seriesTypeIds)
+                .getResultList();
+        });
     }
 }

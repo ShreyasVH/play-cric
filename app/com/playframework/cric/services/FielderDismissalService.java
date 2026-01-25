@@ -3,6 +3,7 @@ package com.playframework.cric.services;
 import com.google.inject.Inject;
 import com.playframework.cric.models.FielderDismissal;
 import com.playframework.cric.repositories.FielderDismissalRepository;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,11 @@ public class FielderDismissalService {
         return fielderDismissalRepository.add(scorePlayerMap, matchPlayerMap);
     }
 
+    public List<FielderDismissal> add(EntityManager em, Map<Integer, List<Long>> scorePlayerMap, Map<Long, Integer> matchPlayerMap)
+    {
+        return fielderDismissalRepository.add(em, scorePlayerMap, matchPlayerMap);
+    }
+
     public Map<String, Map<String, Integer>> getFieldingStats(Long playerId)
     {
         return fielderDismissalRepository.getFieldingStats(playerId);
@@ -34,5 +40,10 @@ public class FielderDismissalService {
     public void remove(List<Integer> matchPlayerIds)
     {
         fielderDismissalRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        fielderDismissalRepository.remove(em, matchPlayerIds);
     }
 }

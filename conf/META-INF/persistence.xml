@@ -1,0 +1,51 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="
+               https://jakarta.ee/xml/ns/persistence
+               https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+
+    <persistence-unit name="defaultPersistenceUnit" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- Must match Play DB name -->
+        <non-jta-data-source>DefaultDS</non-jta-data-source>
+
+        <class>com.playframework.cric.models.BattingScore</class>
+        <class>com.playframework.cric.models.BowlingFigure</class>
+        <class>com.playframework.cric.models.Captain</class>
+        <class>com.playframework.cric.models.Country</class>
+        <class>com.playframework.cric.models.DismissalMode</class>
+        <class>com.playframework.cric.models.Extras</class>
+        <class>com.playframework.cric.models.ExtrasType</class>
+        <class>com.playframework.cric.models.FielderDismissal</class>
+        <class>com.playframework.cric.models.GameType</class>
+        <class>com.playframework.cric.models.ManOfTheMatch</class>
+        <class>com.playframework.cric.models.ManOfTheSeries</class>
+        <class>com.playframework.cric.models.Match</class>
+        <class>com.playframework.cric.models.MatchPlayerMap</class>
+        <class>com.playframework.cric.models.Player</class>
+        <class>com.playframework.cric.models.ResultType</class>
+        <class>com.playframework.cric.models.Series</class>
+        <class>com.playframework.cric.models.SeriesTeamsMap</class>
+        <class>com.playframework.cric.models.SeriesType</class>
+        <class>com.playframework.cric.models.Stadium</class>
+        <class>com.playframework.cric.models.Tag</class>
+        <class>com.playframework.cric.models.TagMap</class>
+        <class>com.playframework.cric.models.Team</class>
+        <class>com.playframework.cric.models.TeamType</class>
+        <class>com.playframework.cric.models.Total</class>
+        <class>com.playframework.cric.models.Tour</class>
+        <class>com.playframework.cric.models.WicketKeeper</class>
+        <class>com.playframework.cric.models.WinMarginType</class>
+
+        <properties>
+            <!-- Hibernate -->
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.physical_naming_strategy" value="org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"/>
+        </properties>
+    </persistence-unit>
+
+</persistence>

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.playframework.cric.models.MatchPlayerMap;
 import com.playframework.cric.repositories.MatchPlayerMapRepository;
 import com.playframework.cric.requests.players.MergeRequest;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -22,9 +23,19 @@ public class MatchPlayerMapService {
         return matchPlayerMapRepository.add(matchId, playerIds, playerTeamMap);
     }
 
+    public List<MatchPlayerMap> add(EntityManager em, Integer matchId, List<Long> playerIds, Map<Long, Long> playerTeamMap)
+    {
+        return matchPlayerMapRepository.add(em, matchId, playerIds, playerTeamMap);
+    }
+
     public List<MatchPlayerMap> getByMatchId(Integer matchId)
     {
         return matchPlayerMapRepository.getByMatchId(matchId);
+    }
+
+    public List<MatchPlayerMap> getByMatchId(EntityManager em, Integer matchId)
+    {
+        return matchPlayerMapRepository.getByMatchId(em, matchId);
     }
 
     public void remove(Integer matchId)
@@ -32,8 +43,18 @@ public class MatchPlayerMapService {
         matchPlayerMapRepository.remove(matchId);
     }
 
+    public void remove(EntityManager em, Integer matchId)
+    {
+        matchPlayerMapRepository.remove(em, matchId);
+    }
+
     public void merge(MergeRequest mergeRequest)
     {
         matchPlayerMapRepository.merge(mergeRequest);
+    }
+
+    public void merge(EntityManager em, MergeRequest mergeRequest)
+    {
+        matchPlayerMapRepository.merge(em, mergeRequest);
     }
 }

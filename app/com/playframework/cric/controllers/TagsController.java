@@ -21,7 +21,7 @@ public class TagsController extends Controller {
 
     public Result getAll(int page, int limit) {
         List<Tag> tags = tagsService.getAll(page, limit);
-        int totalCount = 0;
+        long totalCount = 0;
         if(page == 1) {
             totalCount = tagsService.getTotalCount();
         }

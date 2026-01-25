@@ -1,6 +1,5 @@
 package com.playframework.cric.responses;
 
-import io.ebean.SqlRow;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

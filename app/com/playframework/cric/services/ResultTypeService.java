@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 
 import com.playframework.cric.repositories.ResultTypeRepository;
 import com.playframework.cric.models.ResultType;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 

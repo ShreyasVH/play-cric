@@ -3,6 +3,7 @@ package com.playframework.cric.services;
 import com.google.inject.Inject;
 import com.playframework.cric.models.Captain;
 import com.playframework.cric.repositories.CaptainRepository;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,11 @@ public class CaptainService {
         return captainRepository.add(playerIds, matchPlayerMap);
     }
 
+    public List<Captain> add(EntityManager em, List<Long> playerIds, Map<Long, Integer> matchPlayerMap)
+    {
+        return captainRepository.add(em, playerIds, matchPlayerMap);
+    }
+
     public List<Captain> getByMatchPlayerIds(List<Integer> matchPlayerIds)
     {
         return captainRepository.getByMatchPlayerIds(matchPlayerIds);
@@ -29,5 +35,10 @@ public class CaptainService {
     public void remove(List<Integer> matchPlayerIds)
     {
         captainRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        captainRepository.remove(em, matchPlayerIds);
     }
 }

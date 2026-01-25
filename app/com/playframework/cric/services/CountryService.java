@@ -7,6 +7,7 @@ import com.playframework.cric.repositories.CountryRepository;
 import com.playframework.cric.requests.countries.CreateRequest;
 import com.playframework.cric.models.Country;
 import com.playframework.cric.exceptions.ConflictException;
+import jakarta.persistence.EntityManager;
 
 public class CountryService {
 	private final CountryRepository countryRepository;
@@ -36,6 +37,10 @@ public class CountryService {
 		return countryRepository.getByIds(ids);
 	}
 
+	public List<Country> getByIds(EntityManager em, List<Long> ids) {
+		return countryRepository.getByIds(em, ids);
+	}
+
 	public List<Country> searchByName(String name) {
 		return countryRepository.getByNamePattern(name);
 	}
@@ -44,7 +49,7 @@ public class CountryService {
 		return countryRepository.getAll(page, limit);
 	}
 
-	public int getTotalCount() {
+	public long getTotalCount() {
 		return countryRepository.getTotalCount();
 	}
 }

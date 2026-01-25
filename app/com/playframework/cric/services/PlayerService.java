@@ -7,7 +7,7 @@ import com.playframework.cric.exceptions.ConflictException;
 import com.playframework.cric.models.Player;
 import com.playframework.cric.repositories.PlayerRepository;
 import com.playframework.cric.requests.players.CreateRequest;
-import com.playframework.cric.requests.players.MergeRequest;
+import jakarta.persistence.EntityManager;
 
 public class PlayerService {
     private final PlayerRepository playerRepository;
@@ -33,7 +33,7 @@ public class PlayerService {
         return playerRepository.getAll(page, limit);
     }
 
-    public int getTotalCount() {
+    public long getTotalCount() {
         return playerRepository.getTotalCount();
     }
 
@@ -41,9 +41,18 @@ public class PlayerService {
         return playerRepository.getByIds(ids);
     }
 
+    public List<Player> getByIds(EntityManager em, List<Long> ids) {
+        return playerRepository.getByIds(em, ids);
+    }
+
     public Player getById(Long id)
     {
         return playerRepository.getById(id);
+    }
+
+    public Player getById(EntityManager em, Long id)
+    {
+        return playerRepository.getById(em, id);
     }
 
     public void remove(Long id)
@@ -51,12 +60,17 @@ public class PlayerService {
         playerRepository.remove(id);
     }
 
+    public void remove(EntityManager em, Long id)
+    {
+        playerRepository.remove(em, id);
+    }
+
     public List<Player> search(String keyword, int page, int limit)
     {
         return playerRepository.search(keyword, page, limit);
     }
 
-    public int searchCount(String keyword)
+    public long searchCount(String keyword)
     {
         return playerRepository.searchCount(keyword);
     }

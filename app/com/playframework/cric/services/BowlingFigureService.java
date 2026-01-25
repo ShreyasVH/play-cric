@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.playframework.cric.models.BowlingFigure;
 import com.playframework.cric.repositories.BowlingFigureRepository;
 import com.playframework.cric.requests.matches.BowlingFigureRequest;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,11 @@ public class BowlingFigureService {
         return bowlingFigureRepository.add(bowlingFigureRequests, matchPlayerMap);
     }
 
+    public List<BowlingFigure> add(EntityManager em, List<BowlingFigureRequest> bowlingFigureRequests, Map<Long, Integer> matchPlayerMap)
+    {
+        return bowlingFigureRepository.add(em, bowlingFigureRequests, matchPlayerMap);
+    }
+
     public Map<String, Map<String, Integer>> getBasicBowlingStats(Long playerId)
     {
         return bowlingFigureRepository.getBasicBowlingStats(playerId);
@@ -35,5 +41,10 @@ public class BowlingFigureService {
     public void remove(List<Integer> matchPlayerIds)
     {
         bowlingFigureRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        bowlingFigureRepository.remove(em, matchPlayerIds);
     }
 }

@@ -7,6 +7,7 @@ import com.playframework.cric.repositories.StadiumRepository;
 import com.playframework.cric.requests.stadiums.CreateRequest;
 import com.playframework.cric.models.Stadium;
 import com.playframework.cric.exceptions.ConflictException;
+import jakarta.persistence.EntityManager;
 
 public class StadiumService {
 	private final StadiumRepository stadiumRepository;
@@ -32,7 +33,7 @@ public class StadiumService {
 		return stadiumRepository.getAll(page, limit);
 	}
 
-	public int getTotalCount() {
+	public long getTotalCount() {
 		return stadiumRepository.getTotalCount();
 	}
 

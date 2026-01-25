@@ -1,19 +1,18 @@
 package com.playframework.cric.models;
 
 import com.playframework.cric.requests.matches.TotalsRequestEntry;
-import io.ebean.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "totals")
-public class Total extends Model {
+public class Total {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

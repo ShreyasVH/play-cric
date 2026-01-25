@@ -18,7 +18,7 @@ public class TagsService {
         return tagsRepository.getAll(page, limit);
     }
 
-    public int getTotalCount() {
+    public long getTotalCount() {
         return tagsRepository.getTotalCount();
     }
 

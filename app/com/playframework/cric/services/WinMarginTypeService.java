@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 
 import com.playframework.cric.repositories.WinMarginTypeRepository;
 import com.playframework.cric.models.WinMarginType;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 

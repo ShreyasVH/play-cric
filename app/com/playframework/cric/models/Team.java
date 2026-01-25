@@ -2,14 +2,13 @@ package com.playframework.cric.models;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import javax.persistence.*;
-import io.ebean.Model;
+import jakarta.persistence.*;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "teams")
-public class Team extends Model {
+public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -3,7 +3,9 @@ package com.playframework.cric.services;
 import com.playframework.cric.models.Total;
 import com.playframework.cric.repositories.TotalsRepository;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+
 import java.util.List;
 
 public class TotalsService {
@@ -20,8 +22,18 @@ public class TotalsService {
         this.totalsRepository.add(totals);
     }
 
+    public void add(EntityManager em, List<Total> totals)
+    {
+        this.totalsRepository.add(em, totals);
+    }
+
     public void remove(Integer matchId)
     {
         this.totalsRepository.remove(matchId);
+    }
+
+    public void remove(EntityManager em, Integer matchId)
+    {
+        this.totalsRepository.remove(em, matchId);
     }
 }
