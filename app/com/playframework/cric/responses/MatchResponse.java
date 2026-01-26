@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.playframework.cric.models.GameType;
 import com.playframework.cric.models.Match;
 import com.playframework.cric.models.Series;
+import com.playframework.cric.models.Tag;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -39,8 +40,9 @@ public class MatchResponse {
     private List<PlayerMiniResponse> manOfTheMatchList;
     private List<PlayerMiniResponse> captains;
     private List<PlayerMiniResponse> wicketKeepers;
+    private List<Tag> tags;
 
-    public MatchResponse(Match match, Series series, GameType gameType, TeamResponse team1, TeamResponse team2, ResultTypeResponse resultType, WinMarginTypeResponse winMarginType, StadiumResponse stadium, Map<Long, List<PlayerMiniResponse>> players, List<BattingScoreResponse> battingScores, List<BowlingFigureResponse> bowlingFigures, List<ExtrasResponse> extras, List<Long> manOfTheMatchPlayerIds, List<Long> captainIds, List<Long> wicketKeeperIds)
+    public MatchResponse(Match match, Series series, GameType gameType, TeamResponse team1, TeamResponse team2, ResultTypeResponse resultType, WinMarginTypeResponse winMarginType, StadiumResponse stadium, Map<Long, List<PlayerMiniResponse>> players, List<BattingScoreResponse> battingScores, List<BowlingFigureResponse> bowlingFigures, List<ExtrasResponse> extras, List<Long> manOfTheMatchPlayerIds, List<Long> captainIds, List<Long> wicketKeeperIds, List<Tag> tags)
     {
         this.id = match.getId();
         this.series = new SeriesMiniResponse(series, gameType);
@@ -78,5 +80,6 @@ public class MatchResponse {
         this.manOfTheMatchList = manOfTheMatchPlayerIds.stream().map(playerMap::get).collect(Collectors.toList());
         this.captains = captainIds.stream().map(playerMap::get).collect(Collectors.toList());
         this.wicketKeepers = wicketKeeperIds.stream().map(playerMap::get).collect(Collectors.toList());
+        this.tags = tags;
     }
 }

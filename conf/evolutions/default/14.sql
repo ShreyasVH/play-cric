@@ -1,0 +1,24 @@
+# --- !Ups
+
+INSERT INTO `tags` (`name`) VALUES
+('FINAL'),
+('SEMI_FINAL'),
+('QUARTER_FINAL'),
+('KNOCKOUT'),
+('ELIMINATOR'),
+('THIRD_PLACE'),
+('QUALIFIER_1'),
+('QUALIFIER_2');
+
+# --- !Downs
+
+DROP FROM `tags` WHERE `name` IN (
+'FINAL',
+'SEMI_FINAL',
+'QUARTER_FINAL',
+'KNOCKOUT',
+'ELIMINATOR',
+'THIRD_PLACE',
+'QUALIFIER_1',
+'QUALIFIER_2'
+)
