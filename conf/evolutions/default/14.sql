@@ -12,7 +12,7 @@ INSERT INTO `tags` (`name`) VALUES
 
 # --- !Downs
 
-DROP FROM `tags` WHERE `name` IN (
+DELETE FROM `tags` WHERE `name` IN (
 'FINAL',
 'SEMI_FINAL',
 'QUARTER_FINAL',

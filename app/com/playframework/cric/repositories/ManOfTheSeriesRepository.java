@@ -47,8 +47,7 @@ public class ManOfTheSeriesRepository {
 
     public void delete(EntityManager em, Integer seriesId, List<Long> playerIds) {
         em.createQuery(
-                "DELETE FROM ManOfTheSeries mots WHERE mots.seriesId = :seriesId AND mots.playerId IN :playerIds",
-                ManOfTheSeries.class
+                "DELETE FROM ManOfTheSeries mots WHERE mots.seriesId = :seriesId AND mots.playerId IN :playerIds"
         )
                 .setParameter("seriesId", seriesId).setParameter("playerIds", playerIds).executeUpdate();
     }
@@ -63,8 +62,7 @@ public class ManOfTheSeriesRepository {
     public void remove(EntityManager em, Integer seriesId)
     {
         em.createQuery(
-            "DELETE FROM ManOfTheSeries mots WHERE mots.seriesId = :seriesId",
-            ManOfTheSeries.class
+            "DELETE FROM ManOfTheSeries mots WHERE mots.seriesId = :seriesId"
         )
         .setParameter("seriesId", seriesId).executeUpdate();
     }

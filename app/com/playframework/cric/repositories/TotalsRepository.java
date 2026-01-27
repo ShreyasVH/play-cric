@@ -49,8 +49,7 @@ public class TotalsRepository {
     public void remove(EntityManager em, Integer matchId)
     {
         em.createQuery(
-            "DELETE FROM Total t WHERE t.matchId = :matchId",
-            Total.class
+            "DELETE FROM Total t WHERE t.matchId = :matchId"
         )
         .setParameter("matchId", matchId)
         .executeUpdate();

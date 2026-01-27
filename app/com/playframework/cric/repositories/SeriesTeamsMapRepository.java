@@ -46,8 +46,7 @@ public class SeriesTeamsMapRepository {
 
     public void delete(EntityManager em, Integer seriesId, List<Long> teamIds) {
         em.createQuery(
-                "DELETE FROM SeriesTeamsMap stm WHERE stm.seriesId = :seriesId AND stm.teamId IN :teamIds",
-                SeriesTeamsMap.class
+                "DELETE FROM SeriesTeamsMap stm WHERE stm.seriesId = :seriesId AND stm.teamId IN :teamIds"
         )
         .setParameter("seriesId", seriesId)
         .setParameter("teamIds", teamIds)
@@ -64,8 +63,7 @@ public class SeriesTeamsMapRepository {
     public void remove(EntityManager em, Integer seriesId)
     {
         em.createQuery(
-            "DELETE FROM SeriesTeamsMap stm WHERE stm.seriesId = :seriesId",
-            SeriesTeamsMap.class
+            "DELETE FROM SeriesTeamsMap stm WHERE stm.seriesId = :seriesId"
         )
         .setParameter("seriesId", seriesId)
         .executeUpdate();

@@ -54,8 +54,7 @@ public class CaptainRepository {
     public void remove(EntityManager em, List<Integer> matchPlayerIds)
     {
         em.createQuery(
-                "DELETE FROM Captain c WHERE c.matchPlayerId IN :ids",
-                Captain.class
+                "DELETE FROM Captain c WHERE c.matchPlayerId IN :ids"
         )
         .setParameter("ids", matchPlayerIds).executeUpdate();
     }

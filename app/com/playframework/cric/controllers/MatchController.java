@@ -515,6 +515,7 @@ public class MatchController extends Controller {
         jpaApi.withTransaction(em -> {
             List<MatchPlayerMap> matchPlayerMaps = matchPlayerMapService.getByMatchId(em, id);
             List<Integer> matchPlayerIds = matchPlayerMaps.stream().map(MatchPlayerMap::getId).collect(Collectors.toList());
+            tagMapService.remove(em, id, TagEntityType.MATCH.name());
             extrasService.remove(em, id);
             captainService.remove(em, matchPlayerIds);
             wicketKeeperService.remove(em, matchPlayerIds);

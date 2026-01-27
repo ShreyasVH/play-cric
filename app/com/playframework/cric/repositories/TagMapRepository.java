@@ -50,8 +50,7 @@ public class TagMapRepository {
     public void remove(EntityManager em, Integer entityId, String tagEntityType)
     {
         em.createQuery(
-                "DELETE FROM TagMap tm WHERE tm.entityId = :entityId AND tm.entityType = :entityType",
-                TagMap.class
+                "DELETE FROM TagMap tm WHERE tm.entityId = :entityId AND tm.entityType = :entityType"
         )
                 .setParameter("entityId", entityId)
                 .setParameter("entityType", tagEntityType)

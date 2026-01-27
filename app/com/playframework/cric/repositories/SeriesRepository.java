@@ -110,8 +110,7 @@ public class SeriesRepository {
     public void remove(EntityManager em, Integer id)
     {
         em.createQuery(
-                "DELETE FROM Series s WHERE s.id = :id",
-                Series.class
+                "DELETE FROM Series s WHERE s.id = :id"
         )
         .setParameter("id", id).executeUpdate();
     }

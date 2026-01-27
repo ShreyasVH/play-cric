@@ -85,8 +85,7 @@ public class MatchRepository {
     public void remove(EntityManager em, Integer matchId)
     {
         em.createQuery(
-            "DELETE FROM Match m WHERE m.id = :id",
-            Match.class
+            "DELETE FROM Match m WHERE m.id = :id"
         )
         .setParameter("id", matchId).executeUpdate();
     }

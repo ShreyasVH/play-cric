@@ -88,8 +88,7 @@ public class BowlingFigureRepository {
     public void remove(EntityManager em, List<Integer> matchPlayerIds)
     {
         em.createQuery(
-            "DELETE FROM BowlingFigure bf WHERE bf.matchPlayerId IN :ids",
-            BowlingFigure.class
+            "DELETE FROM BowlingFigure bf WHERE bf.matchPlayerId IN :ids"
         )
         .setParameter("ids", matchPlayerIds).executeUpdate();
     }
