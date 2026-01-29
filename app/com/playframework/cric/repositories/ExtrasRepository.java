@@ -53,8 +53,7 @@ public class ExtrasRepository {
     public void remove(EntityManager em, Integer matchId)
     {
         em.createQuery(
-            "DELETE FROM Extras e WHERE e.matchId = :id",
-            Extras.class
+            "DELETE FROM Extras e WHERE e.matchId = :id"
         )
         .setParameter("id", matchId).executeUpdate();
     }

@@ -60,8 +60,7 @@ public class MatchPlayerMapRepository {
     public void remove(EntityManager em, Integer matchId)
     {
         em.createQuery(
-            "DELETE FROM MatchPlayerMap mpm WHERE mpm.matchId = :matchId",
-            BattingScore.class
+            "DELETE FROM MatchPlayerMap mpm WHERE mpm.matchId = :matchId"
         )
         .setParameter("matchId", matchId).executeUpdate();
     }

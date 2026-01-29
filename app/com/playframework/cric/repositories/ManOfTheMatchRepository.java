@@ -53,8 +53,7 @@ public class ManOfTheMatchRepository {
     public void remove(EntityManager em, List<Integer> matchPlayerIds)
     {
         em.createQuery(
-            "DELETE FROM ManOfTheMatch motm WHERE motm.matchPlayerId IN :ids",
-            ManOfTheMatch.class
+            "DELETE FROM ManOfTheMatch motm WHERE motm.matchPlayerId IN :ids"
         )
         .setParameter("ids", matchPlayerIds).executeUpdate();
     }

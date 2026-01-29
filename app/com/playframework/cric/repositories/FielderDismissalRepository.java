@@ -91,8 +91,7 @@ public class FielderDismissalRepository {
     public void remove(EntityManager em, List<Integer> matchPlayerIds)
     {
         em.createQuery(
-            "DELETE FROM FielderDismissal fd WHERE fd.matchPlayerId IN :ids",
-            FielderDismissal.class
+            "DELETE FROM FielderDismissal fd WHERE fd.matchPlayerId IN :ids"
         )
         .setParameter("ids", matchPlayerIds).executeUpdate();
     }

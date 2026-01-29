@@ -1,6 +1,7 @@
 package com.playframework.cric.controllers;
 
 import com.google.inject.Inject;
+import com.playframework.cric.enums.TagEntityType;
 import com.playframework.cric.exceptions.NotFoundException;
 import com.playframework.cric.models.*;
 import com.playframework.cric.requests.matches.CreateRequest;
@@ -40,9 +41,11 @@ public class MatchController extends Controller {
     private final WicketKeeperService wicketKeeperService;
     private final GameTypeService gameTypeService;
     private final TotalsService totalsService;
+    private final TagMapService tagMapService;
+    private final TagsService tagsService;
 
     @Inject
-    public MatchController(JPAApi jpaApi, MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService, TotalsService totalsService)
+    public MatchController(JPAApi jpaApi, MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService, TotalsService totalsService, TagMapService tagMapService, TagsService tagsService)
     {
         this.jpaApi = jpaApi;
         this.matchService = matchService;
@@ -66,6 +69,8 @@ public class MatchController extends Controller {
         this.wicketKeeperService = wicketKeeperService;
         this.gameTypeService = gameTypeService;
         this.totalsService = totalsService;
+        this.tagMapService = tagMapService;
+        this.tagsService = tagsService;
     }
 
     public Result create(Http.Request request)
@@ -169,6 +174,7 @@ public class MatchController extends Controller {
 
         List<DismissalMode> dismissalModes = dismissalModeService.getAll();
         List<ExtrasType> extrasTypes = extrasTypeService.getAll();
+        List<Tag> tags = tagsService.get(createRequest.getTags());
 
         WinMarginTypeResponse finalWinMarginTypeResponse = winMarginTypeResponse;
         TransactionalResult transactionResult = jpaApi.withTransaction(em -> {
@@ -256,6 +262,7 @@ public class MatchController extends Controller {
             captainService.add(em, createRequest.getCaptains(), playerToMatchPlayerMap);
             wicketKeeperService.add(em, createRequest.getWicketKeepers(), playerToMatchPlayerMap);
             totalsService.add(em, createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
+            tagMapService.create(em, match.getId(), createRequest.getTags(), TagEntityType.MATCH.name());
 
             TransactionalResult transactionalResult = new TransactionalResult();
 
@@ -297,7 +304,8 @@ public class MatchController extends Controller {
             transactionResult.extrasResponses,
             createRequest.getManOfTheMatchList(),
             createRequest.getCaptains(),
-            createRequest.getWicketKeepers()
+            createRequest.getWicketKeepers(),
+            tags
         );
 
         return created(Json.toJson(new Response(matchResponse)));
@@ -469,6 +477,10 @@ public class MatchController extends Controller {
             );
         }).collect(Collectors.toList());
 
+        List<TagMap> tagMaps = tagMapService.get(id, TagEntityType.MATCH.name());
+        List<Integer> tagIds = tagMaps.stream().map(TagMap::getTagId).collect(Collectors.toList());
+        List<Tag> tags = tagsService.get(tagIds);
+
         MatchResponse matchResponse = new MatchResponse(
             match,
             series,
@@ -484,7 +496,8 @@ public class MatchController extends Controller {
             extrasResponses,
             manOfTheMatchList.stream().map(motm -> matchPlayerToPlayerMap.get(motm.getMatchPlayerId())).collect(Collectors.toList()),
             captains.stream().map(captain -> matchPlayerToPlayerMap.get(captain.getMatchPlayerId())).collect(Collectors.toList()),
-            wicketKeepers.stream().map(wicketKeeper -> matchPlayerToPlayerMap.get(wicketKeeper.getMatchPlayerId())).collect(Collectors.toList())
+            wicketKeepers.stream().map(wicketKeeper -> matchPlayerToPlayerMap.get(wicketKeeper.getMatchPlayerId())).collect(Collectors.toList()),
+            tags
         );
 
         return ok(Json.toJson(new Response(matchResponse)));
@@ -502,6 +515,7 @@ public class MatchController extends Controller {
         jpaApi.withTransaction(em -> {
             List<MatchPlayerMap> matchPlayerMaps = matchPlayerMapService.getByMatchId(em, id);
             List<Integer> matchPlayerIds = matchPlayerMaps.stream().map(MatchPlayerMap::getId).collect(Collectors.toList());
+            tagMapService.remove(em, id, TagEntityType.MATCH.name());
             extrasService.remove(em, id);
             captainService.remove(em, matchPlayerIds);
             wicketKeeperService.remove(em, matchPlayerIds);

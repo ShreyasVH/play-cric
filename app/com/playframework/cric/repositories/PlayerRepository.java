@@ -101,8 +101,7 @@ public class PlayerRepository {
     public void remove(EntityManager em, Long id)
     {
         em.createQuery(
-                "DELETE FROM Player p WHERE p.id = :id",
-                Player.class
+                "DELETE FROM Player p WHERE p.id = :id"
         )
         .setParameter("id", id)
         .executeUpdate();

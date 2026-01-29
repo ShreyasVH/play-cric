@@ -126,8 +126,7 @@ public class BattingScoreRepository {
     public void remove(EntityManager em, List<Integer> matchPlayerIds)
     {
         em.createQuery(
-            "DELETE FROM BattingScore bs WHERE bs.matchPlayerId IN :ids",
-            BattingScore.class
+            "DELETE FROM BattingScore bs WHERE bs.matchPlayerId IN :ids"
         )
         .setParameter("ids", matchPlayerIds).executeUpdate();
     }

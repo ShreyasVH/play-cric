@@ -445,8 +445,8 @@ public class SeriesController extends Controller {
         jpaApi.withTransaction(em -> {
             manOfTheSeriesService.remove(em, id);
             seriesTeamsMapService.remove(em, id);
-            seriesService.remove(em, id);
             tagMapService.remove(em, id, TagEntityType.SERIES.name());
+            seriesService.remove(em, id);
         });
 
         return ok(Json.toJson(new Response("Deleted successfully", true)));

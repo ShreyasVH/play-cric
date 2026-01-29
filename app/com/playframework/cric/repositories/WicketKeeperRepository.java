@@ -54,8 +54,7 @@ public class WicketKeeperRepository {
     public void remove(EntityManager em, List<Integer> matchPlayerIds)
     {
         em.createQuery(
-            "DELETE FROM WicketKeeper c WHERE c.matchPlayerId IN :ids",
-            WicketKeeper.class
+            "DELETE FROM WicketKeeper c WHERE c.matchPlayerId IN :ids"
         )
         .setParameter("ids", matchPlayerIds).executeUpdate();
     }
