@@ -140,6 +140,8 @@ public class PlayerRepository {
             case "playerName":
                 fieldName = "p.name";
                 break;
+            case "number":
+                fieldName = "bs.number";
         }
 
         return fieldName;
