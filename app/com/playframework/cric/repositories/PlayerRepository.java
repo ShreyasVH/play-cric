@@ -123,7 +123,7 @@ public class PlayerRepository {
                 fieldName = "t.id";
                 break;
             case "opposingTeam":
-                fieldName = "IF(t.id = m.team_1_id, m.team_2_id, m.team_1_id)";
+                fieldName = "(CASE WHEN t.id = m.team_1_id THEN m.team_2_id ELSE m.team_1_id END)";
                 break;
             case "teamType":
                 fieldName = "t.type_id";
@@ -135,7 +135,7 @@ public class PlayerRepository {
                 fieldName = "s.id";
                 break;
             case "year":
-                fieldName = "YEAR(m.start_time)";
+                fieldName = "EXTRACT(YEAR FROM m.start_time)";
                 break;
             case "playerName":
                 fieldName = "p.name";
@@ -237,7 +237,7 @@ public class PlayerRepository {
     public StatsResponse getBattingStats(FilterRequest filterRequest) {
         StatsResponse statsResponse = new StatsResponse();
         List<Map<String, Object>> statList = new ArrayList<>();
-        String query = "select p.id as playerId, p.name AS name, sum(bs.runs) AS `runs`, count(0) AS `innings`, sum(`bs`.`balls`) AS `balls`, sum(`bs`.`fours`) AS `fours`, sum(`bs`.`sixes`) AS `sixes`, max(`bs`.`runs`) AS `highest`, count((case when (`bs`.`dismissal_mode_id` is null) then 1 end)) AS `notouts`, count((case when ((`bs`.`runs` >= 50) and (`bs`.`runs` < 100)) then 1 end)) AS `fifties`, count((case when ((`bs`.`runs` >= 100)) then 1 end)) AS `hundreds` from batting_scores bs " +
+        String query = "select p.id as playerId, p.name AS name, sum(bs.runs) AS runs, count(0) AS innings, sum(bs.balls) AS balls, sum(bs.fours) AS fours, sum(bs.sixes) AS sixes, max(bs.runs) AS highest, count((case when (bs.dismissal_mode_id is null) then 1 end)) AS notouts, count((case when ((bs.runs >= 50) and (bs.runs < 100)) then 1 end)) AS fifties, count((case when ((bs.runs >= 100)) then 1 end)) AS hundreds from batting_scores bs " +
                 "inner join match_player_map mpm on mpm.id = bs.match_player_id " +
                 "inner join players p on p.id = mpm.player_id " +
                 "inner join matches m on m.id = mpm.match_id " +
@@ -351,7 +351,7 @@ public class PlayerRepository {
         StatsResponse statsResponse = new StatsResponse();
         List<Map<String, Object>> statList = new ArrayList<>();
 
-        String query = "select p.id as playerId, p.name AS name, sum(bf.wickets) AS wickets, sum(bf.runs) as runs, count(0) AS `innings`, sum(`bf`.`balls`) AS `balls`, sum(`bf`.`maidens`) AS `maidens`, count((case when ((`bf`.`wickets` >= 5) and (`bf`.`wickets` < 10)) then 1 end)) AS `fifers`, count((case when (`bf`.`wickets` = 10) then 1 end)) AS `tenWickets` from bowling_figures bf " +
+        String query = "select p.id as playerId, p.name AS name, sum(bf.wickets) AS wickets, sum(bf.runs) as runs, count(0) AS innings, sum(bf.balls) AS balls, sum(bf.maidens) AS maidens, count((case when ((bf.wickets >= 5) and (bf.wickets < 10)) then 1 end)) AS fifers, count((case when (bf.wickets = 10) then 1 end)) AS tenWickets from bowling_figures bf " +
                 "inner join match_player_map mpm on mpm.id = bf.match_player_id " +
                 "inner join players p on p.id = mpm.player_id " +
                 "inner join matches m on m.id = mpm.match_id " +
@@ -470,7 +470,7 @@ public class PlayerRepository {
         StatsResponse statsResponse = new StatsResponse();
         List<Map<String, Object>> statList = new ArrayList<>();
 
-        String query = "select p.id as playerId, p.name AS name, SUM(case when dm.name = 'Caught' and wk.id is null then 1 else 0 end) as `fielderCatches`, SUM(case when dm.name = 'Caught' and wk.id is not null then 1 else 0 end) as `keeperCatches`, SUM(case when dm.name = 'Stumped' then 1 else 0 end) as `stumpings`, SUM(case when dm.name = 'Run Out' then 1 else 0 end) as `runOuts` from fielder_dismissals fd " +
+        String query = "select p.id as playerId, p.name AS name, SUM(case when dm.name = 'Caught' and wk.id is null then 1 else 0 end) as fielderCatches, SUM(case when dm.name = 'Caught' and wk.id is not null then 1 else 0 end) as keeperCatches, SUM(case when dm.name = 'Stumped' then 1 else 0 end) as stumpings, SUM(case when dm.name = 'Run Out' then 1 else 0 end) as runOuts from fielder_dismissals fd " +
                 "inner join match_player_map mpm on mpm.id = fd.match_player_id " +
                 "inner join players p on p.id = mpm.player_id " +
                 "inner join matches m on m.id = mpm.match_id " +
