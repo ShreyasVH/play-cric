@@ -84,8 +84,12 @@ public class MatchController extends Controller {
             GameType gameType;
             WinMarginTypeResponse winMarginTypeResponse;
             List<BattingScoreResponse> battingScoreResponses;
+            List<BattingScore> battingScores;
             List<BowlingFigureResponse> bowlingFigureResponses;
+            List<BowlingFigure> bowlingFigures;
             List<ExtrasResponse> extrasResponses;
+            List<Extras> extrasList;
+            Map<Long, Integer> playerToMatchPlayerMap;
         }
 
         Series series = seriesService.getById(createRequest.getSeriesId());
@@ -173,109 +177,158 @@ public class MatchController extends Controller {
         Map<Long, Country> countryMap = countries.stream().collect(Collectors.toMap(Country::getId, country -> country));
 
         List<DismissalMode> dismissalModes = dismissalModeService.getAll();
+        Map<Integer, DismissalMode> dismissalModeMap = dismissalModes.stream().collect(Collectors.toMap(DismissalMode::getId, dismissalMode -> dismissalMode));
         List<ExtrasType> extrasTypes = extrasTypeService.getAll();
+        Map<Integer, ExtrasType> extrasTypeMap = extrasTypes.stream().collect(Collectors.toMap(ExtrasType::getId, extrasType -> extrasType));
         List<Tag> tags = tagsService.get(createRequest.getTags());
 
         WinMarginTypeResponse finalWinMarginTypeResponse = winMarginTypeResponse;
-        TransactionalResult transactionResult = jpaApi.withTransaction(em -> {
-            Match match = matchService.create(em, createRequest);
-            List<MatchPlayerMap> matchPlayerMapList = matchPlayerMapService.add(em, match.getId(), allPlayerIds, playerTeamMap);
-            Map<Long, Integer> playerToMatchPlayerMap = matchPlayerMapList.stream().collect(Collectors.toMap(MatchPlayerMap::getPlayerId, MatchPlayerMap::getId));
-            List<BattingScore> battingScores = battingScoreService.add(em, createRequest.getBattingScores(), playerToMatchPlayerMap);
+//        TransactionalResult transactionResult = jpaApi.withTransaction(em -> {
+//            Match match = matchService.create(em, createRequest);
+//            List<MatchPlayerMap> matchPlayerMapList = matchPlayerMapService.add(em, match.getId(), allPlayerIds, playerTeamMap);
+//            em.flush();
+//            Map<Long, Integer> playerToMatchPlayerMap = matchPlayerMapList.stream().collect(Collectors.toMap(MatchPlayerMap::getPlayerId, MatchPlayerMap::getId));
+//            List<BattingScore> battingScores = battingScoreService.add(em, createRequest.getBattingScores(), playerToMatchPlayerMap);
+//            em.flush();
+//            Map<String, BattingScore> battingScoreMap = battingScores.stream().collect(Collectors.toMap(battingScore -> battingScore.getMatchPlayerId() + "_" + battingScore.getInnings(), battingScore -> battingScore));
+//            Map<Integer, List<Long>> scoreFielderMap = new HashMap<>();
+//            createRequest.getBattingScores().forEach(battingScore -> {
+//                String key = playerToMatchPlayerMap.get(battingScore.getPlayerId()) + "_" + battingScore.getInnings();
+//                BattingScore battingScoreFromDb = battingScoreMap.get(key);
+//
+//                if(null != battingScore.getDismissalModeId())
+//                {
+//                    if(null != battingScore.getFielderIds())
+//                    {
+//                        scoreFielderMap.put(battingScoreFromDb.getId(), battingScore.getFielderIds());
+//                    }
+//                }
+//            });
+//
+//            fielderDismissalService.add(em, scoreFielderMap, playerToMatchPlayerMap);
+//            em.flush();
+//            List<BowlingFigure> bowlingFigures = bowlingFigureService.add(em, createRequest.getBowlingFigures(), playerToMatchPlayerMap);
+//            em.flush();
+//
+//            List<Extras> extrasList = extrasService.add(em, match.getId(), createRequest.getExtras());
+//            em.flush();
+//
+//            manOfTheMatchService.add(em, createRequest.getManOfTheMatchList(), playerToMatchPlayerMap);
+//            captainService.add(em, createRequest.getCaptains(), playerToMatchPlayerMap);
+//            wicketKeeperService.add(em, createRequest.getWicketKeepers(), playerToMatchPlayerMap);
+//            totalsService.add(em, createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
+//            tagMapService.create(em, match.getId(), createRequest.getTags(), TagEntityType.MATCH.name());
+//
+//            TransactionalResult transactionalResult = new TransactionalResult();
+//
+//            transactionalResult.match = match;
+//            transactionalResult.series = series;
+//            transactionalResult.gameType = gameType;
+//            transactionalResult.winMarginTypeResponse = finalWinMarginTypeResponse;
+////            transactionalResult.battingScoreResponses = battingScoreResponses;
+//            transactionalResult.battingScores = battingScores;
+//            transactionalResult.bowlingFigures = bowlingFigures;
+////            transactionalResult.bowlingFigureResponses = bowlingFigureResponses;
+////            transactionalResult.extrasResponses = extrasResponses;
+//            transactionalResult.extrasList = extrasList;
+//            transactionalResult.playerToMatchPlayerMap = playerToMatchPlayerMap;
+//
+//            return transactionalResult;
+//        });
+        Match match = matchService.create(createRequest);
+        List<MatchPlayerMap> matchPlayerMapList = matchPlayerMapService.add(match.getId(), allPlayerIds, playerTeamMap);
+        Map<Long, Integer> playerToMatchPlayerMap = matchPlayerMapList.stream().collect(Collectors.toMap(MatchPlayerMap::getPlayerId, MatchPlayerMap::getId));
+        List<BattingScore> battingScores = battingScoreService.add(createRequest.getBattingScores(), playerToMatchPlayerMap);
 
-            Map<Integer, DismissalMode> dismissalModeMap = dismissalModes.stream().collect(Collectors.toMap(DismissalMode::getId, dismissalMode -> dismissalMode));
-            Map<String, BattingScore> battingScoreMap = battingScores.stream().collect(Collectors.toMap(battingScore -> battingScore.getMatchPlayerId() + "_" + battingScore.getInnings(), battingScore -> battingScore));
-            Map<Integer, List<Long>> scoreFielderMap = new HashMap<>();
-            List<BattingScoreResponse> battingScoreResponses = createRequest.getBattingScores().stream().map(battingScore -> {
-                String key = playerToMatchPlayerMap.get(battingScore.getPlayerId()) + "_" + battingScore.getInnings();
-                BattingScore battingScoreFromDb = battingScoreMap.get(key);
+        Map<String, BattingScore> battingScoreMap = battingScores.stream().collect(Collectors.toMap(battingScore -> battingScore.getMatchPlayerId() + "_" + battingScore.getInnings(), battingScore -> battingScore));
+        Map<Integer, List<Long>> scoreFielderMap = new HashMap<>();
+        List<BattingScoreResponse> battingScoreResponses = createRequest.getBattingScores().stream().map(battingScore -> {
+            String key = playerToMatchPlayerMap.get(battingScore.getPlayerId()) + "_" + battingScore.getInnings();
+            BattingScore battingScoreFromDb = battingScoreMap.get(key);
 
-                DismissalModeResponse dismissalModeResponse = null;
-                List<PlayerMiniResponse> fielders = new ArrayList<>();
-                PlayerMiniResponse bowler = null;
+            DismissalModeResponse dismissalModeResponse = null;
+            List<PlayerMiniResponse> fielders = new ArrayList<>();
+            PlayerMiniResponse bowler = null;
 
-                if(null != battingScore.getDismissalModeId())
+            if(null != battingScore.getDismissalModeId())
+            {
+                dismissalModeResponse = new DismissalModeResponse(dismissalModeMap.get(battingScore.getDismissalModeId()));
+                if(null != battingScore.getBowlerId())
                 {
-                    dismissalModeResponse = new DismissalModeResponse(dismissalModeMap.get(battingScore.getDismissalModeId()));
-                    if(null != battingScore.getBowlerId())
-                    {
-                        Player bowlerPlayer = playerMap.get(battingScore.getBowlerId());
-                        bowler = new PlayerMiniResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId())));
-                    }
-
-                    if(null != battingScore.getFielderIds())
-                    {
-                        fielders = battingScore.getFielderIds().stream().map(playerId -> {
-                            Player fielderPlayer = playerMap.get(playerId);
-                            return new PlayerMiniResponse(fielderPlayer, new CountryResponse(countryMap.get(fielderPlayer.getCountryId())));
-                        }).collect(Collectors.toList());
-                        scoreFielderMap.put(battingScoreFromDb.getId(), battingScore.getFielderIds());
-                    }
+                    Player bowlerPlayer = playerMap.get(battingScore.getBowlerId());
+                    bowler = new PlayerMiniResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId())));
                 }
-                Player batsmanPlayer = playerMap.get(battingScore.getPlayerId());
 
-                return new BattingScoreResponse(
-                        battingScoreFromDb,
-                        new PlayerMiniResponse(batsmanPlayer, new CountryResponse(countryMap.get(batsmanPlayer.getCountryId()))),
-                        dismissalModeResponse,
-                        bowler,
-                        fielders
-                );
-            }).collect(Collectors.toList());
+                if(null != battingScore.getFielderIds())
+                {
+                    fielders = battingScore.getFielderIds().stream().map(playerId -> {
+                        Player fielderPlayer = playerMap.get(playerId);
+                        return new PlayerMiniResponse(fielderPlayer, new CountryResponse(countryMap.get(fielderPlayer.getCountryId())));
+                    }).collect(Collectors.toList());
+                    scoreFielderMap.put(battingScoreFromDb.getId(), battingScore.getFielderIds());
+                }
+            }
+            Player batsmanPlayer = playerMap.get(battingScore.getPlayerId());
 
-            fielderDismissalService.add(em, scoreFielderMap, playerToMatchPlayerMap);
-            List<BowlingFigure> bowlingFigures = bowlingFigureService.add(em, createRequest.getBowlingFigures(), playerToMatchPlayerMap);
-            Map<String, BowlingFigure> bowlingFigureMap = bowlingFigures.stream().collect(Collectors.toMap(bowlingFigure -> bowlingFigure.getMatchPlayerId() + "_" + bowlingFigure.getInnings(), bowlingFigure -> bowlingFigure));
-            List<BowlingFigureResponse> bowlingFigureResponses = createRequest.getBowlingFigures().stream().map(bowlingFigureRequest -> {
-                String key = playerToMatchPlayerMap.get(bowlingFigureRequest.getPlayerId()) + "_" + bowlingFigureRequest.getInnings();
-                BowlingFigure bowlingFigure = bowlingFigureMap.get(key);
+            return new BattingScoreResponse(
+                    battingScoreFromDb,
+                    new PlayerMiniResponse(batsmanPlayer, new CountryResponse(countryMap.get(batsmanPlayer.getCountryId()))),
+                    dismissalModeResponse,
+                    bowler,
+                    fielders
+            );
+        }).collect(Collectors.toList());
 
-                Player bowlerPlayer = playerMap.get(bowlingFigureRequest.getPlayerId());
+        fielderDismissalService.add(scoreFielderMap, playerToMatchPlayerMap);
+        List<BowlingFigure> bowlingFigures = bowlingFigureService.add(createRequest.getBowlingFigures(), playerToMatchPlayerMap);
+        Map<String, BowlingFigure> bowlingFigureMap = bowlingFigures.stream().collect(Collectors.toMap(bowlingFigure -> bowlingFigure.getMatchPlayerId() + "_" + bowlingFigure.getInnings(), bowlingFigure -> bowlingFigure));
+        List<BowlingFigureResponse> bowlingFigureResponses = createRequest.getBowlingFigures().stream().map(bowlingFigureRequest -> {
+            String key = playerToMatchPlayerMap.get(bowlingFigureRequest.getPlayerId()) + "_" + bowlingFigureRequest.getInnings();
+            BowlingFigure bowlingFigure = bowlingFigureMap.get(key);
 
-                return new BowlingFigureResponse(bowlingFigure, new PlayerMiniResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId()))));
-            }).collect(Collectors.toList());
+            Player bowlerPlayer = playerMap.get(bowlingFigureRequest.getPlayerId());
 
-            Map<Integer, ExtrasType> extrasTypeMap = extrasTypes.stream().collect(Collectors.toMap(ExtrasType::getId, extrasType -> extrasType));
-            List<Extras> extrasList = extrasService.add(em, match.getId(), createRequest.getExtras());
-            List<ExtrasResponse> extrasResponses = extrasList.stream()
-                    .map(extras -> {
-                        Team battingTeam = teamMap.get(extras.getBattingTeamId());
-                        Team bowlingTeam = teamMap.get(extras.getBowlingTeamId());
-                        return new ExtrasResponse(
-                                extras,
-                                new ExtrasTypeResponse(extrasTypeMap.get(extras.getTypeId())),
-                                new TeamResponse(
-                                        battingTeam,
-                                        new CountryResponse(countryMap.get(battingTeam.getCountryId())),
-                                        new TeamTypeResponse(teamTypeMap.get(battingTeam.getTypeId()))
-                                ),
-                                new TeamResponse(
-                                        bowlingTeam,
-                                        new CountryResponse(countryMap.get(bowlingTeam.getCountryId())),
-                                        new TeamTypeResponse(teamTypeMap.get(bowlingTeam.getTypeId()))
-                                )
-                        );
-                    })
-                    .collect(Collectors.toList());
+            return new BowlingFigureResponse(bowlingFigure, new PlayerMiniResponse(bowlerPlayer, new CountryResponse(countryMap.get(bowlerPlayer.getCountryId()))));
+        }).collect(Collectors.toList());
 
-            manOfTheMatchService.add(em, createRequest.getManOfTheMatchList(), playerToMatchPlayerMap);
-            captainService.add(em, createRequest.getCaptains(), playerToMatchPlayerMap);
-            wicketKeeperService.add(em, createRequest.getWicketKeepers(), playerToMatchPlayerMap);
-            totalsService.add(em, createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
-            tagMapService.create(em, match.getId(), createRequest.getTags(), TagEntityType.MATCH.name());
+        List<Extras> extrasList = extrasService.add(match.getId(), createRequest.getExtras());
+        List<ExtrasResponse> extrasResponses = extrasList.stream()
+                .map(extras -> {
+                    Team battingTeam = teamMap.get(extras.getBattingTeamId());
+                    Team bowlingTeam = teamMap.get(extras.getBowlingTeamId());
+                    return new ExtrasResponse(
+                            extras,
+                            new ExtrasTypeResponse(extrasTypeMap.get(extras.getTypeId())),
+                            new TeamResponse(
+                                    battingTeam,
+                                    new CountryResponse(countryMap.get(battingTeam.getCountryId())),
+                                    new TeamTypeResponse(teamTypeMap.get(battingTeam.getTypeId()))
+                            ),
+                            new TeamResponse(
+                                    bowlingTeam,
+                                    new CountryResponse(countryMap.get(bowlingTeam.getCountryId())),
+                                    new TeamTypeResponse(teamTypeMap.get(bowlingTeam.getTypeId()))
+                            )
+                    );
+                })
+                .collect(Collectors.toList());
 
-            TransactionalResult transactionalResult = new TransactionalResult();
+        manOfTheMatchService.add(createRequest.getManOfTheMatchList(), playerToMatchPlayerMap);
+        captainService.add(createRequest.getCaptains(), playerToMatchPlayerMap);
+        wicketKeeperService.add(createRequest.getWicketKeepers(), playerToMatchPlayerMap);
+        totalsService.add(createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
+        tagMapService.create(match.getId(), createRequest.getTags(), TagEntityType.MATCH.name());
 
-            transactionalResult.match = match;
-            transactionalResult.series = series;
-            transactionalResult.gameType = gameType;
-            transactionalResult.winMarginTypeResponse = finalWinMarginTypeResponse;
-            transactionalResult.battingScoreResponses = battingScoreResponses;
-            transactionalResult.bowlingFigureResponses = bowlingFigureResponses;
-            transactionalResult.extrasResponses = extrasResponses;
+//        TransactionalResult transactionResult = new TransactionalResult();
+//
+//        transactionResult.match = match;
+//        transactionResult.series = series;
+//        transactionResult.gameType = gameType;
+//        transactionResult.winMarginTypeResponse = finalWinMarginTypeResponse;
+//        transactionResult.battingScoreResponses = battingScoreResponses;
+//        transactionResult.bowlingFigureResponses = bowlingFigureResponses;
+//        transactionResult.extrasResponses = extrasResponses;
 
-            return transactionalResult;
-        });
 
         Map<Long, List<PlayerMiniResponse>> teamPlayerMap = new HashMap<>();
         for(Player player: allPlayers)
@@ -290,18 +343,18 @@ public class MatchController extends Controller {
         }
 
         MatchResponse matchResponse = new MatchResponse(
-            transactionResult.match,
-            transactionResult.series,
-            transactionResult.gameType,
+            match,
+            series,
+            gameType,
             new TeamResponse(team1, new CountryResponse(countryMap.get(team1.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team1.getTypeId()))),
             new TeamResponse(team2, new CountryResponse(countryMap.get(team2.getCountryId())), new TeamTypeResponse(teamTypeMap.get(team2.getTypeId()))),
             new ResultTypeResponse(resultType),
-            transactionResult.winMarginTypeResponse,
+            winMarginTypeResponse,
             new StadiumResponse(stadium, new CountryResponse(countryMap.get(stadium.getCountryId()))),
             teamPlayerMap,
-            transactionResult.battingScoreResponses,
-            transactionResult.bowlingFigureResponses,
-            transactionResult.extrasResponses,
+            battingScoreResponses,
+            bowlingFigureResponses,
+            extrasResponses,
             createRequest.getManOfTheMatchList(),
             createRequest.getCaptains(),
             createRequest.getWicketKeepers(),
