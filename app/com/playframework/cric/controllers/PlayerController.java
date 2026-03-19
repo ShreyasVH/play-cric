@@ -104,82 +104,82 @@ public class PlayerController extends Controller {
         Map<String, Map<String, Integer>> dismissalStats = battingScoreService.getDismissalStats(id);
         playerResponse.setDismissalStats(dismissalStats);
 
-        Map<String, Integer> dismissalCountMap = new HashMap<>();
-        for(String gameType: dismissalStats.keySet())
-        {
-            Integer dismissalCount = 0;
-            for(String key: dismissalStats.get(gameType).keySet())
-            {
-                dismissalCount += dismissalStats.get(gameType).get(key);
-            }
-            dismissalCountMap.put(gameType, dismissalCount);
-        }
+//        Map<String, Integer> dismissalCountMap = new HashMap<>();
+//        for(String gameType: dismissalStats.keySet())
+//        {
+//            Integer dismissalCount = 0;
+//            for(String key: dismissalStats.get(gameType).keySet())
+//            {
+//                dismissalCount += dismissalStats.get(gameType).get(key);
+//            }
+//            dismissalCountMap.put(gameType, dismissalCount);
+//        }
 
-        Map<String, Map<String, Integer>> basicBattingStats = battingScoreService.getBattingStats(id);
-        if(!basicBattingStats.keySet().isEmpty())
-        {
-            Map<String, BattingStats> battingStatsMap = new HashMap<>();
-
-            for(String gameType: basicBattingStats.keySet())
-            {
-                BattingStats battingStats = new BattingStats(basicBattingStats.get(gameType));
-                battingStats.setNotOuts(battingStats.getInnings() - dismissalCountMap.getOrDefault(gameType, 0));
-
-                if(dismissalCountMap.getOrDefault(gameType, 0) > 0)
-                {
-                    battingStats.setAverage(battingStats.getRuns() * 1.0 / dismissalCountMap.get(gameType));
-                }
-
-                if(battingStats.getBalls() > 0)
-                {
-                    battingStats.setStrikeRate(battingStats.getRuns() * 100.0 / battingStats.getBalls());
-                }
-
-                battingStatsMap.put(gameType, battingStats);
-            }
-
-            playerResponse.setBattingStats(battingStatsMap);
-        }
-
-        Map<String, Map<String, Integer>> basicBowlingStatsMap = bowlingFigureService.getBasicBowlingStats(id);
-        if(!basicBowlingStatsMap.keySet().isEmpty())
-        {
-            Map<String, BowlingStats> bowlingStatsFinal = new HashMap<>();
-
-            for(String gameType: basicBowlingStatsMap.keySet())
-            {
-                BowlingStats bowlingStats = new BowlingStats(basicBowlingStatsMap.get(gameType));
-
-                if(bowlingStats.getBalls() > 0)
-                {
-                    bowlingStats.setEconomy(bowlingStats.getRuns() * 6.0 / bowlingStats.getBalls());
-
-                    if(bowlingStats.getWickets() > 0)
-                    {
-                        bowlingStats.setAverage(bowlingStats.getRuns() * 1.0 / bowlingStats.getWickets());
-
-                        bowlingStats.setStrikeRate(bowlingStats.getBalls() * 1.0 / bowlingStats.getWickets());
-                    }
-                }
-
-                bowlingStatsFinal.put(gameType, bowlingStats);
-            }
-
-            playerResponse.setBowlingStats(bowlingStatsFinal);
-        }
-
-        Map<String, Map<String, Integer>> fieldingStatsMap = fielderDismissalService.getFieldingStats(id);
-        if(!fieldingStatsMap.keySet().isEmpty())
-        {
-            Map<String, FieldingStats> fieldingStatsMapFinal = new HashMap<>();
-            for(String gameType: fieldingStatsMap.keySet())
-            {
-                FieldingStats fieldingStats = new FieldingStats(fieldingStatsMap.get(gameType));
-                fieldingStatsMapFinal.put(gameType, fieldingStats);
-            }
-
-            playerResponse.setFieldingStats(fieldingStatsMapFinal);
-        }
+//        Map<String, Map<String, Integer>> basicBattingStats = battingScoreService.getBattingStats(id);
+//        if(!basicBattingStats.keySet().isEmpty())
+//        {
+//            Map<String, BattingStats> battingStatsMap = new HashMap<>();
+//
+//            for(String gameType: basicBattingStats.keySet())
+//            {
+//                BattingStats battingStats = new BattingStats(basicBattingStats.get(gameType));
+//                battingStats.setNotOuts(battingStats.getInnings() - dismissalCountMap.getOrDefault(gameType, 0));
+//
+//                if(dismissalCountMap.getOrDefault(gameType, 0) > 0)
+//                {
+//                    battingStats.setAverage(battingStats.getRuns() * 1.0 / dismissalCountMap.get(gameType));
+//                }
+//
+//                if(battingStats.getBalls() > 0)
+//                {
+//                    battingStats.setStrikeRate(battingStats.getRuns() * 100.0 / battingStats.getBalls());
+//                }
+//
+//                battingStatsMap.put(gameType, battingStats);
+//            }
+//
+//            playerResponse.setBattingStats(battingStatsMap);
+//        }
+//
+//        Map<String, Map<String, Integer>> basicBowlingStatsMap = bowlingFigureService.getBasicBowlingStats(id);
+//        if(!basicBowlingStatsMap.keySet().isEmpty())
+//        {
+//            Map<String, BowlingStats> bowlingStatsFinal = new HashMap<>();
+//
+//            for(String gameType: basicBowlingStatsMap.keySet())
+//            {
+//                BowlingStats bowlingStats = new BowlingStats(basicBowlingStatsMap.get(gameType));
+//
+//                if(bowlingStats.getBalls() > 0)
+//                {
+//                    bowlingStats.setEconomy(bowlingStats.getRuns() * 6.0 / bowlingStats.getBalls());
+//
+//                    if(bowlingStats.getWickets() > 0)
+//                    {
+//                        bowlingStats.setAverage(bowlingStats.getRuns() * 1.0 / bowlingStats.getWickets());
+//
+//                        bowlingStats.setStrikeRate(bowlingStats.getBalls() * 1.0 / bowlingStats.getWickets());
+//                    }
+//                }
+//
+//                bowlingStatsFinal.put(gameType, bowlingStats);
+//            }
+//
+//            playerResponse.setBowlingStats(bowlingStatsFinal);
+//        }
+//
+//        Map<String, Map<String, Integer>> fieldingStatsMap = fielderDismissalService.getFieldingStats(id);
+//        if(!fieldingStatsMap.keySet().isEmpty())
+//        {
+//            Map<String, FieldingStats> fieldingStatsMapFinal = new HashMap<>();
+//            for(String gameType: fieldingStatsMap.keySet())
+//            {
+//                FieldingStats fieldingStats = new FieldingStats(fieldingStatsMap.get(gameType));
+//                fieldingStatsMapFinal.put(gameType, fieldingStats);
+//            }
+//
+//            playerResponse.setFieldingStats(fieldingStatsMapFinal);
+//        }
 
         return ok(Json.toJson(new Response(playerResponse)));
     }
