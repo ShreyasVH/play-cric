@@ -300,7 +300,7 @@ CREATE TABLE totals (
 CREATE INDEX idx_totals_match_id ON totals(match_id);
 CREATE INDEX idx_totals_team_id ON totals(team_id);
 
-# --- !Downs
+# --- !Ups
 
 DROP TABLE IF EXISTS totals;
 DROP TABLE IF EXISTS man_of_the_match;
