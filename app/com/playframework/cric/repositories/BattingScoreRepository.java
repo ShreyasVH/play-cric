@@ -37,9 +37,10 @@ public class BattingScoreRepository {
     public Map<String, Map<String, Integer>> getBattingStats(Long playerId)
     {
         Map<String, Map<String, Integer>> statsFinal = new HashMap<>();
-        String query = "SELECT COUNT(*) AS innings, SUM(runs) AS runs, SUM(balls) AS balls, SUM(fours) AS fours, SUM(sixes) AS sixes, MAX(runs) AS highest, gt.name as gameType, count(CASE WHEN (bs.runs >= 50 and bs.runs < 100) then 1 end) as fifties, count(CASE WHEN (bs.runs >= 100 and bs.runs < 200) then 1 end) as hundreds, count(CASE WHEN (bs.runs >= 200 and bs.runs < 300) then 1 end) as twoHundreds, count(CASE WHEN (bs.runs >= 300 and bs.runs < 400) then 1 end) as threeHundreds, count(CASE WHEN (bs.runs >= 400 and bs.runs < 500) then 1 end) as fourHundreds FROM batting_scores bs inner join match_player_map mpm on mpm.player_id = " + playerId + " and  mpm.id = bs.match_player_id inner join matches m on m.id = mpm.match_id and m.is_official = true inner join series s on s.id = m.series_id inner join teams t on t.id = mpm.team_id inner join team_types tt on tt.id = t.type_id and tt.name = 'International' inner join game_types gt on gt.id = s.game_type_id group by gt.name;";
+        String query = "SELECT COUNT(*) AS innings, SUM(runs) AS runs, SUM(balls) AS balls, SUM(fours) AS fours, SUM(sixes) AS sixes, MAX(runs) AS highest, gt.name as gameType, count(CASE WHEN (bs.runs >= 50 and bs.runs < 100) then 1 end) as fifties, count(CASE WHEN (bs.runs >= 100 and bs.runs < 200) then 1 end) as hundreds, count(CASE WHEN (bs.runs >= 200 and bs.runs < 300) then 1 end) as twoHundreds, count(CASE WHEN (bs.runs >= 300 and bs.runs < 400) then 1 end) as threeHundreds, count(CASE WHEN (bs.runs >= 400 and bs.runs < 500) then 1 end) as fourHundreds FROM batting_scores bs inner join match_player_map mpm on mpm.player_id = :playerId and  mpm.id = bs.match_player_id inner join matches m on m.id = mpm.match_id and m.is_official = true inner join series s on s.id = m.series_id inner join teams t on t.id = mpm.team_id inner join team_types tt on tt.id = t.type_id and tt.name = 'International' inner join game_types gt on gt.id = s.game_type_id group by gt.name;";
         jpaApi.withTransaction(em -> {
-            List<Object[]> rows = em.createNativeQuery(query).getResultList();
+            List<Object[]> rows = em.createNativeQuery(query)
+                    .setParameter("playerId", playerId).getResultList();
 
             for (Object[] row: rows)
             {
