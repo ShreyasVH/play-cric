@@ -9,7 +9,7 @@ libraryDependencies += evolutions
 libraryDependencies += jdbc
 libraryDependencies += javaJpa
 libraryDependencies += "org.projectlombok" % "lombok" % "1.18.44" % "provided"
-libraryDependencies += "com.mysql" % "mysql-connector-j" % "9.6.0"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.7.10"
 libraryDependencies += "org.hibernate.orm" % "hibernate-core" % "7.2.7.Final"
 
 Compile / javacOptions ++= Seq("-proc:full")
