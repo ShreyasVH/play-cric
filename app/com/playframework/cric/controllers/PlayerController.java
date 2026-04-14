@@ -102,7 +102,7 @@ public class PlayerController extends Controller {
         playerResponse.setCountry(new CountryResponse(country));
 
         Map<String, Map<String, Integer>> dismissalStats = battingScoreService.getDismissalStats(id);
-//        playerResponse.setDismissalStats(dismissalStats);
+        playerResponse.setDismissalStats(dismissalStats);
 
         Map<String, Integer> dismissalCountMap = new HashMap<>();
         for(String gameType: dismissalStats.keySet())
