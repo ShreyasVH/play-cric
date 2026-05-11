@@ -4,11 +4,12 @@ export PATH=
 # java 11 path
 export PATH=
 
-export MYSQL_IP=
-export MYSQL_PORT=
-export MYSQL_DB=
-export MYSQL_USER=
-export MYSQL_PASSWORD=
+export POSTGRES_URL=
+export POSTGRES_PORT=
+export POSTGRES_DB=
+export POSTGRES_USER=
+export POSTGRES_PASSWORD=
+export POSTGRES_VERSION=
 
 export PORT=
 export DEBUG_PORT=
