@@ -10,7 +10,7 @@ libraryDependencies += jdbc
 libraryDependencies += javaJpa
 libraryDependencies += "org.projectlombok" % "lombok" % "1.18.46" % "provided"
 libraryDependencies += "org.postgresql" % "postgresql" % "42.7.11"
-libraryDependencies += "org.hibernate.orm" % "hibernate-core" % "7.3.8.Final"
+libraryDependencies += "org.hibernate.orm" % "hibernate-core" % "7.4.1.Final"
 
 Compile / javacOptions ++= Seq("-proc:full")
 
