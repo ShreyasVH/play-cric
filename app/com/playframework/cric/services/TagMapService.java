@@ -15,26 +15,26 @@ public class TagMapService {
         this.tagMapRepository = tagMapRepository;
     }
 
-    public void create(Integer entityId, List<Integer> tagIds, String tagEntityType) {
-        tagMapRepository.create(entityId, tagIds, tagEntityType);
+    public void create(Integer entityId, List<Integer> tagIds) {
+        tagMapRepository.create(entityId, tagIds);
     }
 
-    public void create(EntityManager em, Integer entityId, List<Integer> tagIds, String tagEntityType) {
-        tagMapRepository.create(em, entityId, tagIds, tagEntityType);
+    public void create(EntityManager em, Integer entityId, List<Integer> tagIds) {
+        tagMapRepository.create(em, entityId, tagIds);
     }
 
-    public List<TagMap> get(Integer entityId, String tagEntityType)
+    public List<TagMap> get(Integer entityId, List<Integer> tagIds)
     {
-        return tagMapRepository.get(entityId, tagEntityType);
+        return tagMapRepository.get(entityId, tagIds);
     }
 
-    public void remove(Integer entityId, String tagEntityType)
+    public void remove(Integer entityId, List<Integer> tagIds)
     {
-        tagMapRepository.remove(entityId, tagEntityType);
+        tagMapRepository.remove(entityId, tagIds);
     }
 
-    public void remove(EntityManager em, Integer entityId, String tagEntityType)
+    public void remove(EntityManager em, Integer entityId, List<Integer> tagIds)
     {
-        tagMapRepository.remove(em, entityId, tagEntityType);
+        tagMapRepository.remove(em, entityId, tagIds);
     }
 }

@@ -16,44 +16,44 @@ public class TagMapRepository {
         this.jpaApi = jpaApi;
     }
 
-    public void create(Integer entityId, List<Integer> tagIds, String tagEntityType) {
+    public void create(Integer entityId, List<Integer> tagIds) {
         jpaApi.withTransaction(em -> {
-            create(em, entityId, tagIds, tagEntityType);
+            create(em, entityId, tagIds);
         });
     }
 
-    public void create(EntityManager em, Integer entityId, List<Integer> tagIds, String tagEntityType) {
-        List<TagMap> tagMaps = tagIds.stream().map(tagId -> new TagMap(null, tagEntityType, entityId, tagId)).collect(Collectors.toList());
+    public void create(EntityManager em, Integer entityId, List<Integer> tagIds) {
+        List<TagMap> tagMaps = tagIds.stream().map(tagId -> new TagMap(null, entityId, tagId)).collect(Collectors.toList());
         tagMaps.forEach(em::persist);
     }
 
-    public List<TagMap> get(Integer entityId, String tagEntityType)
+    public List<TagMap> get(Integer entityId, List<Integer> tagIds)
     {
         return jpaApi.withTransaction(em -> {
             return em.createQuery(
-                "SELECT tm FROM TagMap tm WHERE tm.entityId = :entityId AND tm.entityType = :entityType",
+                "SELECT tm FROM TagMap tm WHERE tm.entityId = :entityId AND tm.tagId IN :tagIds",
                 TagMap.class
             )
             .setParameter("entityId", entityId)
-            .setParameter("entityType", tagEntityType)
+            .setParameter("tagIds", tagIds)
             .getResultList();
         });
     }
 
-    public void remove(Integer entityId, String tagEntityType)
+    public void remove(Integer entityId, List<Integer> tagIds)
     {
         jpaApi.withTransaction(em -> {
-            remove(em, entityId, tagEntityType);
+            remove(em, entityId, tagIds);
         });
     }
 
-    public void remove(EntityManager em, Integer entityId, String tagEntityType)
+    public void remove(EntityManager em, Integer entityId, List<Integer> tagIds)
     {
         em.createQuery(
-                "DELETE FROM TagMap tm WHERE tm.entityId = :entityId AND tm.entityType = :entityType"
+                "DELETE FROM TagMap tm WHERE tm.entityId = :entityId AND tm.tagId IN :tagIds"
         )
                 .setParameter("entityId", entityId)
-                .setParameter("entityType", tagEntityType)
+                .setParameter("tagIds", tagIds)
                 .executeUpdate();
     }
 }

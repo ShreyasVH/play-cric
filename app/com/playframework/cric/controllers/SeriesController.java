@@ -124,7 +124,7 @@ public class SeriesController extends Controller {
             Series series = seriesService.create(em, createRequest);
             seriesTeamsMapService.create(em, series.getId(), createRequest.getTeams());
             manOfTheSeriesService.add(em, series.getId(), finalManOfTheSeriesToAdd);
-            tagMapService.create(em, series.getId(), createRequest.getTags(), TagEntityType.SERIES.name());
+            tagMapService.create(em, series.getId(), createRequest.getTags());
 
             TransactionalResult transactionalResult = new TransactionalResult();
             transactionalResult.series = series;
@@ -419,9 +419,11 @@ public class SeriesController extends Controller {
             );
         }).collect(Collectors.toList());
 
-        List<TagMap> tagMaps = tagMapService.get(id, TagEntityType.SERIES.name());
+        List<Tag> seriesTags = tagsService.getByType(TagEntityType.SERIES.name());
+        List<Integer> seriesTagIds = seriesTags.stream().map(Tag::getId).collect(Collectors.toList());
+        List<TagMap> tagMaps = tagMapService.get(id, seriesTagIds);
         List<Integer> tagIds = tagMaps.stream().map(TagMap::getTagId).collect(Collectors.toList());
-        List<Tag> tags = tagsService.get(tagIds);
+        List<Tag> tags = seriesTags.stream().filter(t -> tagIds.contains(t.getId())).collect(Collectors.toList());
 
         SeriesDetailedResponse seriesResponse = new SeriesDetailedResponse(series, seriesType, gameType, teamResponses, matchMiniResponses, tags);
 
@@ -437,6 +439,9 @@ public class SeriesController extends Controller {
             throw new NotFoundException("Series");
         }
 
+        List<Tag> seriesTags = tagsService.getByType(TagEntityType.SERIES.name());
+        List<Integer> seriesTagIds = seriesTags.stream().map(Tag::getId).collect(Collectors.toList());
+
         List<Match> matches = matchService.getBySeriesId(id);
         if(!matches.isEmpty())
         {
@@ -445,7 +450,7 @@ public class SeriesController extends Controller {
         jpaApi.withTransaction(em -> {
             manOfTheSeriesService.remove(em, id);
             seriesTeamsMapService.remove(em, id);
-            tagMapService.remove(em, id, TagEntityType.SERIES.name());
+            tagMapService.remove(em, id, seriesTagIds);
             seriesService.remove(em, id);
         });
 

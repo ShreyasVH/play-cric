@@ -142,6 +142,13 @@ public class PlayerRepository {
                 break;
             case "number":
                 fieldName = "bs.number";
+                break;
+            case "seriesTags":
+                fieldName = "tm.tag_id";
+                break;
+            case "matchTags":
+                fieldName = "tmm.tag_id";
+                break;
         }
 
         return fieldName;
@@ -252,6 +259,16 @@ public class PlayerRepository {
                 "inner join series s on s.id = m.series_id " +
                 "inner join stadiums st on st.id = m.stadium_id " +
                 "inner join teams t on t.id = mpm.team_id";
+
+        if (filterRequest.getFilters().containsKey("seriesTags")) {
+            query += " left join tags_map tm on tm.entity_id = s.id";
+            countQuery += " left join tags_map tm on tm.entity_id = s.id";
+        }
+
+        if (filterRequest.getFilters().containsKey("matchTags")) {
+            query += " left join tags_map tmm on tmm.entity_id = m.id";
+            countQuery += " left join tags_map tmm on tmm.entity_id = m.id";
+        }
 
         //where
         List<String> whereQueryParts = new ArrayList<>();
@@ -366,6 +383,16 @@ public class PlayerRepository {
                 "inner join series s on s.id = m.series_id " +
                 "inner join stadiums st on st.id = m.stadium_id " +
                 "inner join teams t on t.id = mpm.team_id";
+
+        if (filterRequest.getFilters().containsKey("seriesTags")) {
+            query += " left join tags_map tm on tm.entity_id = s.id";
+            countQuery += " left join tags_map tm on tm.entity_id = s.id";
+        }
+
+        if (filterRequest.getFilters().containsKey("matchTags")) {
+            query += " left join tags_map tmm on tmm.entity_id = m.id";
+            countQuery += " left join tags_map tmm on tmm.entity_id = m.id";
+        }
 
         //where
         List<String> whereQueryParts = new ArrayList<>();
@@ -491,6 +518,16 @@ public class PlayerRepository {
                 "inner join dismissal_modes dm on dm.id = bs.dismissal_mode_id " +
                 "inner join teams t on t.id = mpm.team_id " +
                 "left join wicket_keepers wk on wk.match_player_id = fd.match_player_id";
+
+        if (filterRequest.getFilters().containsKey("seriesTags")) {
+            query += " left join tags_map tm on tm.entity_id = s.id";
+            countQuery += " left join tags_map tm on tm.entity_id = s.id";
+        }
+
+        if (filterRequest.getFilters().containsKey("matchTags")) {
+            query += " left join tags_map tmm on tmm.entity_id = m.id";
+            countQuery += " left join tags_map tmm on tmm.entity_id = m.id";
+        }
 
         //where
         List<String> whereQueryParts = new ArrayList<>(){
