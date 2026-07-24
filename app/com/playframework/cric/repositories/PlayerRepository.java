@@ -146,6 +146,9 @@ public class PlayerRepository {
             case "seriesTags":
                 fieldName = "tm.tag_id";
                 break;
+            case "matchTags":
+                fieldName = "tmm.tag_id";
+                break;
         }
 
         return fieldName;
@@ -258,8 +261,13 @@ public class PlayerRepository {
                 "inner join teams t on t.id = mpm.team_id";
 
         if (filterRequest.getFilters().containsKey("seriesTags")) {
-            query += " inner join tags_map tm on tm.entity_id = s.id";
-            countQuery += " inner join tags_map tm on tm.entity_id = s.id";
+            query += " left join tags_map tm on tm.entity_id = s.id";
+            countQuery += " left join tags_map tm on tm.entity_id = s.id";
+        }
+
+        if (filterRequest.getFilters().containsKey("matchTags")) {
+            query += " left join tags_map tmm on tmm.entity_id = m.id";
+            countQuery += " left join tags_map tmm on tmm.entity_id = m.id";
         }
 
         //where
@@ -377,8 +385,13 @@ public class PlayerRepository {
                 "inner join teams t on t.id = mpm.team_id";
 
         if (filterRequest.getFilters().containsKey("seriesTags")) {
-            query += " inner join tags_map tm on tm.entity_id = s.id";
-            countQuery += " inner join tags_map tm on tm.entity_id = s.id";
+            query += " left join tags_map tm on tm.entity_id = s.id";
+            countQuery += " left join tags_map tm on tm.entity_id = s.id";
+        }
+
+        if (filterRequest.getFilters().containsKey("matchTags")) {
+            query += " left join tags_map tmm on tmm.entity_id = m.id";
+            countQuery += " left join tags_map tmm on tmm.entity_id = m.id";
         }
 
         //where
@@ -507,8 +520,13 @@ public class PlayerRepository {
                 "left join wicket_keepers wk on wk.match_player_id = fd.match_player_id";
 
         if (filterRequest.getFilters().containsKey("seriesTags")) {
-            query += " inner join tags_map tm on tm.entity_id = s.id";
-            countQuery += " inner join tags_map tm on tm.entity_id = s.id";
+            query += " left join tags_map tm on tm.entity_id = s.id";
+            countQuery += " left join tags_map tm on tm.entity_id = s.id";
+        }
+
+        if (filterRequest.getFilters().containsKey("matchTags")) {
+            query += " left join tags_map tmm on tmm.entity_id = m.id";
+            countQuery += " left join tags_map tmm on tmm.entity_id = m.id";
         }
 
         //where
