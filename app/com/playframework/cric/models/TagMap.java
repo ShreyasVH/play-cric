@@ -14,7 +14,6 @@ public class TagMap {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String entityType;
     private Integer entityId;
     private Integer tagId;
 }

@@ -317,7 +317,7 @@ public class MatchController extends Controller {
         captainService.add(createRequest.getCaptains(), playerToMatchPlayerMap);
         wicketKeeperService.add(createRequest.getWicketKeepers(), playerToMatchPlayerMap);
         totalsService.add(createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
-        tagMapService.create(match.getId(), createRequest.getTags(), TagEntityType.MATCH.name());
+        tagMapService.create(match.getId(), createRequest.getTags());
 
 //        TransactionalResult transactionResult = new TransactionalResult();
 //
@@ -530,9 +530,11 @@ public class MatchController extends Controller {
             );
         }).collect(Collectors.toList());
 
-        List<TagMap> tagMaps = tagMapService.get(id, TagEntityType.MATCH.name());
+        List<Tag> matchTags = tagsService.getByType(TagEntityType.MATCH.name());
+        List<Integer> matchTagIds = matchTags.stream().map(Tag::getId).collect(Collectors.toList());
+        List<TagMap> tagMaps = tagMapService.get(id, matchTagIds);
         List<Integer> tagIds = tagMaps.stream().map(TagMap::getTagId).collect(Collectors.toList());
-        List<Tag> tags = tagsService.get(tagIds);
+        List<Tag> tags = matchTags.stream().filter(t -> tagIds.contains(t.getId())).collect(Collectors.toList());
 
         MatchResponse matchResponse = new MatchResponse(
             match,
@@ -565,10 +567,13 @@ public class MatchController extends Controller {
             throw new NotFoundException("Match");
         }
 
+        List<Tag> matchTags = tagsService.getByType(TagEntityType.MATCH.name());
+        List<Integer> matchTagIds = matchTags.stream().map(Tag::getId).collect(Collectors.toList());
+
         jpaApi.withTransaction(em -> {
             List<MatchPlayerMap> matchPlayerMaps = matchPlayerMapService.getByMatchId(em, id);
             List<Integer> matchPlayerIds = matchPlayerMaps.stream().map(MatchPlayerMap::getId).collect(Collectors.toList());
-            tagMapService.remove(em, id, TagEntityType.MATCH.name());
+            tagMapService.remove(em, id, matchTagIds);
             extrasService.remove(em, id);
             captainService.remove(em, matchPlayerIds);
             wicketKeeperService.remove(em, matchPlayerIds);

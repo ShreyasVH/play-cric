@@ -54,4 +54,12 @@ public class TagsRepository {
                 .getResultList();
         });
     }
+
+    public List<Tag> getByType(String type) {
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery("SELECT t FROM Tag t WHERE t.type = :type", Tag.class)
+                    .setParameter("type", type)
+                    .getResultList();
+        });
+    }
 }

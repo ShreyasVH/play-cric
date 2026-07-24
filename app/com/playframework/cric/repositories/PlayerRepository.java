@@ -258,8 +258,8 @@ public class PlayerRepository {
                 "inner join teams t on t.id = mpm.team_id";
 
         if (filterRequest.getFilters().containsKey("seriesTags")) {
-            query += " inner join tags_map tm on tm.entity_id = s.id and tm.entity_type = 'SERIES'";
-            countQuery += " inner join tags_map tm on tm.entity_id = s.id and tm.entity_type = 'SERIES'";
+            query += " inner join tags_map tm on tm.entity_id = s.id";
+            countQuery += " inner join tags_map tm on tm.entity_id = s.id";
         }
 
         //where
