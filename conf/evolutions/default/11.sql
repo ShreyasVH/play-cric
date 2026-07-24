@@ -11,4 +11,7 @@ ALTER TABLE tags ALTER COLUMN type SET NOT NULL;
 # --- !Downs
 
 ALTER TABLE tags DROP COLUMN type;
-ALTER TABLE tags_map ADD COLUMN entity_type VARCHAR(100) NOT NULL;
+ALTER TABLE tags_map ADD COLUMN entity_type VARCHAR(100);
+UPDATE tags_map tm SET entity_type = 'SERIES' FROM tags t WHERE tm.tag_id = t.id AND t.name IN ('WORLD_CUP', 'IPL', 'CHAMPIONS_TROPHY', 'BBL', 'ILT20', 'CHAMPIONS_LEAGUE', 'ASIA_CUP', 'WTC', 'CPL');
+UPDATE tags_map tm SET entity_type = 'MATCH' FROM tags t WHERE tm.tag_id = t.id AND t.name IN  ('FINAL', 'SEMI_FINAL', 'QUARTER_FINAL', 'KNOCKOUT', 'ELIMINATOR', 'THIRD_PLACE', 'QUALIFIER', 'QUALIFIER_1', 'QUALIFIER_2', 'CHALLENGER');
+ALTER TABLE tags_map ALTER COLUMN entity_type SET NOT NULL;
