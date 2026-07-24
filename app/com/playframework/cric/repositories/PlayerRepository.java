@@ -142,6 +142,10 @@ public class PlayerRepository {
                 break;
             case "number":
                 fieldName = "bs.number";
+                break;
+            case "seriesTags":
+                fieldName = "tm.tag_id";
+                break;
         }
 
         return fieldName;
@@ -252,6 +256,11 @@ public class PlayerRepository {
                 "inner join series s on s.id = m.series_id " +
                 "inner join stadiums st on st.id = m.stadium_id " +
                 "inner join teams t on t.id = mpm.team_id";
+
+        if (filterRequest.getFilters().containsKey("seriesTags")) {
+            query += " inner join tags_map tm on tm.entity_id = s.id and tm.entity_type = 'SERIES'";
+            countQuery += " inner join tags_map tm on tm.entity_id = s.id and tm.entity_type = 'SERIES'";
+        }
 
         //where
         List<String> whereQueryParts = new ArrayList<>();
