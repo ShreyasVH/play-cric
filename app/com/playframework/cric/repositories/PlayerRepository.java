@@ -376,6 +376,11 @@ public class PlayerRepository {
                 "inner join stadiums st on st.id = m.stadium_id " +
                 "inner join teams t on t.id = mpm.team_id";
 
+        if (filterRequest.getFilters().containsKey("seriesTags")) {
+            query += " inner join tags_map tm on tm.entity_id = s.id";
+            countQuery += " inner join tags_map tm on tm.entity_id = s.id";
+        }
+
         //where
         List<String> whereQueryParts = new ArrayList<>();
         for(Map.Entry<String, List<String>> entry: filterRequest.getFilters().entrySet())
@@ -500,6 +505,11 @@ public class PlayerRepository {
                 "inner join dismissal_modes dm on dm.id = bs.dismissal_mode_id " +
                 "inner join teams t on t.id = mpm.team_id " +
                 "left join wicket_keepers wk on wk.match_player_id = fd.match_player_id";
+
+        if (filterRequest.getFilters().containsKey("seriesTags")) {
+            query += " inner join tags_map tm on tm.entity_id = s.id";
+            countQuery += " inner join tags_map tm on tm.entity_id = s.id";
+        }
 
         //where
         List<String> whereQueryParts = new ArrayList<>(){
