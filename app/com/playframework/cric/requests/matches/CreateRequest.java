@@ -44,6 +44,7 @@ public class CreateRequest {
     private Boolean isOfficial = true;
     private List<TotalsRequestEntry> totals;
     private List<Integer> tags;
+    private List<PartnershipRequest> partnerships;
 
     public void validate() {
         if(null != battingScores)

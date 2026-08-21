@@ -43,9 +43,10 @@ public class MatchController extends Controller {
     private final TotalsService totalsService;
     private final TagMapService tagMapService;
     private final TagsService tagsService;
+    private final PartnershipService partnershipService;
 
     @Inject
-    public MatchController(JPAApi jpaApi, MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService, TotalsService totalsService, TagMapService tagMapService, TagsService tagsService)
+    public MatchController(JPAApi jpaApi, MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService, TotalsService totalsService, TagMapService tagMapService, TagsService tagsService, PartnershipService partnershipService)
     {
         this.jpaApi = jpaApi;
         this.matchService = matchService;
@@ -71,6 +72,7 @@ public class MatchController extends Controller {
         this.totalsService = totalsService;
         this.tagMapService = tagMapService;
         this.tagsService = tagsService;
+        this.partnershipService = partnershipService;
     }
 
     public Result create(Http.Request request)
@@ -318,6 +320,7 @@ public class MatchController extends Controller {
         wicketKeeperService.add(createRequest.getWicketKeepers(), playerToMatchPlayerMap);
         totalsService.add(createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
         tagMapService.create(match.getId(), createRequest.getTags());
+        partnershipService.add(createRequest.getPartnerships(), playerToMatchPlayerMap);
 
 //        TransactionalResult transactionResult = new TransactionalResult();
 //
