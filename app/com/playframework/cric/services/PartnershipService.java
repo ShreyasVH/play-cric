@@ -28,21 +28,11 @@ public class PartnershipService {
         return partnershipRepository.add(em, partnershipRequests, matchPlayerMaps);
     }
 
-//    public Map<String, Map<String, Integer>> getBattingStats(Long playerId)
-//    {
-//        return battingScoreRepository.getBattingStats(playerId);
-//    }
-//
-//    public Map<String, Map<String, Integer>> getDismissalStats(Long playerId)
-//    {
-//        return battingScoreRepository.getDismissalStats(playerId);
-//    }
-//
-//    public List<BattingScore> getBattingScores(List<Integer> matchPlayerIds)
-//    {
-//        return battingScoreRepository.getBattingScores(matchPlayerIds);
-//    }
-//
+    public List<Partnership> getPartnerships(List<Integer> matchPlayerIds)
+    {
+        return partnershipRepository.getPartnerships(matchPlayerIds);
+    }
+
     public void remove(List<Integer> matchPlayerIds)
     {
         partnershipRepository.remove(matchPlayerIds);

@@ -1,6 +1,7 @@
 package com.playframework.cric.repositories;
 
 import com.google.inject.Inject;
+import com.playframework.cric.models.BattingScore;
 import com.playframework.cric.models.Partnership;
 import com.playframework.cric.requests.matches.PartnershipRequest;
 import jakarta.persistence.EntityManager;
@@ -44,8 +45,20 @@ public class PartnershipRepository {
     public void remove(EntityManager em, List<Integer> matchPlayerIds)
     {
         em.createQuery(
-                        "DELETE FROM Partnership p WHERE (p.matchPlayerId1 IN :ids OR p.matchPlayerId2 IN :ids)"
-                )
-                .setParameter("ids", matchPlayerIds).executeUpdate();
+            "DELETE FROM Partnership p WHERE (p.matchPlayerId1 IN :ids OR p.matchPlayerId2 IN :ids)"
+        )
+        .setParameter("ids", matchPlayerIds).executeUpdate();
+    }
+
+    public List<Partnership> getPartnerships(List<Integer> matchPlayerIds)
+    {
+        return jpaApi.withTransaction(em -> {
+            return em.createQuery(
+                "SELECT p FROM Partnership p WHERE (p.matchPlayerId1 IN :ids OR p.matchPlayerId2 IN :ids) AND p.primaryEntry = true",
+                Partnership.class
+            )
+            .setParameter("ids", matchPlayerIds)
+            .getResultList();
+        });
     }
 }

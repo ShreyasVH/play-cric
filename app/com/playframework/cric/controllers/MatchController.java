@@ -320,7 +320,21 @@ public class MatchController extends Controller {
         wicketKeeperService.add(createRequest.getWicketKeepers(), playerToMatchPlayerMap);
         totalsService.add(createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
         tagMapService.create(match.getId(), createRequest.getTags());
-        partnershipService.add(createRequest.getPartnerships(), playerToMatchPlayerMap);
+        List<Partnership> partnerships = partnershipService.add(createRequest.getPartnerships(), playerToMatchPlayerMap);
+        Map<String, Partnership> partnershipMap = partnerships.stream().collect(Collectors.toMap(partnership -> partnership.getMatchPlayerId1() + "_" + partnership.getMatchPlayerId2() + "-" + partnership.getInnings() + "_" + partnership.getWicket(), partnership -> partnership));
+        
+        List<PartnershipResponse> partnershipResponses = createRequest.getPartnerships().stream().map(partnershipRequest -> {
+            String key = playerToMatchPlayerMap.get(partnershipRequest.getPlayerId1()) + "_" + playerToMatchPlayerMap.get(partnershipRequest.getPlayerId2()) + "_" + partnershipRequest.getInnings() + "_" + partnershipRequest.getWicket();
+            Partnership partnership = partnershipMap.get(key);
+            
+            Player player1 = playerMap.get(partnershipRequest.getPlayerId1());
+            Player player2 = playerMap.get(partnershipRequest.getPlayerId2());
+            
+            return new PartnershipResponse(
+                partnership,
+                new PlayerMiniResponse(player1, new CountryResponse(countryMap.get(player1.getCountryId()))),
+                new PlayerMiniResponse(player2, new CountryResponse(countryMap.get(player2.getCountryId()))));
+        }).toList();
 
 //        TransactionalResult transactionResult = new TransactionalResult();
 //
@@ -361,7 +375,8 @@ public class MatchController extends Controller {
             createRequest.getManOfTheMatchList(),
             createRequest.getCaptains(),
             createRequest.getWicketKeepers(),
-            tags
+            tags,
+            partnershipResponses
         );
 
         return created(Json.toJson(new Response(matchResponse)));
@@ -538,6 +553,19 @@ public class MatchController extends Controller {
         List<TagMap> tagMaps = tagMapService.get(id, matchTagIds);
         List<Integer> tagIds = tagMaps.stream().map(TagMap::getTagId).collect(Collectors.toList());
         List<Tag> tags = matchTags.stream().filter(t -> tagIds.contains(t.getId())).collect(Collectors.toList());
+        
+        List<Partnership> partnerships = partnershipService.getPartnerships(matchPlayerIds);
+        List<PartnershipResponse> partnershipResponses = partnerships.stream().map(partnership -> {
+            PlayerMiniResponse player1 = playerMap.get(matchPlayerToPlayerMap.get(partnership.getMatchPlayerId1()));
+            PlayerMiniResponse player2 = playerMap.get(matchPlayerToPlayerMap.get(partnership.getMatchPlayerId2()));
+
+            return new PartnershipResponse(
+                partnership,
+                player1,
+                player2
+            );
+        }).toList();
+        
 
         MatchResponse matchResponse = new MatchResponse(
             match,
@@ -555,7 +583,8 @@ public class MatchController extends Controller {
             manOfTheMatchList.stream().map(motm -> matchPlayerToPlayerMap.get(motm.getMatchPlayerId())).collect(Collectors.toList()),
             captains.stream().map(captain -> matchPlayerToPlayerMap.get(captain.getMatchPlayerId())).collect(Collectors.toList()),
             wicketKeepers.stream().map(wicketKeeper -> matchPlayerToPlayerMap.get(wicketKeeper.getMatchPlayerId())).collect(Collectors.toList()),
-            tags
+            tags,
+            partnershipResponses
         );
 
         return ok(Json.toJson(new Response(matchResponse)));
