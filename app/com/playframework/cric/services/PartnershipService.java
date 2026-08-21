@@ -43,13 +43,13 @@ public class PartnershipService {
 //        return battingScoreRepository.getBattingScores(matchPlayerIds);
 //    }
 //
-//    public void remove(List<Integer> matchPlayerIds)
-//    {
-//        battingScoreRepository.remove(matchPlayerIds);
-//    }
-//
-//    public void remove(EntityManager em, List<Integer> matchPlayerIds)
-//    {
-//        battingScoreRepository.remove(em, matchPlayerIds);
-//    }
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        partnershipRepository.remove(matchPlayerIds);
+    }
+
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        partnershipRepository.remove(em, matchPlayerIds);
+    }
 }

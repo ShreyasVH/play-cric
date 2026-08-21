@@ -584,6 +584,7 @@ public class MatchController extends Controller {
             fielderDismissalService.remove(em, matchPlayerIds);
             battingScoreService.remove(em, matchPlayerIds);
             bowlingFigureService.remove(em, matchPlayerIds);
+            partnershipService.remove(em, matchPlayerIds);
             matchPlayerMapService.remove(em, id);
             totalsService.remove(em, id);
             matchService.remove(em, id);
