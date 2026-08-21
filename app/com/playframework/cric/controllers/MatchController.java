@@ -321,7 +321,7 @@ public class MatchController extends Controller {
         totalsService.add(createRequest.getTotals().stream().map(total -> (new Total(match.getId(), total))).collect(Collectors.toList()));
         tagMapService.create(match.getId(), createRequest.getTags());
         List<Partnership> partnerships = partnershipService.add(createRequest.getPartnerships(), playerToMatchPlayerMap);
-        Map<String, Partnership> partnershipMap = partnerships.stream().collect(Collectors.toMap(partnership -> partnership.getMatchPlayerId1() + "_" + partnership.getMatchPlayerId2() + "-" + partnership.getInnings() + "_" + partnership.getWicket(), partnership -> partnership));
+        Map<String, Partnership> partnershipMap = partnerships.stream().collect(Collectors.toMap(partnership -> partnership.getMatchPlayerId1() + "_" + partnership.getMatchPlayerId2() + "_" + partnership.getInnings() + "_" + partnership.getWicket(), partnership -> partnership));
         
         List<PartnershipResponse> partnershipResponses = createRequest.getPartnerships().stream().map(partnershipRequest -> {
             String key = playerToMatchPlayerMap.get(partnershipRequest.getPlayerId1()) + "_" + playerToMatchPlayerMap.get(partnershipRequest.getPlayerId2()) + "_" + partnershipRequest.getInnings() + "_" + partnershipRequest.getWicket();
