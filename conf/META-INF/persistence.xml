@@ -38,6 +38,7 @@
         <class>com.playframework.cric.models.Tour</class>
         <class>com.playframework.cric.models.WicketKeeper</class>
         <class>com.playframework.cric.models.WinMarginType</class>
+        <class>com.playframework.cric.models.Partnership</class>
 
         <properties>
             <!-- Hibernate -->
