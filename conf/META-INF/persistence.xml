@@ -11,6 +11,7 @@
         <!-- Must match Play DB name -->
         <non-jta-data-source>DefaultDS</non-jta-data-source>
 
+        <class>com.playframework.cric.models.BallwiseDetail</class>
         <class>com.playframework.cric.models.BattingScore</class>
         <class>com.playframework.cric.models.BowlingFigure</class>
         <class>com.playframework.cric.models.Captain</class>

@@ -44,9 +44,10 @@ public class MatchController extends Controller {
     private final TagMapService tagMapService;
     private final TagsService tagsService;
     private final PartnershipService partnershipService;
+    private final BallwiseDetailsService ballwiseDetailsService;
 
     @Inject
-    public MatchController(JPAApi jpaApi, MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService, TotalsService totalsService, TagMapService tagMapService, TagsService tagsService, PartnershipService partnershipService)
+    public MatchController(JPAApi jpaApi, MatchService matchService, SeriesService seriesService, CountryService countryService, TeamService teamService, TeamTypeService teamTypeService, ResultTypeService resultTypeService, WinMarginTypeService winMarginTypeService, StadiumService stadiumService, PlayerService playerService, MatchPlayerMapService matchPlayerMapService, BattingScoreService battingScoreService, DismissalModeService dismissalModeService, FielderDismissalService fielderDismissalService, BowlingFigureService bowlingFigureService, ExtrasService extrasService, ExtrasTypeService extrasTypeService, ManOfTheMatchService manOfTheMatchService, CaptainService captainService, WicketKeeperService wicketKeeperService, GameTypeService gameTypeService, TotalsService totalsService, TagMapService tagMapService, TagsService tagsService, PartnershipService partnershipService, BallwiseDetailsService ballwiseDetailsService)
     {
         this.jpaApi = jpaApi;
         this.matchService = matchService;
@@ -73,6 +74,7 @@ public class MatchController extends Controller {
         this.tagMapService = tagMapService;
         this.tagsService = tagsService;
         this.partnershipService = partnershipService;
+        this.ballwiseDetailsService = ballwiseDetailsService;
     }
 
     public Result create(Http.Request request)
@@ -322,6 +324,7 @@ public class MatchController extends Controller {
         tagMapService.create(match.getId(), createRequest.getTags());
         List<Partnership> partnerships = partnershipService.add(createRequest.getPartnerships(), playerToMatchPlayerMap);
         Map<String, Partnership> partnershipMap = partnerships.stream().collect(Collectors.toMap(partnership -> partnership.getMatchPlayerId1() + "_" + partnership.getMatchPlayerId2() + "_" + partnership.getInnings() + "_" + partnership.getWicket(), partnership -> partnership));
+        ballwiseDetailsService.add(createRequest.getBallwiseDetails(), playerToMatchPlayerMap);
         
         List<PartnershipResponse> partnershipResponses = createRequest.getPartnerships().stream().map(partnershipRequest -> {
             String key = playerToMatchPlayerMap.get(partnershipRequest.getPlayerId1()) + "_" + playerToMatchPlayerMap.get(partnershipRequest.getPlayerId2()) + "_" + partnershipRequest.getInnings() + "_" + partnershipRequest.getWicket();

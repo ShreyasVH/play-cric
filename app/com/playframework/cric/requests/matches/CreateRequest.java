@@ -45,6 +45,7 @@ public class CreateRequest {
     private List<TotalsRequestEntry> totals;
     private List<Integer> tags;
     private List<PartnershipRequest> partnerships;
+    private List<BallwiseDetailRequest> ballwiseDetails;
 
     public void validate() {
         if(null != battingScores)
