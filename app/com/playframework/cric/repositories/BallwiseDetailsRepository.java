@@ -48,18 +48,18 @@ public class BallwiseDetailsRepository {
 //        );
 //    }
 //
-//    public void remove(List<Integer> matchPlayerIds)
-//    {
-//        jpaApi.withTransaction(em -> {
-//            remove(em, matchPlayerIds);
-//        });
-//    }
+    public void remove(List<Integer> matchPlayerIds)
+    {
+        jpaApi.withTransaction(em -> {
+            remove(em, matchPlayerIds);
+        });
+    }
 //
-//    public void remove(EntityManager em, List<Integer> matchPlayerIds)
-//    {
-//        em.createQuery(
-//                        "DELETE FROM BattingScore bs WHERE bs.matchPlayerId IN :ids"
-//                )
-//                .setParameter("ids", matchPlayerIds).executeUpdate();
-//    }
+    public void remove(EntityManager em, List<Integer> matchPlayerIds)
+    {
+        em.createQuery(
+                        "DELETE FROM BallwiseDetail bd WHERE (bd.batsmanMatchPlayerId IN :ids or bd.bowlerMatchPlayerId IN :ids)"
+                )
+                .setParameter("ids", matchPlayerIds).executeUpdate();
+    }
 }
