@@ -14,7 +14,7 @@ CREATE TABLE ballwise_details (
     extras_type                 VARCHAR(100),
     timestamp                   BIGINT NOT NULL,
     CONSTRAINT pk_ballwise_details PRIMARY KEY (id),
-    CONSTRAINT uk_bd_timestamp UNIQUE (timestamp),
+    CONSTRAINT uk_bd_timestamp UNIQUE (bowler_match_player_id, timestamp),
     CONSTRAINT fk_bd_batsman
         FOREIGN KEY (batsman_match_player_id) REFERENCES match_player_map (id)
             ON DELETE RESTRICT ON UPDATE RESTRICT,
