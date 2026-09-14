@@ -2,15 +2,15 @@ name := "play-cric"
 
 version := "1.0.0"
 
-scalaVersion := "3.8.4"
+scalaVersion := "3.9.0"
 
 libraryDependencies += guice
 libraryDependencies += evolutions
 libraryDependencies += jdbc
 libraryDependencies += javaJpa
-libraryDependencies += "org.projectlombok" % "lombok" % "1.18.46" % "provided"
+libraryDependencies += "org.projectlombok" % "lombok" % "1.18.48" % "provided"
 libraryDependencies += "org.postgresql" % "postgresql" % "42.7.13"
-libraryDependencies += "org.hibernate.orm" % "hibernate-core" % "7.4.6.Final"
+libraryDependencies += "org.hibernate.orm" % "hibernate-core" % "7.4.8.Final"
 
 Compile / javacOptions ++= Seq("-proc:full")
 
