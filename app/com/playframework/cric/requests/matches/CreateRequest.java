@@ -14,7 +14,6 @@ import lombok.Data;
 
 import com.playframework.cric.exceptions.BadRequestException;
 
-
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)

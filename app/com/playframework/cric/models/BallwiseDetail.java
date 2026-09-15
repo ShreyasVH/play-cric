@@ -1,7 +1,6 @@
 package com.playframework.cric.models;
 
 import com.playframework.cric.requests.matches.BallwiseDetailRequest;
-import com.playframework.cric.requests.matches.BattingScoreRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
