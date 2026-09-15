@@ -2,12 +2,8 @@ package com.playframework.cric.services;
 
 import com.google.inject.Inject;
 import com.playframework.cric.models.BallwiseDetail;
-import com.playframework.cric.models.BattingScore;
 import com.playframework.cric.repositories.BallwiseDetailsRepository;
-import com.playframework.cric.repositories.BattingScoreRepository;
 import com.playframework.cric.requests.matches.BallwiseDetailRequest;
-import com.playframework.cric.requests.matches.BattingScoreRequest;
-import com.playframework.cric.responses.BattingStats;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
